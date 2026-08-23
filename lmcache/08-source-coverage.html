@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh" dir="ltr"><head><title>08-source-coverage</title><meta charset="utf-8"/><link rel="preload" href="../index-bb6c1746.css" as="style"/><link rel="preload" href="../prescript-2bfc6315.js" as="script"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Notes"/><meta property="og:title" content="08-source-coverage"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="08-source-coverage"/><meta name="twitter:description" content="源码覆盖、交叉验证与当前限制 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 配套图均由源码证据生成并完成目视复核：图索引。 覆盖定义 git ls-files 返回的每个路径都在 source-inventory.json 中出现一次。处理规则： full_read：完整读取文本内容并计算 SHA-256/行数；包括实现、测试、示例、benchmark、文档、构建、CI、容器和部署配置。 inventory_only / binary：读取 bytes 计算 hash，但不把媒体/编译产物当源码..."/><meta property="og:description" content="源码覆盖、交叉验证与当前限制 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 配套图均由源码证据生成并完成目视复核：图索引。 覆盖定义 git ls-files 返回的每个路径都在 source-inventory.json 中出现一次。处理规则： full_read：完整读取文本内容并计算 SHA-256/行数；包括实现、测试、示例、benchmark、文档、构建、CI、容器和部署配置。 inventory_only / binary：读取 bytes 计算 hash，但不把媒体/编译产物当源码..."/><meta property="og:image:alt" content="源码覆盖、交叉验证与当前限制 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 配套图均由源码证据生成并完成目视复核：图索引。 覆盖定义 git ls-files 返回的每个路径都在 source-inventory.json 中出现一次。处理规则： full_read：完整读取文本内容并计算 SHA-256/行数；包括实现、测试、示例、benchmark、文档、构建、CI、容器和部署配置。 inventory_only / binary：读取 bytes 计算 hash，但不把媒体/编译产物当源码..."/><meta property="twitter:domain" content="fmpic.github.io/notes"/><meta property="og:url" content="https://fmpic.github.io/notes/lmcache/08-source-coverage"/><meta property="twitter:url" content="https://fmpic.github.io/notes/lmcache/08-source-coverage"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="源码覆盖、交叉验证与当前限制 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 配套图均由源码证据生成并完成目视复核：图索引。 覆盖定义 git ls-files 返回的每个路径都在 source-inventory.json 中出现一次。处理规则： full_read：完整读取文本内容并计算 SHA-256/行数；包括实现、测试、示例、benchmark、文档、构建、CI、容器和部署配置。 inventory_only / binary：读取 bytes 计算 hash，但不把媒体/编译产物当源码..."/><meta name="generator" content="Quartz"/><link href="../index-bb6c1746.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-735924e0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-589c1cea.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-bbc3f7c0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-2911f5d1.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-e427079e.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-53b25b2b.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-c93c6a44.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-8a06014f.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-77d6a441.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-6ee21cee.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-1ea6ad18.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-34bdfded.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-788c9ca3.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-642859cd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-4abc06bd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-274a3dfe.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-94cb6c84.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-58d5ff56.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-7262b5a7.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-a5c806d2.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-6bd36952.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-9857b007.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-d3a1a224.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript-2bfc6315.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted%20Grotesk%3Awght%40400%3B700&amp;family=Source%20Sans%20Pro%3Aital%2Cwght%400%2C400%3B0%2C600%3B1%2C400%3B1%2C600&amp;family=IBM%20Plex%20Mono%3Awght%40400%3B600&amp;display=swap"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://fmpic.github.io/notes/lmcache/08-source-coverage-og-image.webp"/><meta property="og:image:url" content="https://fmpic.github.io/notes/lmcache/08-source-coverage-og-image.webp"/><meta name="twitter:image" content="https://fmpic.github.io/notes/lmcache/08-source-coverage-og-image.webp"/><meta property="og:image:type" content="image/webp"/></head><body data-slug="lmcache/08-source-coverage" data-basepath="/notes"><div id="quartz-root" class="page" data-frame="default"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Notes</a></h2><div class="mobile-only"><div class="spacer"></div></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 0.5rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button" aria-label="搜索" aria-expanded="false"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>搜索</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="搜索内容..." placeholder="搜索内容..."/><div class="search-layout" data-preview="true" data-field-priority="[&quot;title&quot;,&quot;content&quot;,&quot;tags&quot;]"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode" aria-label="暗色模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="暗色模式"><title>暗色模式</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="亮色模式"><title>亮色模式</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode" aria-label="阅读模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="阅读模式"><title>阅读模式</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><div class="explorer nav-files-container" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a2, b2) => {\n    if (!a2.isFolder &amp;&amp; !b2.isFolder || a2.isFolder &amp;&amp; b2.isFolder) {\n      return (a2.displayName || \&quot;\&quot;).localeCompare(b2.displayName || \&quot;\&quot;, void 0, {\n        numeric: true,\n        sensitivity: \&quot;base\&quot;\n      });\n    }\n    if (!a2.isFolder &amp;&amp; b2.isFolder) {\n      return 1;\n    }\n    return -1;\n  }&quot;,&quot;filterFn&quot;:&quot;(node) => node.slugSegment !== \&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;(node) => {\n    return node;\n  }&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-7" aria-label="探索"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>探索</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-7" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#" class="nav-file-title tree-item-self"></a></li></template><template id="template-folder"><li><div class="folder-container nav-folder-title tree-item-self"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon nav-folder-collapse-indicator collapse-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content tree-item-children"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../lmcache/">LMCache</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>08-source-coverage</a></div></nav><h1 class="article-title">08-source-coverage</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-23T09:18:46.234Z">2026年8月23日</time><span>11分钟阅读</span></p></div></div><article class="popover-hint"><div class="markdown-preview-view markdown-rendered"><h1 id="源码覆盖交叉验证与当前限制">源码覆盖、交叉验证与当前限制<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#源码覆盖交叉验证与当前限制" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<blockquote>
+<p>分析基准：<code>389b9cfcb5cec502dbba6b5d13725bf2e024610d</code>。代码行号与结论均针对该修订；后续提交可能使行号漂移。</p>
+</blockquote>
+<blockquote>
+<p>配套图均由源码证据生成并完成目视复核：<a href="./diagrams/readme" class="internal internal-link alias" data-slug="lmcache/diagrams/readme">图索引</a>。</p>
+</blockquote>
+<h2 id="覆盖定义">覆盖定义<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#覆盖定义" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><code>git ls-files</code> 返回的每个路径都在 <a href="./source-inventory.json" class="internal internal-link" data-slug="lmcache/source-inventory.json"><code>source-inventory.json</code></a> 中出现一次。处理规则：</p>
+<ul>
+<li><strong>full_read</strong>：完整读取文本内容并计算 SHA-256/行数；包括实现、测试、示例、benchmark、文档、构建、CI、容器和部署配置。</li>
+<li><strong>inventory_only / binary</strong>：读取 bytes 计算 hash，但不把媒体/编译产物当源码解释。</li>
+<li><strong>inventory_only / translations</strong>：登记 <code>docs/source/locale</code> 与 gettext catalog，不用翻译内容推导架构。</li>
+<li><strong>inventory_only / generated</strong>：登记 Operator generated Go/YAML/PROJECT，以手写 types/builders/markers 为语义来源。</li>
+<li><strong>symlink</strong>：登记链接，并读取其范围内目标内容。</li>
+<li>全过程仅静态读取/解析，不 import 项目模块或启动服务。</li>
+</ul>
+<h2 id="完整读取结果">完整读取结果<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#完整读取结果" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>指标</th><th style="text-align:right;">值</th></tr></thead><tbody><tr><td>Git 跟踪文件</td><td style="text-align:right;">1972</td></tr><tr><td>full_read</td><td style="text-align:right;">1779</td></tr><tr><td>inventory_only</td><td style="text-align:right;">193</td></tr><tr><td>binary</td><td style="text-align:right;">22</td></tr><tr><td>translation</td><td style="text-align:right;">164</td></tr><tr><td>generated</td><td style="text-align:right;">7</td></tr><tr><td>symlink</td><td style="text-align:right;">5</td></tr><tr><td>bytes</td><td style="text-align:right;">20,367,813</td></tr><tr><td>文本行</td><td style="text-align:right;">459,971</td></tr><tr><td>批次</td><td style="text-align:right;">20 × 最多 100 文件</td></tr><tr><td>读取错误</td><td style="text-align:right;">0</td></tr><tr><td>解码错误</td><td style="text-align:right;">0</td></tr></tbody></table></div>
+<h2 id="主要语言">主要语言<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#主要语言" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>语言/格式</th><th style="text-align:right;">文件数</th></tr></thead><tbody><tr><td>Python</td><td style="text-align:right;">982</td></tr><tr><td>YAML</td><td style="text-align:right;">181</td></tr><tr><td>reStructuredText</td><td style="text-align:right;">167</td></tr><tr><td>Gettext PO</td><td style="text-align:right;">163</td></tr><tr><td>Markdown</td><td style="text-align:right;">142</td></tr><tr><td>Shell</td><td style="text-align:right;">94</td></tr><tr><td>Go</td><td style="text-align:right;">64</td></tr><tr><td>Other</td><td style="text-align:right;">29</td></tr><tr><td>C++</td><td style="text-align:right;">28</td></tr><tr><td>C/C++ header</td><td style="text-align:right;">24</td></tr><tr><td>Text</td><td style="text-align:right;">20</td></tr><tr><td>Extensionless text</td><td style="text-align:right;">10</td></tr><tr><td>Make</td><td style="text-align:right;">10</td></tr><tr><td>JSON</td><td style="text-align:right;">9</td></tr><tr><td>CUDA</td><td style="text-align:right;">6</td></tr><tr><td>Dockerfile</td><td style="text-align:right;">6</td></tr><tr><td>HTML</td><td style="text-align:right;">6</td></tr><tr><td>TOML</td><td style="text-align:right;">5</td></tr><tr><td>CSS</td><td style="text-align:right;">4</td></tr><tr><td>CUDA header</td><td style="text-align:right;">4</td></tr><tr><td>JavaScript</td><td style="text-align:right;">3</td></tr><tr><td>Requirements</td><td style="text-align:right;">3</td></tr><tr><td>CMake</td><td style="text-align:right;">2</td></tr><tr><td>INI</td><td style="text-align:right;">2</td></tr><tr><td>Cargo</td><td style="text-align:right;">1</td></tr><tr><td>Config</td><td style="text-align:right;">1</td></tr><tr><td>Go checksum</td><td style="text-align:right;">1</td></tr><tr><td>Go module</td><td style="text-align:right;">1</td></tr><tr><td>Kubebuilder metadata</td><td style="text-align:right;">1</td></tr><tr><td>Python stub</td><td style="text-align:right;">1</td></tr><tr><td>Rust</td><td style="text-align:right;">1</td></tr><tr><td>Setuptools manifest</td><td style="text-align:right;">1</td></tr></tbody></table></div>
+<h2 id="用途覆盖">用途覆盖<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#用途覆盖" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>用途</th><th style="text-align:right;">文件数（标签可重叠）</th></tr></thead><tbody><tr><td>runtime_implementation</td><td style="text-align:right;">607</td></tr><tr><td>documentation_reference</td><td style="text-align:right;">496</td></tr><tr><td>tests</td><td style="text-align:right;">351</td></tr><tr><td>ci_automation</td><td style="text-align:right;">164</td></tr><tr><td>kubernetes_operator</td><td style="text-align:right;">144</td></tr><tr><td>examples</td><td style="text-align:right;">143</td></tr><tr><td>container_deployment</td><td style="text-align:right;">59</td></tr><tr><td>native_implementation</td><td style="text-align:right;">59</td></tr><tr><td>build_packaging</td><td style="text-align:right;">32</td></tr><tr><td>benchmarks</td><td style="text-align:right;">28</td></tr><tr><td>repository_metadata</td><td style="text-align:right;">14</td></tr><tr><td>rust_implementation</td><td style="text-align:right;">5</td></tr><tr><td>developer_tools</td><td style="text-align:right;">2</td></tr></tbody></table></div>
+<h2 id="派生分析结果">派生分析结果<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#派生分析结果" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li>静态扫描语言源码：<strong>1207</strong> 文件，错误 <strong>0</strong>。</li>
+<li>符号：<strong>16,809</strong>；内部依赖边：<strong>3,553</strong>。</li>
+<li>核心继承节点/边：<strong>259 / 251</strong>。</li>
+<li>外部入口：packaging scripts <strong>4</strong>，<code>__main__</code> <strong>7</strong>，显式 Python guards <strong>68</strong>。</li>
+<li>运行链：<strong>6</strong> 条，typed protocol contracts <strong>10</strong> 个。</li>
+<li>通信机制：<strong>9</strong> 类。</li>
+<li>示例：<strong>143</strong> 文件、<strong>42</strong> 个路线单元，未分配 <strong>0</strong>。</li>
+<li>交叉验证：confirmed <strong>7</strong>，discrepancies <strong>8</strong>，historical <strong>9</strong>，limitations <strong>13</strong>。</li>
+</ul>
+<h2 id="已发现的文档配置差异">已发现的文档/配置差异<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#已发现的文档配置差异" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>以下结论以源码和测试为准：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>ID</th><th>差异</th><th>对新人指南的处理</th></tr></thead><tbody><tr><td><code>protocol-readme-stale-groups</code></td><td>protocols/README.md 的 Current Protocol Groups 只列 engine/controller/debug 早期集合；源码已注册 blend、blend_v2、blend_v3、observability、p2p，并新增 WAIT/FREE/engine-driven 等请求。</td><td>指南列出当前 RequestType/协议模块，并把 README 标注为设计机制说明而非完整清单。</td></tr><tr><td><code>l2-design-old-prefetch-handle</code></td><td>L2 overall design 仍展示 PrefetchHandle.request_id/l1_prefix_hit_count 和 query_prefetch_status 返回 int；源码现在使用 prefetch_request_id、l1_found_indices、l2_orig_indices，并返回 Bitmap。</td><td>指南采用当前 dataclass 和 Bitmap API，前缀命中通过 count_leading_ones 派生。</td></tr><tr><td><code>l2-design-prefix-not-universal</code></td><td>L2 design 把 contiguous prefix 描述为全局 invariant；当前 TrimPolicy.PREFIX 仍如此，但 SEGMENTED_PREFIX/SPARSE 会保留 gap-tolerant 位图。</td><td>指南说明 PREFIX 是默认策略，非 PREFIX policy 保留所有 set bit。</td></tr><tr><td><code>coordinator-readme-backbone-only</code></td><td>mp_coordinator README 开头声称 quota reconcile 和 blend lookup 尚未实现；当前 app 已组装 QuotaManager、L2 usage/eviction/resync 与 GlobalBlendMatcher，且 REST API/测试齐全。</td><td>指南把 membership、quota/usage/eviction/resync、blend directory 分成当前子系统。</td></tr><tr><td><code>observability-doc-old-emitter-path</code></td><td>request-event-span design 的 Implementation 表仍说四个事件在 multiprocess/server.py 发出；模块化重构后 REQUEST/LOOKUP/END 在 modules/lookup.py，STORE/RETRIEVE SUBMITTED/START/END 在 modules/lmcache_driven_transfer.py。</td><td>指南保留 deferral 语义，更新到当前模块/符号索引。</td></tr><tr><td><code>multi-hardware-doc-omits-musa</code></td><td>ARCHITECTURE_MULTI_HARDWARE 图和 connector routing 仅展开 CUDA/XPU/HPU；源码已把 MUSA 放在检测优先级首位并提供 vLLM MUSA connector。</td><td>指南用支持矩阵分别表示 runtime connector、原生 extension build 和功能限制。</td></tr><tr><td><code>gemma3-mamba-doc-conflict</code></td><td>Gemma 3 recipe 仍广义声称 Mamba/linear-attention hybrid 不支持，而当前 hybrid_models 与 Qwen3.5 recipe 已支持 align 模式的 Mamba/GDN opaque-page 路径。</td><td>指南避免全局 yes/no，列出已验证 Qwen3.5/Qwen3.6 路径及其约束。</td></tr><tr><td><code>sycl-requirements-gap</code></td><td>SyclProfile.requirements_file() 返回 xpu_core.txt，但基准修订的 requirements/ 中没有该文件；setup.py 对缺失文件静默返回空依赖。</td><td>构建指南明确要求人工准备 oneAPI、XPU torch/runtime，并标注缺失文件。</td></tr></tbody></table></div>
+<h2 id="历史与兼容路径">历史与兼容路径<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#历史与兼容路径" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>ID</th><th>区分</th></tr></thead><tbody><tr><td><code>server-entrypoint-split</code></td><td><code>lmcache server</code> 是当前 FastAPI+ZMQ MP server；<code>lmcache_server</code> console script 指向早期 raw TCP LMCacheServer。</td></tr><tr><td><code>controller-coordinator-split</code></td><td><code>lmcache_controller</code>/cache_controller 是早期缓存编排面；<code>lmcache coordinator</code>/mp_coordinator 是当前 fleet membership、L2 quota/eviction 和 blend directory。</td></tr><tr><td><code>storage-manager-split</code></td><td><code>lmcache/v1/storage_backend/StorageManager</code> 服务进程内 LMCacheEngine；<code>lmcache/v1/distributed/StorageManager</code> 服务当前 MP L1/L2 controller 架构。</td></tr><tr><td><code>versioned-vllm-shims</code></td><td>非版本后缀 connector 是当前入口；_0180、_0201、_085 文件保留特定 vLLM API 兼容。</td></tr><tr><td><code>cacheblend-generations</code></td><td>examples/blend_kv 是旧 lmcache_vllm/CacheBlend V0，blend_kv_v1 是需要补丁的实验路径，当前 MP server 的 <code>engine_type=blend</code> 组装 BlendV3Module。</td></tr><tr><td><code>raw-manifest-vs-operator</code></td><td>examples/multi_process raw YAML 使用 hostNetwork 和 hostPath /dev/shm；当前 Operator 选择 HostIPC、非 hostNetwork、node-local Service，且不额外挂载 /dev/shm。</td></tr><tr><td><code>pd-two-paths</code></td><td>examples/disagg_prefill 是直接 NIXL/PD backend 路径；examples/disagg_prefill_mp 是经独立 MP server 的推荐入门路径。</td></tr><tr><td><code>native-disable-env-alias</code></td><td>NO_NATIVE_EXT 是当前关闭全部原生扩展的开关；NO_CUDA_EXT 是历史别名，实际也关闭全部原生扩展；NO_GPU_EXT 只关闭设备扩展。</td></tr><tr><td><code>storage-interface-alias</code></td><td>ConfigurableStorageBackendInterface 只是 StoragePluginInterface 的兼容别名。</td></tr></tbody></table></div>
+<h2 id="当前明确限制">当前明确限制<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#当前明确限制" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>ID</th><th>限制</th><th>影响</th></tr></thead><tbody><tr><td><code>mq-nonblocking-unimplemented</code></td><td>HandlerType.NON_BLOCKING 已在枚举中预留，但 MessageQueueServer 注册和派发均直接抛 NotImplementedError。</td><td>协议只能选择 SYNC 或 BLOCKING；异步状态机必须拆成 submit/query 请求。</td></tr><tr><td><code>multi-server-dp-pp</code></td><td>LMCacheMPConnector 多 server 模式不支持 DP，也拒绝 PP>1，仅支持相应 TP 分片。</td><td>多节点拓扑必须按 world_size/server 数整除并避免 DP/PP 组合。</td></tr><tr><td><code>engine-driven-no-hma</code></td><td>engine-driven 非 GPU transfer path 不支持 hybrid KV cache groups，store/retrieve 会拒绝 multi-group。</td><td>HMA 模型目前需要可用的 LMCache-driven/device IPC 路径。</td></tr><tr><td><code>musa-build-and-features</code></td><td>MUSA 有 vLLM runtime connector，但 BuildProfile 是 stub；SGLang MUSA、blending 和 connector v3 均被拒绝，native transfer 仍是 opt-in。</td><td>“支持 MUSA”只表示受限 runtime 路径，不表示完整 CUDA 等价能力或可发布原生 wheel。</td></tr><tr><td><code>hpu-feature-subset</code></td><td>HPU 只有非 layerwise VLLMPagedMemHPUConnectorV2，blending/v3 等 device-scoped 功能也不在支持集合。</td><td>HPU 配置必须关闭相应功能。</td></tr><tr><td><code>cpu-stub-not-connector</code></td><td>CPU fallback 是中间层 API stub/engine-driven 支持，不是 vLLM GPUConnector；CreateGPUConnector 的 VLLM CPU 分支会报 no supported connector。</td><td>CLI/部分 MP smoke 可在 CPU 上运行，不代表完整 CPU serving connector 可用。</td></tr><tr><td><code>p2p-peer-l1-only</code></td><td>P2P peer handler 强制 skip_l2=True，只共享已驻留 peer L1 的连续前缀，不会级联查询对方 L2。</td><td>peer L2 中存在对象仍可能在 P2P 查询中 miss。</td></tr><tr><td><code>operator-single-l2</code></td><td>MP runtime 的 L2AdaptersConfig 支持重复 —l2-adapter 和动态多个 adapter；Operator CRD 当前只暴露单个 L2 backend。</td><td>使用 Operator 时无法声明 runtime 的完整多 L2 cascade。</td></tr><tr><td><code>raw-block-platform</code></td><td>Rust raw-block 仅支持 Linux，O_DIRECT 要求 offset/size/buffer 对齐；示例直接使用块设备具有破坏性。</td><td>不能在普通文件系统/任意缓冲区或非 Linux 环境无条件启用。</td></tr><tr><td><code>disagg-mp-example-scope</code></td><td>disagg_prefill_mp 示例说明当前只支持 1P1D，且未做性能优化。</td><td>它适合学习拓扑，不应被当作生产性能结论。</td></tr><tr><td><code>cacheblend-version-coupling</code></td><td>CacheBlend V1 示例需要特定 vLLM patch；MP Blend V3/Operator webhook 也要求 engine、plugin 和 vLLM 位于兼容窗口。</td><td>普通 prefix-cache 配置不能直接切换到 CacheBlend。</td></tr><tr><td><code>slim-cli-server</code></td><td>lmcache-cli 轻量包会注册 server 命令外壳，但缺少完整依赖时 execute 明确退出并要求安装 lmcache。</td><td>远程 CLI wheel 不等于可运行 MP server 的 runtime wheel。</td></tr><tr><td><code>mamba-validated-subset</code></td><td>Mamba/GDN 支持要求 align mode、模型特定统一 block size，并把 cache page 当作 byte-opaque；上游 prefix caching 仍标 experimental，文本路径才是已验证范围。</td><td>不能把支持扩展为任意 Mamba mode、多模态内容处理或跨不同 kernel/block-size engine 共享。</td></tr></tbody></table></div>
+<h2 id="最终验证结果">最终验证结果<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#最终验证结果" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>检查</th><th>结果</th></tr></thead><tbody><tr><td>范围复核</td><td>HEAD 仍为完整基准提交；重新枚举 <strong>1972</strong> 个跟踪路径，无新增、遗漏、重复或删除。</td></tr><tr><td>全量重读</td><td><strong>1972/1972</strong> 文件可读，UTF-8 解码错误 <strong>0</strong>，与首次清单的 SHA-256 差异 <strong>0</strong>。</td></tr><tr><td>JSON 与图</td><td><code>source-inventory.json</code> 和 5 个 Excalidraw 文件均可解析；5 张 PNG 均重新渲染并完成目视复核。</td></tr><tr><td>链接与锚点</td><td><strong>349</strong> 个本地链接、<strong>233</strong> 个源码行锚点和 1 个 Markdown 标题锚点均有效；抽查的 <strong>204</strong> 个符号链接均在目标行附近出现对应符号。</td></tr><tr><td>静态检查</td><td><code>git diff --check</code> 通过；仓库 <code>pre-commit run --all-files</code> 的 10 个 hook 全部通过，新指南显式执行 codespell 通过。</td></tr><tr><td>Sphinx</td><td><code>make clean &amp;&amp; make html</code> 构建成功；<code>guides/</code> 独立于 Sphinx toctree，没有引入 warning。基准 <code>docs/source/</code> 自身仍报告 24 个既有 warning，本次未修改这些跟踪文档。</td></tr><tr><td>安全与范围</td><td>最终工作树只有本目录下 21 个新增产物；没有源码改动、秘密、个人目录、临时目录、凭据 URL 或 PNG 文本元数据。</td></tr></tbody></table></div>
+<p>剩余限制分为两类：上表“当前明确限制”是基准实现本身的能力边界；Sphinx 的既有 warning 与外部依赖源码未纳入分析，是本指南验证环境和仓库范围的边界。提交变化后必须重新生成清单、重验行锚点，并重新审视所有“当前”结论。</p>
+<h2 id="如何复核">如何复核<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#如何复核" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ol>
+<li>在 <code>source-inventory.json</code> 中按 path 查找 <code>read_status</code>、<code>line_count</code>、<code>sha256</code>。</li>
+<li>用本指南中的 <code>path:line</code> 在基准提交定位符号。</li>
+<li>对行为结论优先打开相邻测试；测试索引见 <a href="./07-key-code-index" class="internal internal-link" data-slug="lmcache/07-key-code-index">07-key-code-index.md</a>。</li>
+<li>如果仓库提交变化，重新生成 file set/hash，再接受行号或结论。</li>
+</ol>
+<h2 id="未纳入架构语义的内容">未纳入架构语义的内容<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#未纳入架构语义的内容" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li>图片、字体等二进制资产只做 hash/inventory。</li>
+<li>中文翻译 catalog 不作为英文 canonical docs 的替代来源。</li>
+<li>generated Operator CRD/RBAC/DeepCopy 只用来确认产物存在；行为解释来自 API types、resource builders 和 tests。</li>
+<li>外部服务（vLLM、NIXL、Mooncake、Redis、Kubernetes 等）的实现源码不在本仓库，指南只描述 LMCache 侧契约。</li>
+</ul></div></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>关系图谱</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc"><button type="button" class="toc-header" aria-controls="toc-7" aria-expanded="true"><h3>目录</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#源码覆盖交叉验证与当前限制" data-for="源码覆盖交叉验证与当前限制">源码覆盖、交叉验证与当前限制</a></li><li class="depth-1"><a href="#覆盖定义" data-for="覆盖定义">覆盖定义</a></li><li class="depth-1"><a href="#完整读取结果" data-for="完整读取结果">完整读取结果</a></li><li class="depth-1"><a href="#主要语言" data-for="主要语言">主要语言</a></li><li class="depth-1"><a href="#用途覆盖" data-for="用途覆盖">用途覆盖</a></li><li class="depth-1"><a href="#派生分析结果" data-for="派生分析结果">派生分析结果</a></li><li class="depth-1"><a href="#已发现的文档配置差异" data-for="已发现的文档配置差异">已发现的文档/配置差异</a></li><li class="depth-1"><a href="#历史与兼容路径" data-for="历史与兼容路径">历史与兼容路径</a></li><li class="depth-1"><a href="#当前明确限制" data-for="当前明确限制">当前明确限制</a></li><li class="depth-1"><a href="#最终验证结果" data-for="最终验证结果">最终验证结果</a></li><li class="depth-1"><a href="#如何复核" data-for="如何复核">如何复核</a></li><li class="depth-1"><a href="#未纳入架构语义的内容" data-for="未纳入架构语义的内容">未纳入架构语义的内容</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>反向链接</h3><ul id="list-0" class="overflow"><li><a href="../lmcache/06-examples-learning-path" class="internal">06-examples-learning-path</a></li><li><a href="../lmcache/readme" class="internal">README</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v5.0.0</a> © 2026</p><ul><li><a href="https://github.com/jackyzha0/quartz">GitHub</a></li><li><a href="https://discord.gg/cRFFHYye7t">Discord Community</a></li></ul></footer></div></div></body><script src="../static/resource-after-e13fffa1.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-8b336f9a.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-baba652b.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-5eb75950.js" type="module" data-persist="true"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript-3eea7814.js" type="module" data-persist="true"></script></html>

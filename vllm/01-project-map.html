@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh" dir="ltr"><head><title>01-project-map</title><meta charset="utf-8"/><link rel="preload" href="../index-bb6c1746.css" as="style"/><link rel="preload" href="../prescript-2bfc6315.js" as="script"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Notes"/><meta property="og:title" content="01-project-map"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="01-project-map"/><meta name="twitter:description" content="01：项目地图与 V1 总体架构 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 先看全局：V1 主链路 从一次文本生成看，vLLM 可以先抽象成七层： 用户 / OpenAI client / Python caller ↓ CLI、LLM、FastAPI 或 Rust frontend ↓ 输入解析、renderer、serving、OutputProcessor ↓ EngineCoreClient → EngineCore → Scheduler ↓ Executor → Worker ..."/><meta property="og:description" content="01：项目地图与 V1 总体架构 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 先看全局：V1 主链路 从一次文本生成看，vLLM 可以先抽象成七层： 用户 / OpenAI client / Python caller ↓ CLI、LLM、FastAPI 或 Rust frontend ↓ 输入解析、renderer、serving、OutputProcessor ↓ EngineCoreClient → EngineCore → Scheduler ↓ Executor → Worker ..."/><meta property="og:image:alt" content="01：项目地图与 V1 总体架构 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 先看全局：V1 主链路 从一次文本生成看，vLLM 可以先抽象成七层： 用户 / OpenAI client / Python caller ↓ CLI、LLM、FastAPI 或 Rust frontend ↓ 输入解析、renderer、serving、OutputProcessor ↓ EngineCoreClient → EngineCore → Scheduler ↓ Executor → Worker ..."/><meta property="twitter:domain" content="fmpic.github.io/notes"/><meta property="og:url" content="https://fmpic.github.io/notes/vllm/01-project-map"/><meta property="twitter:url" content="https://fmpic.github.io/notes/vllm/01-project-map"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="01：项目地图与 V1 总体架构 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 先看全局：V1 主链路 从一次文本生成看，vLLM 可以先抽象成七层： 用户 / OpenAI client / Python caller ↓ CLI、LLM、FastAPI 或 Rust frontend ↓ 输入解析、renderer、serving、OutputProcessor ↓ EngineCoreClient → EngineCore → Scheduler ↓ Executor → Worker ..."/><meta name="generator" content="Quartz"/><link href="../index-bb6c1746.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-735924e0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-589c1cea.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-bbc3f7c0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-2911f5d1.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-e427079e.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-53b25b2b.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-c93c6a44.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-8a06014f.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-77d6a441.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-6ee21cee.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-1ea6ad18.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-34bdfded.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-788c9ca3.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-642859cd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-4abc06bd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-274a3dfe.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-94cb6c84.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-58d5ff56.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-7262b5a7.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-a5c806d2.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-6bd36952.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-9857b007.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-d3a1a224.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript-2bfc6315.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted%20Grotesk%3Awght%40400%3B700&amp;family=Source%20Sans%20Pro%3Aital%2Cwght%400%2C400%3B0%2C600%3B1%2C400%3B1%2C600&amp;family=IBM%20Plex%20Mono%3Awght%40400%3B600&amp;display=swap"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://fmpic.github.io/notes/vllm/01-project-map-og-image.webp"/><meta property="og:image:url" content="https://fmpic.github.io/notes/vllm/01-project-map-og-image.webp"/><meta name="twitter:image" content="https://fmpic.github.io/notes/vllm/01-project-map-og-image.webp"/><meta property="og:image:type" content="image/webp"/></head><body data-slug="vllm/01-project-map" data-basepath="/notes"><div id="quartz-root" class="page" data-frame="default"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Notes</a></h2><div class="mobile-only"><div class="spacer"></div></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 0.5rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button" aria-label="搜索" aria-expanded="false"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>搜索</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="搜索内容..." placeholder="搜索内容..."/><div class="search-layout" data-preview="true" data-field-priority="[&quot;title&quot;,&quot;content&quot;,&quot;tags&quot;]"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode" aria-label="暗色模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="暗色模式"><title>暗色模式</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="亮色模式"><title>亮色模式</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode" aria-label="阅读模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="阅读模式"><title>阅读模式</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><div class="explorer nav-files-container" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a2, b2) => {\n    if (!a2.isFolder &amp;&amp; !b2.isFolder || a2.isFolder &amp;&amp; b2.isFolder) {\n      return (a2.displayName || \&quot;\&quot;).localeCompare(b2.displayName || \&quot;\&quot;, void 0, {\n        numeric: true,\n        sensitivity: \&quot;base\&quot;\n      });\n    }\n    if (!a2.isFolder &amp;&amp; b2.isFolder) {\n      return 1;\n    }\n    return -1;\n  }&quot;,&quot;filterFn&quot;:&quot;(node) => node.slugSegment !== \&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;(node) => {\n    return node;\n  }&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-11" aria-label="探索"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>探索</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-11" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#" class="nav-file-title tree-item-self"></a></li></template><template id="template-folder"><li><div class="folder-container nav-folder-title tree-item-self"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon nav-folder-collapse-indicator collapse-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content tree-item-children"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../vllm/">vLLM</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>01-project-map</a></div></nav><h1 class="article-title">01-project-map</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-23T09:18:46.292Z">2026年8月23日</time><span>15分钟阅读</span></p></div></div><article class="popover-hint"><div class="markdown-preview-view markdown-rendered"><h1 id="01项目地图与-v1-总体架构">01：项目地图与 V1 总体架构<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#01项目地图与-v1-总体架构" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<blockquote>
+<p><strong>代码快照</strong>：<code>0934b267906f8cd9459f287b31647c3ed5c58e01</code>。
+行号、类型关系和调用链均以此提交为准；返回<a href="./readme" class="internal internal-link alias" data-slug="vllm/readme">指南入口</a>。</p>
+</blockquote>
+<h2 id="先看全局v1-主链路">先看全局：V1 主链路<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#先看全局v1-主链路" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><img src="./diagrams/project-architecture.png" alt="vLLM 项目架构图"/></p>
+<p>从一次文本生成看，vLLM 可以先抽象成七层：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>用户 / OpenAI client / Python caller</span></span>
+<span data-line><span>                ↓</span></span>
+<span data-line><span>CLI、LLM、FastAPI 或 Rust frontend</span></span>
+<span data-line><span>                ↓</span></span>
+<span data-line><span>输入解析、renderer、serving、OutputProcessor</span></span>
+<span data-line><span>                ↓</span></span>
+<span data-line><span>EngineCoreClient → EngineCore → Scheduler</span></span>
+<span data-line><span>                ↓</span></span>
+<span data-line><span>Executor → Worker → ModelRunner → model.forward / sampler</span></span>
+<span data-line><span>                ↓</span></span>
+<span data-line><span>platform、distributed runtime、KV cache、connectors</span></span>
+<span data-line><span>                ↓</span></span>
+<span data-line><span>PyTorch / Triton / CUDA / ROCm / CPU custom ops</span></span></code></pre></figure>
+<p>在线 Python 主链路由 API Server 构造 <code>AsyncLLM</code>，请求经 <code>EngineCoreClient</code> 进入独立或进程内的 <code>EngineCore</code>。<code>EngineCore</code> 组合 Scheduler 和动态选择的 Executor；Executor 把本轮 <code>SchedulerOutput</code> 交给一个或多个 Worker，Worker 再委托 ModelRunner 准备输入、执行模型与采样。返回方向由 Scheduler 更新请求状态，<code>OutputProcessor</code> 解码并唤醒对应的异步输出流。</p>
+<p>这张图有三个重要阅读原则：</p>
+<ol>
+<li><strong>层是职责边界，不都是继承层级。</strong> <code>LLM</code> 组合 <code>LLMEngine</code>，<code>EngineCore</code> 组合 Scheduler 和 Executor，Worker 组合 ModelRunner。</li>
+<li><strong>逻辑调用与部署拓扑分开。</strong> 同一条逻辑链可以使用 in-process、ZMQ 多进程、Ray 或 external launcher；这些差异在<a href="./04-processes-and-module-communication" class="internal internal-link alias" data-slug="vllm/04-processes-and-module-communication">进程与通信</a>中展开。</li>
+<li><strong>Python 控制层与原生数据路径相互穿插。</strong> ModelRunner 是 Python 编排对象，但一次 forward 会进入 PyTorch、Triton 或已注册的 C++/CUDA/ROCm/CPU custom op。</li>
+</ol>
+<p>关键汇聚点可以先记住：</p>
+<ul>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/async_llm.py#L201-L250" class="external external-link"><code>AsyncLLM.from_vllm_config</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 在线 V1 Engine 的构造入口，并先解析 Executor backend。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L78-L141" class="external external-link"><code>EngineCoreClient.make_client</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 根据同步/异步、多进程和 DP 模式选择传输实现。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L103-L169" class="external external-link"><code>EngineCore.__init__</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 组合 Executor、KV cache 与动态 Scheduler。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L581-L611" class="external external-link"><code>EngineCore.step</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 串起 schedule、execute、sample 和状态更新。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_model_runner.py#L4158-L4240" class="external external-link"><code>GPUModelRunner.execute_model</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 消费 <code>SchedulerOutput</code>，准备并执行模型批次。</li>
+</ul>
+<h2 id="根目录地图">根目录地图<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#根目录地图" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>根目录不是按单一语言划分，而是把 Python runtime、原生内核、Rust 前端、验证资产和发行基础设施并列组织。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>路径</th><th>主要职责</th><th>新人何时进入</th></tr></thead><tbody><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/" class="external external-link"><code>vllm/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>Python 主包；公开 API、配置、serving、V1 engine、distributed、model、platform 和 Python kernel wrapper</td><td>阅读绝大多数功能的第一站</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/tests/" class="external external-link"><code>tests/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>单元、集成、平台、模型、kernel、distributed、entrypoint 与 eval 行为规格</td><td>确认改动应保护的可观察行为</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/examples/" class="external external-link"><code>examples/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>离线、在线、pooling、tool calling、multimodal、部署和集成示例</td><td>从最小可运行入口反查内部实现</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/benchmarks/" class="external external-link"><code>benchmarks/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>serving、latency、throughput、scheduler、cache 与 kernel 性能测量</td><td>正确性确认后评估性能影响</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/csrc/" class="external external-link"><code>csrc/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>C++、CUDA、HIP、CPU kernel 与 PyTorch dispatcher 注册</td><td>追踪 <code>torch.ops.*</code> 的 schema 和实现</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/rust/" class="external external-link"><code>rust/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td><code>vllm-rs</code> 前端、EngineCore client、protocol、renderer/parser、benchmark 与 PyO3 扩展</td><td>研究实验性 Rust 前端或 Rust 构建</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/cmake/" class="external external-link"><code>cmake/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>CMake helper、CPU extension、外部依赖和 HIP 转换</td><td>理解设备条件与 extension target</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/requirements/" class="external external-link"><code>requirements/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>common、build、device、test、lint、docs 等依赖输入或锁定结果</td><td>搭建环境或解释 wheel 构建依赖</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/docs/" class="external external-link"><code>docs/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>官方用户、部署、设计、模型、贡献和安全文档</td><td>查用户承诺、正式流程和背景设计</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/.buildkite/" class="external external-link"><code>.buildkite/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>主要 CI pipeline、硬件测试、wheel/release 与 benchmark 作业</td><td>把本地验证映射到 CI</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/.github/" class="external external-link"><code>.github/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>GitHub workflow、模板、CODEOWNERS 与仓库自动化</td><td>查 ownership 和轻量 workflow</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/docker/" class="external external-link"><code>docker/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>CUDA、ROCm、CPU、XPU、TPU 等镜像与 bake 配置</td><td>研究构建环境和部署镜像</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/tools/" class="external external-link"><code>tools/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>构建、检查、安装、profiling 和代码生成工具</td><td>执行维护任务或追踪生成链</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/scripts/" class="external external-link"><code>scripts/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>当前以 kernel autotune/benchmark 驱动脚本为主</td><td>研究特定 kernel 调优流程</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/pyproject.toml" class="external external-link"><code>pyproject.toml</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>PEP 517 build-system、项目元数据、CLI script 和工具配置</td><td>从 Python 安装入口开始追踪</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/setup.py" class="external external-link"><code>setup.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>设备判定、CMakeExtension、Rust extension 和 package data 汇聚</td><td>研究 wheel 中包含哪些构建产物</td></tr><tr><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/CMakeLists.txt" class="external external-link"><code>CMakeLists.txt</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>顶层设备分支、源码集合与原生 target 定义</td><td>从 Python extension 名追到 native source</td></tr></tbody></table></div>
+<h3 id="如何使用这张根目录表">如何使用这张根目录表<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#如何使用这张根目录表" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>改 Python 行为</strong>：从 <code>vllm/</code> 的实现找到 <code>tests/</code> 中最近的行为规格，再找 <code>examples/</code> 是否有用户可见用法。</li>
+<li><strong>改模型或量化</strong>：同时查看 <code>vllm/model_executor/</code>、<code>tests/models/</code> 或 <code>tests/quantization/</code>，必要时继续进入 <code>csrc/</code>、<code>vllm/kernels/</code> 和 <code>benchmarks/kernels/</code>。</li>
+<li><strong>改设备支持</strong>：从 <code>vllm/platforms/</code> 到 Worker/ModelRunner，再沿 <code>setup.py → CMakeLists.txt → cmake/ → csrc/</code> 检查构建闭环。</li>
+<li><strong>改 serving 或 distributed</strong>：从 <code>vllm/entrypoints/</code>、<code>vllm/v1/engine/</code> 和 <code>vllm/distributed/</code> 出发，对照 <code>tests/entrypoints/</code>、<code>tests/v1/</code> 与 <code>tests/distributed/</code>。</li>
+</ul>
+<h2 id="vllm-内部子系统地图"><code>vllm/</code> 内部子系统地图<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vllm-内部子系统地图" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Python 主包承担控制流、模型实现和设备适配三大类职责。下面按“稳定职责边界”而不是目录大小来阅读。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>子系统</th><th>职责与主要输入/输出</th><th>代表位置</th></tr></thead><tbody><tr><td>公开 API 与 CLI</td><td>延迟公开符号，解析 <code>vllm</code> 子命令，构造配置并选择运行模式</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/__init__.py#L16-L73" class="external external-link"><code>vllm/__init__.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/cli/main.py#L17-L97" class="external external-link"><code>vllm/entrypoints/cli/main.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>离线入口</td><td>把批量 Python 输入和 sampling/pooling 参数转换为同步 Engine 请求</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/llm.py#L66-L74" class="external external-link"><code>vllm/entrypoints/llm.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/llm.py#L336-L353" class="external external-link"><code>LLM.__init__</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>在线 serving</td><td>FastAPI route、OpenAI schema、renderer/parser、stream/non-stream response 与 middleware</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/openai/api_server.py#L196-L290" class="external external-link"><code>build_app</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/openai/chat_completion/serving.py#L112-L140" class="external external-link"><code>OpenAIServingChat</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>配置系统</td><td>把 CLI/env/model/platform 参数归一成 <code>VllmConfig</code> 及其 scheduler、parallel、cache、load 子配置</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/config/" class="external external-link"><code>vllm/config/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Engine 外观</td><td><code>AsyncLLM</code> 和兼容 <code>LLMEngine</code> 处理输入、输出流、统计、生命周期与 core client</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/" class="external external-link"><code>vllm/v1/engine/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Core 与调度</td><td><code>EngineCore</code> 协调 Scheduler、KV cache、structured/spec decode 与 Executor</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/core/" class="external external-link"><code>vllm/v1/core/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L103-L169" class="external external-link"><code>vllm/v1/engine/core.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Executor</td><td>为 uni-process、multiprocessing、Ray 或 external backend 提供统一 worker RPC 抽象</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/" class="external external-link"><code>vllm/v1/executor/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/abstract.py#L37-L91" class="external external-link"><code>Executor.get_class</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Worker 与 ModelRunner</td><td>初始化设备和 distributed 环境、管理 KV cache、准备 batch、执行 forward 与采样</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/" class="external external-link"><code>vllm/v1/worker/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>模型执行</td><td>模型 registry、结构化接口、loader、模型类、量化和通用 layer</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/" class="external external-link"><code>vllm/model_executor/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Distributed</td><td>parallel state、collective、communication op、device communicator 与跨进程协调</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/distributed/" class="external external-link"><code>vllm/distributed/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Platform</td><td>探测 CUDA、ROCm、CPU、XPU 等能力并选择 Worker、attention backend 和 kernel import</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/platforms/" class="external external-link"><code>vllm/platforms/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>输入与多模态</td><td>prompt、token、multimodal 数据的解析、校验、缓存和 processor 接口</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/inputs/" class="external external-link"><code>vllm/inputs/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/multimodal/" class="external external-link"><code>vllm/multimodal/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Renderer 与 parser</td><td>chat template、tool/reasoning 输出解析以及 Python/Rust 前端共享的语义层</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/renderers/" class="external external-link"><code>vllm/renderers/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/parser/" class="external external-link"><code>vllm/parser/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/tool_parsers/" class="external external-link"><code>vllm/tool_parsers/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Compilation 与 kernel</td><td>torch.compile 图变换、Triton/CuTe/Python kernel 和 custom-op wrapper</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/compilation/" class="external external-link"><code>vllm/compilation/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/kernels/" class="external external-link"><code>vllm/kernels/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/_custom_ops.py#L166-L276" class="external external-link"><code>vllm/_custom_ops.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>横切功能</td><td>LoRA、KV transfer/connectors、structured output、reasoning、logging、tracing 和 profiling</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/lora/" class="external external-link"><code>vllm/lora/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/structured_output/" class="external external-link"><code>vllm/v1/structured_output/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/tracing/" class="external external-link"><code>vllm/tracing/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>插件</td><td>通过 entry point 或限定名扩展 platform、model、IO、general 与 endpoint 行为</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/plugins/" class="external external-link"><code>vllm/plugins/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr></tbody></table></div>
+<p>目录边界并不等于运行时边界。例如 <code>vllm/model_executor/</code> 中的模型由 <code>vllm/v1/worker/</code> 的 ModelRunner 驱动；<code>vllm/entrypoints/</code> 的 serving 对象依赖 <code>vllm/engine/protocol.py</code> 中的 <code>EngineClient</code> 抽象，而实际实现位于 <code>vllm/v1/engine/async_llm.py</code>。</p>
+<h2 id="分层职责">分层职责<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#分层职责" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="入口与输入层">入口与输入层<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#入口与输入层" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>这一层把用户协议变成 Engine 可以消费的类型，同时把 Engine 输出变回用户协议。</p>
+<ul>
+<li><code>vllm.__init__</code> 使用模块级 <code>__getattr__</code> 延迟加载公开对象，导入 <code>vllm</code> 不代表所有 engine/model 模块都会立即加载（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/__init__.py#L16-L73" class="external external-link"><code>MODULE_ATTRS</code> 与 <code>__getattr__</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li>CLI 通过各命令模块的 <code>cmd_init()</code> 在运行时注册子命令，并将选中的 <code>dispatch_function</code> 作为真正入口（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/cli/main.py#L73-L97" class="external external-link"><code>main</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li>FastAPI 根据模型的 <code>supported_tasks</code> 挂载 generate、pooling、speech 等 route，endpoint plugin 最后进入（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/openai/api_server.py#L196-L290" class="external external-link"><code>build_app</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li>serving/rendering 层拥有 OpenAI schema、chat template、tool/reasoning parser 和流式编码；它不直接调度 GPU。</li>
+</ul>
+<h3 id="engine-client-与输出层">Engine client 与输出层<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#engine-client-与输出层" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Engine 外观隔离了调用协议和 core 部署方式：</p>
+<ul>
+<li>在线 <code>AsyncLLM</code> 实现异步 <code>EngineClient</code>，组合 <code>InputProcessor</code>、<code>OutputProcessor</code>、统计组件和异步 MP core client（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/async_llm.py#L71-L147" class="external external-link"><code>AsyncLLM.__init__</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li>离线 <code>LLM</code> 组合同步 <code>LLMEngine</code>；<code>LLMEngine.step()</code> 拉取 core 输出后交给同一类 V1 输出处理组件。</li>
+<li><code>EngineCoreClient</code> 是逻辑传输边界：in-process 模式直接调用 core，多进程模式通过 IPC 连接后台 core。它不实现 schedule 或 model forward。</li>
+</ul>
+<h3 id="core-与-scheduler-层">Core 与 Scheduler 层<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#core-与-scheduler-层" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>EngineCore</code> 拥有全局请求推进循环，Scheduler 拥有可调度状态：</p>
+<ul>
+<li>Scheduler 在统一 token 预算下管理 waiting/running requests、KV blocks、prefill、decode、chunked prefill、prefix caching 和 speculative decoding；它不是两套割裂的 prefill/decode scheduler（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/core/sched/scheduler.py#L427-L447" class="external external-link"><code>Scheduler.schedule</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li><code>EngineCore.step()</code> 获取 <code>SchedulerOutput</code>，异步触发模型执行，必要时执行独立采样，再让 Scheduler 消费 <code>ModelRunnerOutput</code>（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L581-L611" class="external external-link"><code>EngineCore.step</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li>pipeline parallel 或 batch queue 模式可以重叠调度与执行，因此“单轮四步”是语义顺序，不保证所有部署都完全串行（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L622-L685" class="external external-link"><code>step_with_batch_queue</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+</ul>
+<h3 id="executorworker-与-modelrunner-层">Executor、Worker 与 ModelRunner 层<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#executorworker-与-modelrunner-层" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>这三层分别解决“发给谁”“进程/设备如何准备”和“模型如何执行”：</p>
+<ul>
+<li>Executor 根据 <code>distributed_executor_backend</code> 选择 uni、multiprocessing、Ray、external launcher 或自定义限定名实现（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/abstract.py#L37-L91" class="external external-link"><code>Executor.get_class</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li>Worker 初始化设备、distributed process group 和 KV cache，并处理 pipeline intermediate tensors；平台 Worker 可以替换 runner 实现。</li>
+<li>ModelRunner 保存 persistent batch state，准备 attention metadata，调用模型 forward 与 sampler；默认 GPU runner 还组合 LoRA、KV Connector 和 EC Connector Mixin（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_model_runner.py#L453-L473" class="external external-link"><code>GPUModelRunner</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li>模型类由 ModelRegistry 和 ModelLoader 动态解析/加载，不要求都继承单一 vLLM 实体基类；结构化 Protocol 与 <code>Supports*</code> Mixin 表达能力。</li>
+</ul>
+<h3 id="platform-与原生内核层">Platform 与原生内核层<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#platform-与原生内核层" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>platform 层把同一上层语义映射到设备能力：</p>
+<ul>
+<li>platform 决定 Worker、attention backend、dtype/compute capability、device communicator 以及应导入哪些 kernel extension。</li>
+<li>Python <code>_custom_ops.py</code> 通常只是参数整理、fake/meta 注册和 <code>torch.ops.*</code> 调用包装；真正 schema 与 implementation 由动态加载的共享库向 PyTorch dispatcher 注册。</li>
+<li>CUDA、ROCm 和 CPU 源码可能共享 schema，但使用不同 dispatch key、源码集合和构建 target；Triton/CuTe kernel 则可从 Python 编译路径进入。</li>
+</ul>
+<p>构建和注册闭环在<a href="./05-build-and-native-extensions" class="internal internal-link alias" data-slug="vllm/05-build-and-native-extensions">05：构建与原生扩展</a>单独展开。</p>
+<h2 id="v1-主线与兼容外观">V1 主线与兼容外观<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#v1-主线与兼容外观" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>名称中的历史包袱容易让新人误判当前架构。这个快照应按下表理解：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>名称</th><th>当前定位</th><th>与 V1 的关系</th></tr></thead><tbody><tr><td><code>AsyncLLM</code></td><td>Python 在线 serving 的实际异步 Engine 实现</td><td>直接构造 V1 processors 和异步 <code>EngineCoreClient</code></td></tr><tr><td><code>LLM</code></td><td>用户同步离线 API 与多个 offline capability Mixin</td><td>组合当前 <code>LLMEngine</code></td></tr><tr><td><code>LLMEngine</code></td><td>保留同步 Engine API 的兼容外观</td><td>内部使用 V1 <code>InputProcessor</code>、<code>OutputProcessor</code>、<code>EngineCoreClient</code></td></tr><tr><td><code>AsyncLLMEngine</code></td><td>公共兼容名称/旧入口语境</td><td>不应画成当前 API Server 实际创建的对象</td></tr><tr><td><code>EngineCore</code></td><td>V1 调度和执行协调核心</td><td>为在线、离线和 Rust 前端共享</td></tr><tr><td><code>EngineCoreProc</code></td><td>多进程部署包装</td><td>在 <code>EngineCore</code> 上增加 IPC、IO 和主循环</td></tr><tr><td>Rust frontend</td><td>实验性 HTTP/rendering/streaming 前端</td><td>通过兼容协议连接 Python <code>EngineCoreProc</code></td></tr></tbody></table></div>
+<p>源码证据：</p>
+<ul>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/llm_engine.py#L48-L60" class="external external-link"><code>LLMEngine</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 类注释明确其兼容定位；构造路径使用 V1 processors 与 core client。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/openai/api_server.py#L145-L193" class="external external-link"><code>build_async_engine_client_from_engine_args</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 当前 Python API Server 实例化 <code>AsyncLLM</code>。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/utils.py#L325-L390" class="external external-link"><code>RustFrontendProcessManager</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — Python supervisor 向 Rust 子进程传递监听 fd 与 EngineCore transport 地址。</li>
+</ul>
+<p>因此，“V1 主线”描述的是当前请求所经的核心组件集合，不意味着仓库里只有一组部署实现，也不意味着所有带 legacy 注释的 API 都在走 V0 内核。</p>
+<h2 id="横切能力与扩展点">横切能力与扩展点<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#横切能力与扩展点" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>vLLM 的可扩展性主要来自 factory、registry、plugin、Protocol 与 Mixin，而不是一个巨大的继承树。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>扩展点</th><th>选择依据</th><th>影响范围</th><th>阅读入口</th></tr></thead><tbody><tr><td>Scheduler class</td><td><code>scheduler_config.get_scheduler_cls()</code> 与限定名</td><td>请求排序、预算和调度策略</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L145-L169" class="external external-link"><code>EngineCore.__init__</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Executor backend</td><td>parallel config、Ray V2 env、自定义 class path</td><td>Worker 启动与 RPC 机制</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/abstract.py#L37-L91" class="external external-link"><code>Executor.get_class</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Worker class</td><td>platform、<code>worker_cls</code>、<code>worker_extension_cls</code></td><td>设备初始化、runner、运行时 MRO</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/worker_base.py#L243-L287" class="external external-link"><code>WorkerWrapperBase.init_worker</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>ModelRunner</td><td>platform 与 <code>use_v2_model_runner</code></td><td>batch、KV、forward、sampling</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_worker.py#L128-L180" class="external external-link"><code>Worker.__init__</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Model implementation</td><td>HF architecture、ModelRegistry、Transformers fallback、OOT registration</td><td>实际 <code>nn.Module</code> 与能力接口</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/registry.py#L1278-L1331" class="external external-link"><code>ModelRegistry.resolve_model_cls</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>ModelLoader</td><td><code>LoadConfig.load_format</code> registry</td><td>初始化方式与权重读取</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/model_loader/__init__.py#L99-L141" class="external external-link"><code>get_model_loader</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Platform</td><td>entry point、设备环境与 capability</td><td>Worker、attention backend、kernel import</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/platforms/" class="external external-link"><code>vllm/platforms/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Endpoint plugin</td><td>Python entry point</td><td>FastAPI route 与覆盖顺序</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/openai/api_server.py#L276-L290" class="external external-link"><code>build_app</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Connector/Mixin</td><td>配置与类组合</td><td>KV transfer、EC、LoRA 等横切能力</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_model_runner.py#L453-L473" class="external external-link"><code>GPUModelRunner</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Native op</td><td>platform import 与 PyTorch dispatcher</td><td>Python 调用到设备 kernel</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/platforms/interface.py#L362-L370" class="external external-link"><code>Platform.import_kernels</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr></tbody></table></div>
+<p>这些扩展点带来两条阅读规则：</p>
+<ol>
+<li>搜到抽象类后，必须继续找 factory 或 registry，确认当前配置究竟构造哪个实现。</li>
+<li>看到类的静态基类后，仍需检查 plugin、Mixin 和 <code>worker_extension_cls</code> 等运行时注入，不能只依赖静态 MRO 推断行为。</li>
+</ol>
+<p>更完整的类型关系见<a href="./03-core-class-hierarchy" class="internal internal-link alias" data-slug="vllm/03-core-class-hierarchy">03：核心类关系</a>，进程和协议影响见<a href="./04-processes-and-module-communication" class="internal internal-link alias" data-slug="vllm/04-processes-and-module-communication">04：进程与模块通信</a>。</p>
+<h2 id="从地图跳到代码">从地图跳到代码<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#从地图跳到代码" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>你要回答的问题</th><th>下一步</th><th>首要源码区域</th></tr></thead><tbody><tr><td>一次在线请求经过哪些方法和类型？</td><td><a href="./02-entrypoints-and-request-lifecycle" class="internal internal-link alias" data-slug="vllm/02-entrypoints-and-request-lifecycle">02：入口与请求生命周期</a></td><td><code>vllm/entrypoints/</code>、<code>vllm/v1/engine/</code>、<code>vllm/v1/core/</code></td></tr><tr><td>为什么运行时实例不是静态搜索看到的基类？</td><td><a href="./03-core-class-hierarchy" class="internal internal-link alias" data-slug="vllm/03-core-class-hierarchy">03：核心类关系</a></td><td>engine client、executor、worker、model registry/loader</td></tr><tr><td>请求跨了哪些进程，控制消息和模型张量走什么通道？</td><td><a href="./04-processes-and-module-communication" class="internal internal-link alias" data-slug="vllm/04-processes-and-module-communication">04：进程与模块通信</a></td><td>core client/proc、multiproc executor、distributed、Rust client</td></tr><tr><td><code>torch.ops._C.*</code> 最终在哪里实现，wheel 怎样带上它？</td><td><a href="./05-build-and-native-extensions" class="internal internal-link alias" data-slug="vllm/05-build-and-native-extensions">05：构建与原生扩展</a></td><td><code>_custom_ops.py</code>、<code>csrc/</code>、CMake、setup.py、Cargo</td></tr><tr><td>哪些示例最适合验证我的理解？</td><td><a href="./06-examples-learning-path" class="internal internal-link alias" data-slug="vllm/06-examples-learning-path">06：示例学习路线</a></td><td><code>examples/</code>、nearby tests、<code>benchmarks/</code></td></tr><tr><td>一个结论对应哪个符号和行范围？</td><td><a href="./07-source-inventory-and-code-index" class="internal internal-link alias" data-slug="vllm/07-source-inventory-and-code-index">07：源码清单与代码索引</a></td><td>集中索引与扫描证据</td></tr></tbody></table></div>
+<p>阅读任何具体功能时，都建议形成一个最小闭环：<strong>入口或测试 → 配置/factory → 当前实现 → 输出或断言</strong>。只阅读类定义往往会漏掉 vLLM 最关键的运行时选择关系。</p>
+<hr/>
+<p>上一页：<a href="./readme" class="internal internal-link alias" data-slug="vllm/readme">指南入口</a> · 下一页：<a href="./02-entrypoints-and-request-lifecycle" class="internal internal-link alias" data-slug="vllm/02-entrypoints-and-request-lifecycle">02：入口与请求生命周期</a> · 返回：<a href="./readme" class="internal internal-link alias" data-slug="vllm/readme">指南入口</a></p></div></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>关系图谱</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc"><button type="button" class="toc-header" aria-controls="toc-10" aria-expanded="true"><h3>目录</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#01项目地图与-v1-总体架构" data-for="01项目地图与-v1-总体架构">01：项目地图与 V1 总体架构</a></li><li class="depth-1"><a href="#先看全局v1-主链路" data-for="先看全局v1-主链路">先看全局：V1 主链路</a></li><li class="depth-1"><a href="#根目录地图" data-for="根目录地图">根目录地图</a></li><li class="depth-2"><a href="#如何使用这张根目录表" data-for="如何使用这张根目录表">如何使用这张根目录表</a></li><li class="depth-1"><a href="#vllm-内部子系统地图" data-for="vllm-内部子系统地图">vllm/ 内部子系统地图</a></li><li class="depth-1"><a href="#分层职责" data-for="分层职责">分层职责</a></li><li class="depth-2"><a href="#入口与输入层" data-for="入口与输入层">入口与输入层</a></li><li class="depth-2"><a href="#engine-client-与输出层" data-for="engine-client-与输出层">Engine client 与输出层</a></li><li class="depth-2"><a href="#core-与-scheduler-层" data-for="core-与-scheduler-层">Core 与 Scheduler 层</a></li><li class="depth-2"><a href="#executorworker-与-modelrunner-层" data-for="executorworker-与-modelrunner-层">Executor、Worker 与 ModelRunner 层</a></li><li class="depth-2"><a href="#platform-与原生内核层" data-for="platform-与原生内核层">Platform 与原生内核层</a></li><li class="depth-1"><a href="#v1-主线与兼容外观" data-for="v1-主线与兼容外观">V1 主线与兼容外观</a></li><li class="depth-1"><a href="#横切能力与扩展点" data-for="横切能力与扩展点">横切能力与扩展点</a></li><li class="depth-1"><a href="#从地图跳到代码" data-for="从地图跳到代码">从地图跳到代码</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>反向链接</h3><ul id="list-0" class="overflow"><li><a href="../vllm/02-entrypoints-and-request-lifecycle" class="internal">02-entrypoints-and-request-lifecycle</a></li><li><a href="../vllm/06-examples-learning-path" class="internal">06-examples-learning-path</a></li><li><a href="../vllm/readme" class="internal">README</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v5.0.0</a> © 2026</p><ul><li><a href="https://github.com/jackyzha0/quartz">GitHub</a></li><li><a href="https://discord.gg/cRFFHYye7t">Discord Community</a></li></ul></footer></div></div></body><script src="../static/resource-after-e13fffa1.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-8b336f9a.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-baba652b.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-5eb75950.js" type="module" data-persist="true"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript-3eea7814.js" type="module" data-persist="true"></script></html>

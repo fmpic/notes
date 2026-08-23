@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh" dir="ltr"><head><title>README</title><meta charset="utf-8"/><link rel="preload" href="../index-bb6c1746.css" as="style"/><link rel="preload" href="../prescript-2bfc6315.js" as="script"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Notes"/><meta property="og:title" content="README"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="README"/><meta name="twitter:description" content="LMCache 新人架构指南 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 这组文档面向第一次进入 LMCache 仓库的开发者。它不是用户手册的替代品，而是一张从“目录在哪里”到“请求如何跨进程移动 KV”的源码地图。分析以源码和行为测试为主要证据；当设计文档、历史示例与当前实现不一致时，会明确标注。 配套架构图 完整索引与可编辑源文件见 guides/diagrams/。 图主要问题进程内/MP、存储、控制面和部署面如何连接？ABC/Protocol、Factory 与 compositio..."/><meta property="og:description" content="LMCache 新人架构指南 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 这组文档面向第一次进入 LMCache 仓库的开发者。它不是用户手册的替代品，而是一张从“目录在哪里”到“请求如何跨进程移动 KV”的源码地图。分析以源码和行为测试为主要证据；当设计文档、历史示例与当前实现不一致时，会明确标注。 配套架构图 完整索引与可编辑源文件见 guides/diagrams/。 图主要问题进程内/MP、存储、控制面和部署面如何连接？ABC/Protocol、Factory 与 compositio..."/><meta property="og:image:alt" content="LMCache 新人架构指南 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 这组文档面向第一次进入 LMCache 仓库的开发者。它不是用户手册的替代品，而是一张从“目录在哪里”到“请求如何跨进程移动 KV”的源码地图。分析以源码和行为测试为主要证据；当设计文档、历史示例与当前实现不一致时，会明确标注。 配套架构图 完整索引与可编辑源文件见 guides/diagrams/。 图主要问题进程内/MP、存储、控制面和部署面如何连接？ABC/Protocol、Factory 与 compositio..."/><meta property="twitter:domain" content="fmpic.github.io/notes"/><meta property="og:url" content="https://fmpic.github.io/notes/lmcache/readme"/><meta property="twitter:url" content="https://fmpic.github.io/notes/lmcache/readme"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="LMCache 新人架构指南 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 这组文档面向第一次进入 LMCache 仓库的开发者。它不是用户手册的替代品，而是一张从“目录在哪里”到“请求如何跨进程移动 KV”的源码地图。分析以源码和行为测试为主要证据；当设计文档、历史示例与当前实现不一致时，会明确标注。 配套架构图 完整索引与可编辑源文件见 guides/diagrams/。 图主要问题进程内/MP、存储、控制面和部署面如何连接？ABC/Protocol、Factory 与 compositio..."/><meta name="generator" content="Quartz"/><link href="../index-bb6c1746.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-735924e0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-589c1cea.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-bbc3f7c0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-2911f5d1.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-e427079e.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-53b25b2b.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-c93c6a44.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-8a06014f.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-77d6a441.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-6ee21cee.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-1ea6ad18.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-34bdfded.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-788c9ca3.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-642859cd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-4abc06bd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-274a3dfe.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-94cb6c84.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-58d5ff56.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-7262b5a7.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-a5c806d2.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-6bd36952.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-9857b007.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-d3a1a224.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript-2bfc6315.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted%20Grotesk%3Awght%40400%3B700&amp;family=Source%20Sans%20Pro%3Aital%2Cwght%400%2C400%3B0%2C600%3B1%2C400%3B1%2C600&amp;family=IBM%20Plex%20Mono%3Awght%40400%3B600&amp;display=swap"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://fmpic.github.io/notes/lmcache/readme-og-image.webp"/><meta property="og:image:url" content="https://fmpic.github.io/notes/lmcache/readme-og-image.webp"/><meta name="twitter:image" content="https://fmpic.github.io/notes/lmcache/readme-og-image.webp"/><meta property="og:image:type" content="image/webp"/></head><body data-slug="lmcache/readme" data-basepath="/notes"><div id="quartz-root" class="page" data-frame="default"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Notes</a></h2><div class="mobile-only"><div class="spacer"></div></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 0.5rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button" aria-label="搜索" aria-expanded="false"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>搜索</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="搜索内容..." placeholder="搜索内容..."/><div class="search-layout" data-preview="true" data-field-priority="[&quot;title&quot;,&quot;content&quot;,&quot;tags&quot;]"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode" aria-label="暗色模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="暗色模式"><title>暗色模式</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="亮色模式"><title>亮色模式</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode" aria-label="阅读模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="阅读模式"><title>阅读模式</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><div class="explorer nav-files-container" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a2, b2) => {\n    if (!a2.isFolder &amp;&amp; !b2.isFolder || a2.isFolder &amp;&amp; b2.isFolder) {\n      return (a2.displayName || \&quot;\&quot;).localeCompare(b2.displayName || \&quot;\&quot;, void 0, {\n        numeric: true,\n        sensitivity: \&quot;base\&quot;\n      });\n    }\n    if (!a2.isFolder &amp;&amp; b2.isFolder) {\n      return 1;\n    }\n    return -1;\n  }&quot;,&quot;filterFn&quot;:&quot;(node) => node.slugSegment !== \&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;(node) => {\n    return node;\n  }&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-8" aria-label="探索"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>探索</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-8" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#" class="nav-file-title tree-item-self"></a></li></template><template id="template-folder"><li><div class="folder-container nav-folder-title tree-item-self"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon nav-folder-collapse-indicator collapse-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content tree-item-children"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../lmcache/">LMCache</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>README</a></div></nav><h1 class="article-title">README</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-23T09:18:46.234Z">2026年8月23日</time><span>5分钟阅读</span></p></div></div><article class="popover-hint"><div class="markdown-preview-view markdown-rendered"><h1 id="lmcache-新人架构指南">LMCache 新人架构指南<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#lmcache-新人架构指南" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<blockquote>
+<p>分析基准：<code>389b9cfcb5cec502dbba6b5d13725bf2e024610d</code>。代码行号与结论均针对该修订；后续提交可能使行号漂移。</p>
+</blockquote>
+<p>这组文档面向第一次进入 LMCache 仓库的开发者。它不是用户手册的替代品，而是一张从“目录在哪里”到“请求如何跨进程移动 KV”的源码地图。分析以源码和行为测试为主要证据；当设计文档、历史示例与当前实现不一致时，会明确标注。</p>
+<h2 id="配套架构图">配套架构图<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#配套架构图" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>完整索引与可编辑源文件见 <a href="./diagrams/readme" class="internal internal-link" data-slug="lmcache/diagrams/readme"><code>guides/diagrams/</code></a>。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>图</th><th>主要问题</th></tr></thead><tbody><tr><td><a href="./diagrams/01-system-landscape.png" class="internal internal-link" data-slug="lmcache/diagrams/01-system-landscape.png"><img src="./diagrams/01-system-landscape.png" alt="系统全景"/></a></td><td>进程内/MP、存储、控制面和部署面如何连接？</td></tr><tr><td><a href="./diagrams/02-core-class-hierarchy.png" class="internal internal-link" data-slug="lmcache/diagrams/02-core-class-hierarchy.png"><img src="./diagrams/02-core-class-hierarchy.png" alt="核心类关系"/></a></td><td>ABC/Protocol、Factory 与 composition 如何分工？</td></tr><tr><td><a href="./diagrams/03-multiprocess-message-flow.png" class="internal internal-link" data-slug="lmcache/diagrams/03-multiprocess-message-flow.png"><img src="./diagrams/03-multiprocess-message-flow.png" alt="MP 消息流"/></a></td><td>REGISTER/LOOKUP/RETRIEVE/STORE/END_SESSION 各传什么？</td></tr><tr><td><a href="./diagrams/04-storage-pipeline.png" class="internal internal-link" data-slug="lmcache/diagrams/04-storage-pipeline.png"><img src="./diagrams/04-storage-pipeline.png" alt="存储流水线"/></a></td><td>L1/L2 锁和 eventfd 如何保证异步 I/O 正确性？</td></tr><tr><td><a href="./diagrams/05-build-and-deployment.png" class="internal internal-link" data-slug="lmcache/diagrams/05-build-and-deployment.png"><img src="./diagrams/05-build-and-deployment.png" alt="构建与部署"/></a></td><td>源码如何变成 wheel、镜像、Operator 和 K8s runtime？</td></tr></tbody></table></div>
+<h2 id="探索覆盖">探索覆盖<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#探索覆盖" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li>Git 跟踪文件：<strong>1972</strong> 个。</li>
+<li>完整读取的文本源码、测试、示例、文档和配置：<strong>1779</strong> 个。</li>
+<li>仅登记的二进制、翻译目录和显式生成文件：<strong>193</strong> 个。</li>
+<li>完整读取字节：<strong>20,367,813</strong>；文本行：<strong>459,971</strong>。</li>
+<li>读取错误：<strong>0</strong>；UTF-8 解码错误：<strong>0</strong>。</li>
+<li>逐文件路径、行数、SHA-256 和处理状态见 <a href="./source-inventory.json" class="internal internal-link" data-slug="lmcache/source-inventory.json"><code>source-inventory.json</code></a> 与 <a href="./08-source-coverage" class="internal internal-link alias" data-slug="lmcache/08-source-coverage">源码覆盖说明</a>。</li>
+</ul>
+<h2 id="推荐阅读顺序">推荐阅读顺序<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#推荐阅读顺序" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>顺序</th><th>文档</th><th>先回答的问题</th></tr></thead><tbody><tr><td>1</td><td><a href="./01-repository-map" class="internal internal-link alias" data-slug="lmcache/01-repository-map">仓库与模块地图</a></td><td>每个目录负责什么？MP 与进程内实现为什么同时存在？</td></tr><tr><td>2</td><td><a href="./02-entrypoints-and-lifecycle" class="internal internal-link alias" data-slug="lmcache/02-entrypoints-and-lifecycle">入口与生命周期</a></td><td><code>lmcache</code>、vLLM connector、server、coordinator 和 Operator 从哪里启动？</td></tr><tr><td>3</td><td><a href="./03-core-classes-and-extension-points" class="internal internal-link alias" data-slug="lmcache/03-core-classes-and-extension-points">核心类与扩展点</a></td><td>关键 ABC/Protocol 如何派生？哪里是稳定的插件缝？</td></tr><tr><td>4</td><td><a href="./04-communication-and-data-flow" class="internal internal-link alias" data-slug="lmcache/04-communication-and-data-flow">通信与数据流</a></td><td>ZMQ、CUDA IPC、SHM、eventfd、HTTP 和 NIXL 各传什么？</td></tr><tr><td>5</td><td><a href="./05-build-native-and-deployment" class="internal internal-link alias" data-slug="lmcache/05-build-native-and-deployment">构建、原生扩展与部署</a></td><td>CUDA/ROCm/SYCL/MUSA、Rust、Docker 和 Operator 如何产生产物？</td></tr><tr><td>6</td><td><a href="./06-examples-learning-path" class="internal internal-link alias" data-slug="lmcache/06-examples-learning-path">示例学习路线</a></td><td>新人应按什么顺序运行示例，需要哪些 GPU/服务？</td></tr><tr><td>7</td><td><a href="./07-key-code-index" class="internal internal-link alias" data-slug="lmcache/07-key-code-index">关键代码索引</a></td><td>我知道概念名后，应该打开哪个符号？</td></tr><tr><td>8</td><td><a href="./08-source-coverage" class="internal internal-link alias" data-slug="lmcache/08-source-coverage">源码覆盖、差异与限制</a></td><td>哪些文件已读？哪些现有文档已滞后？当前有什么明确限制？</td></tr></tbody></table></div>
+<h2 id="一句话架构">一句话架构<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#一句话架构" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>LMCache 把 serving engine 中短命的 GPU KV cache 转换成按 token chunk 寻址的对象，通过 <strong>L1 内存 + 可插拔 L2</strong> 保存并复用；当前 MP 架构把缓存服务独立成 ZMQ/FastAPI 进程，通过 CUDA IPC、SHM/pickle 或 NIXL 移动数据，并可由 coordinator 与 Kubernetes Operator 管理。</p>
+<p>关键入口：<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/lmcache/cli/main.py#L20" class="external external-link"><code>lmcache.cli.main.main</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>lmcache/cli/main.py:20</code>；当前 MP server：<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/lmcache/v1/multiprocess/server.py#L63" class="external external-link"><code>MPCacheServer</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>lmcache/v1/multiprocess/server.py:63</code>；vLLM MP connector：<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/lmcache/integration/vllm/lmcache_mp_connector.py#L465" class="external external-link"><code>LMCacheMPConnector</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>lmcache/integration/vllm/lmcache_mp_connector.py:465</code>。</p>
+<h2 id="术语">术语<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#术语" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>术语</th><th>在本项目中的含义</th></tr></thead><tbody><tr><td>serving engine</td><td>vLLM、SGLang、TensorRT-LLM 等持有 paged KV 的推理引擎。</td></tr><tr><td>chunk</td><td>LMCache 的缓存和 hash 粒度；一个 chunk 可对应每个 KV group 的多个 engine blocks。</td></tr><tr><td><code>ObjectKey</code></td><td>MP 存储对象键，包含 chunk hash、模型、rank/object group、cache salt 等隔离信息。</td></tr><tr><td>L0 / L1 / L2</td><td>L0 是 serving engine 的 GPU KV；L1 是 LMCache 快速内存层；L2 是文件、对象存储、RESP、Mooncake、NIXL store、P2P 等扩展层。</td></tr><tr><td>in-process</td><td><code>LMCacheEngine</code> 直接位于 serving worker 进程，使用 <code>lmcache/v1/storage_backend/</code>。</td></tr><tr><td>MP</td><td>独立 <code>lmcache server</code> 进程，使用 <code>lmcache/v1/multiprocess/</code> 与 <code>lmcache/v1/distributed/</code>。</td></tr><tr><td>HMA / KV groups</td><td>Hybrid Memory Allocator；不同 attention 行为或物理布局拥有独立 block-id 地址空间。</td></tr><tr><td>PD</td><td>Prefill/Decode disaggregation；prefill 生成 KV，decode 接收并继续生成。</td></tr><tr><td>CacheBlend</td><td>不仅复用前缀，还复用发生位置偏移的非前缀 KV，并选择性重算。</td></tr><tr><td>control plane</td><td>key、block id、任务、配置、发现、状态等小消息。</td></tr><tr><td>data plane</td><td>实际 KV tensor bytes，经 CUDA IPC、SHM/pickle、L2 I/O 或 NIXL 传输。</td></tr></tbody></table></div>
+<h2 id="阅读原则">阅读原则<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阅读原则" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ol>
+<li><strong>遇到同名类先看完整模块路径。</strong> 两个 <code>StorageManager</code> 分别属于进程内与 MP 架构。</li>
+<li><strong>无版本后缀文件通常是当前入口。</strong> <code>_0180</code>、<code>_0201</code>、<code>_085</code> 等是 vLLM API 兼容实现。</li>
+<li><strong>源码与测试优先。</strong> <code>protocols/README.md</code>、部分 design docs 和 raw Kubernetes 示例存在已记录的历史差异。</li>
+<li><strong>命中失败应降级为重算。</strong> 正常 cache miss、后端超时和部分传输失败不应破坏推理正确性。</li>
+<li><strong>KV 数据与控制消息分开看。</strong> 例如普通 MP ZMQ <code>STORE</code> 发送句柄和 block ids，真正数据通过 CUDA IPC；pickle variant 才把 bytes 放入 MQ。</li>
+</ol></div></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>关系图谱</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc"><button type="button" class="toc-header" aria-controls="toc-8" aria-expanded="true"><h3>目录</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#lmcache-新人架构指南" data-for="lmcache-新人架构指南">LMCache 新人架构指南</a></li><li class="depth-1"><a href="#配套架构图" data-for="配套架构图">配套架构图</a></li><li class="depth-1"><a href="#探索覆盖" data-for="探索覆盖">探索覆盖</a></li><li class="depth-1"><a href="#推荐阅读顺序" data-for="推荐阅读顺序">推荐阅读顺序</a></li><li class="depth-1"><a href="#一句话架构" data-for="一句话架构">一句话架构</a></li><li class="depth-1"><a href="#术语" data-for="术语">术语</a></li><li class="depth-1"><a href="#阅读原则" data-for="阅读原则">阅读原则</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v5.0.0</a> © 2026</p><ul><li><a href="https://github.com/jackyzha0/quartz">GitHub</a></li><li><a href="https://discord.gg/cRFFHYye7t">Discord Community</a></li></ul></footer></div></div></body><script src="../static/resource-after-e13fffa1.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-8b336f9a.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-baba652b.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-5eb75950.js" type="module" data-persist="true"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript-3eea7814.js" type="module" data-persist="true"></script></html>

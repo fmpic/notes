@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh" dir="ltr"><head><title>README</title><meta charset="utf-8"/><link rel="preload" href="../index-bb6c1746.css" as="style"/><link rel="preload" href="../prescript-2bfc6315.js" as="script"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Notes"/><meta property="og:title" content="README"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="README"/><meta name="twitter:description" content="vLLM 源码导读 NOTE 分析快照：0934b267906f8cd9459f287b31647c3ed5c58e01 （分支 v0.26.0-dev，提交时间 2026-07-26T13:07:32-07:00）。 本指南按该提交的 Git 跟踪文件撰写；后续提交可能使行号和实现关系发生变化。 这套指南解决什么问题 这是一套面向 vLLM 新贡献者的实现导读。它尝试回答以下问题： 一个离线或在线请求从哪里进入，经过哪些对象，最终如何回到调用方？ AsyncLLM、LLMEngine、EngineCore、Scheduler、Executor、Worker 和 ModelRunner 分别负..."/><meta property="og:description" content="vLLM 源码导读 NOTE 分析快照：0934b267906f8cd9459f287b31647c3ed5c58e01 （分支 v0.26.0-dev，提交时间 2026-07-26T13:07:32-07:00）。 本指南按该提交的 Git 跟踪文件撰写；后续提交可能使行号和实现关系发生变化。 这套指南解决什么问题 这是一套面向 vLLM 新贡献者的实现导读。它尝试回答以下问题： 一个离线或在线请求从哪里进入，经过哪些对象，最终如何回到调用方？ AsyncLLM、LLMEngine、EngineCore、Scheduler、Executor、Worker 和 ModelRunner 分别负..."/><meta property="og:image:alt" content="vLLM 源码导读 NOTE 分析快照：0934b267906f8cd9459f287b31647c3ed5c58e01 （分支 v0.26.0-dev，提交时间 2026-07-26T13:07:32-07:00）。 本指南按该提交的 Git 跟踪文件撰写；后续提交可能使行号和实现关系发生变化。 这套指南解决什么问题 这是一套面向 vLLM 新贡献者的实现导读。它尝试回答以下问题： 一个离线或在线请求从哪里进入，经过哪些对象，最终如何回到调用方？ AsyncLLM、LLMEngine、EngineCore、Scheduler、Executor、Worker 和 ModelRunner 分别负..."/><meta property="twitter:domain" content="fmpic.github.io/notes"/><meta property="og:url" content="https://fmpic.github.io/notes/vllm/readme"/><meta property="twitter:url" content="https://fmpic.github.io/notes/vllm/readme"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="vLLM 源码导读 NOTE 分析快照：0934b267906f8cd9459f287b31647c3ed5c58e01 （分支 v0.26.0-dev，提交时间 2026-07-26T13:07:32-07:00）。 本指南按该提交的 Git 跟踪文件撰写；后续提交可能使行号和实现关系发生变化。 这套指南解决什么问题 这是一套面向 vLLM 新贡献者的实现导读。它尝试回答以下问题： 一个离线或在线请求从哪里进入，经过哪些对象，最终如何回到调用方？ AsyncLLM、LLMEngine、EngineCore、Scheduler、Executor、Worker 和 ModelRunner 分别负..."/><meta name="generator" content="Quartz"/><link href="../index-bb6c1746.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-735924e0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-589c1cea.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-bbc3f7c0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-2911f5d1.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-e427079e.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-53b25b2b.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-c93c6a44.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-8a06014f.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-77d6a441.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-6ee21cee.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-1ea6ad18.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-34bdfded.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-788c9ca3.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-642859cd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-4abc06bd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-274a3dfe.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-94cb6c84.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-58d5ff56.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-7262b5a7.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-a5c806d2.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-6bd36952.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-9857b007.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-d3a1a224.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript-2bfc6315.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted%20Grotesk%3Awght%40400%3B700&amp;family=Source%20Sans%20Pro%3Aital%2Cwght%400%2C400%3B0%2C600%3B1%2C400%3B1%2C600&amp;family=IBM%20Plex%20Mono%3Awght%40400%3B600&amp;display=swap"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://fmpic.github.io/notes/vllm/readme-og-image.webp"/><meta property="og:image:url" content="https://fmpic.github.io/notes/vllm/readme-og-image.webp"/><meta name="twitter:image" content="https://fmpic.github.io/notes/vllm/readme-og-image.webp"/><meta property="og:image:type" content="image/webp"/></head><body data-slug="vllm/readme" data-basepath="/notes"><div id="quartz-root" class="page" data-frame="default"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Notes</a></h2><div class="mobile-only"><div class="spacer"></div></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 0.5rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button" aria-label="搜索" aria-expanded="false"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>搜索</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="搜索内容..." placeholder="搜索内容..."/><div class="search-layout" data-preview="true" data-field-priority="[&quot;title&quot;,&quot;content&quot;,&quot;tags&quot;]"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode" aria-label="暗色模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="暗色模式"><title>暗色模式</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="亮色模式"><title>亮色模式</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode" aria-label="阅读模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="阅读模式"><title>阅读模式</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><div class="explorer nav-files-container" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a2, b2) => {\n    if (!a2.isFolder &amp;&amp; !b2.isFolder || a2.isFolder &amp;&amp; b2.isFolder) {\n      return (a2.displayName || \&quot;\&quot;).localeCompare(b2.displayName || \&quot;\&quot;, void 0, {\n        numeric: true,\n        sensitivity: \&quot;base\&quot;\n      });\n    }\n    if (!a2.isFolder &amp;&amp; b2.isFolder) {\n      return 1;\n    }\n    return -1;\n  }&quot;,&quot;filterFn&quot;:&quot;(node) => node.slugSegment !== \&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;(node) => {\n    return node;\n  }&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-18" aria-label="探索"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>探索</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-18" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#" class="nav-file-title tree-item-self"></a></li></template><template id="template-folder"><li><div class="folder-container nav-folder-title tree-item-self"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon nav-folder-collapse-indicator collapse-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content tree-item-children"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../vllm/">vLLM</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>README</a></div></nav><h1 class="article-title">README</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-23T09:18:46.293Z">2026年8月23日</time><span>14分钟阅读</span></p></div></div><article class="popover-hint"><div class="markdown-preview-view markdown-rendered"><h1 id="vllm-源码导读">vLLM 源码导读<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vllm-源码导读" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<blockquote class="callout note" data-callout="note">
+<div class="callout-title">
+                  <div class="callout-icon"></div>
+                  <div class="callout-title-inner"><p>NOTE</p></div>
+                  
+                </div>
+<div class="callout-content">
+<p><strong>分析快照</strong>：<code>0934b267906f8cd9459f287b31647c3ed5c58e01</code>
+（分支 <code>v0.26.0-dev</code>，提交时间 <code>2026-07-26T13:07:32-07:00</code>）。
+本指南按该提交的 Git 跟踪文件撰写；后续提交可能使行号和实现关系发生变化。</p>
+</div>
+</blockquote>
+<h2 id="这套指南解决什么问题">这套指南解决什么问题<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这套指南解决什么问题" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>这是一套面向 vLLM 新贡献者的实现导读。它尝试回答以下问题：</p>
+<ul>
+<li>一个离线或在线请求从哪里进入，经过哪些对象，最终如何回到调用方？</li>
+<li><code>AsyncLLM</code>、<code>LLMEngine</code>、<code>EngineCore</code>、Scheduler、Executor、Worker 和 ModelRunner 分别负责什么？</li>
+<li>单进程、多进程、Ray、data parallel 和 Rust 前端之间如何分工？</li>
+<li>Python 包、CMake 原生扩展、Rust 产物和预编译 wheel 如何汇合？</li>
+<li>面对数千个源码与测试文件，新人应该按什么顺序阅读？</li>
+</ul>
+<p>这套指南不是安装手册、完整 API 参考或生产运维手册。使用参数、支持模型、部署、安全和贡献流程仍应以项目的<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/docs/" class="external external-link">官方文档<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>与<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/AGENTS.md" class="external external-link">贡献指南<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>为准。</p>
+<h2 id="分析快照与可信范围">分析快照与可信范围<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#分析快照与可信范围" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>分析以 <code>git ls-files -z</code> 得到的完整 Git 跟踪文件集合为边界，并对纳入的文本文件逐字节读取、计算内容摘要，再结合静态扫描与关键调用链人工复核。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>项目</th><th style="text-align:right;">数量</th></tr></thead><tbody><tr><td>Git 跟踪文件</td><td style="text-align:right;">6,110</td></tr><tr><td>纳入全文扫描的文本文件</td><td style="text-align:right;">5,912</td></tr><tr><td>纳入字节数</td><td style="text-align:right;">62,112,421</td></tr><tr><td>纳入行数</td><td style="text-align:right;">1,734,908</td></tr><tr><td>记录但不作源码全文分析的文件</td><td style="text-align:right;">198</td></tr><tr><td>读取错误</td><td style="text-align:right;">0</td></tr></tbody></table></div>
+<p>纳入范围覆盖 Python、Rust、C/C++、CUDA/HIP、CMake、Shell、协议、配置、测试、示例、benchmark、CI 与配套设计文档。图片、音视频、字体、二进制模型或数组、批量数据集、测试快照和数据夹具等文件保留在清单中，但不把内容当作实现源码解析；具体分类与原因见<a href="./07-source-inventory-and-code-index" class="internal internal-link alias" data-slug="vllm/07-source-inventory-and-code-index">源码清单与代码索引</a>。</p>
+<p>本导读采用以下解释边界：</p>
+<ul>
+<li>以 V1 的 <code>AsyncLLM → EngineCoreClient → EngineCore → Scheduler → Executor → Worker → ModelRunner</code> 为主线。</li>
+<li>把当前 <code>LLMEngine</code> 解释为使用 V1 components 的同步兼容外观，而不是另一套独立的旧内核。</li>
+<li>把 Rust 前端解释为实验性的北向 HTTP/rendering/streaming 替代方案；它仍连接 Python <code>EngineCoreProc</code>，不是 Rust 推理内核。</li>
+<li>对 factory、registry、plugin、限定名导入、Mixin 和运行时基类注入等动态关系，以调用点和注册点校正静态继承结果。</li>
+<li>只陈述当前快照能够由源码支持的关系；平台相关、运行时生成和未在本环境执行的行为会明确标注限制。</li>
+</ul>
+<h2 id="推荐阅读顺序">推荐阅读顺序<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#推荐阅读顺序" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>新人主线：</p>
+<p><code>README</code> → <code>01</code> → <code>02</code> → <code>03</code> → <code>04</code> → <code>05</code> → <code>06</code> → <code>07</code></p>
+<ol>
+<li>先用项目地图建立目录和分层的空间模型。</li>
+<li>沿一次请求建立正向执行与反向输出的行为模型。</li>
+<li>再阅读类型、组合、Mixin、Protocol 和运行时工厂。</li>
+<li>把逻辑调用扩展成真实进程、IPC 和 distributed collective。</li>
+<li>理解 Python、原生扩展和 Rust 产物如何进入 wheel。</li>
+<li>通过示例、测试和 benchmark 把静态阅读转为可观察行为。</li>
+<li>需要查证时使用集中代码索引，而不必首次逐条通读。</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>阅读目标</th><th>建议顺序</th></tr></thead><tbody><tr><td>快速理解一次在线生成</td><td><code>README → 01 → 02 → 04</code></td></tr><tr><td>修改 Scheduler、Executor 或 Worker</td><td><code>README → 02 → 03 → 04 → 07</code></td></tr><tr><td>新增模型或模型能力</td><td><code>README → 03 → 06 → 07</code></td></tr><tr><td>排查多进程或分布式问题</td><td><code>README → 02 → 04 → 07</code></td></tr><tr><td>修改 CUDA、ROCm、CPU 或 Rust 构建</td><td><code>README → 05 → 07</code></td></tr><tr><td>从示例开始学习</td><td><code>README → 06 → 01 → 02</code></td></tr></tbody></table></div>
+<h2 id="八篇文档导航">八篇文档导航<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#八篇文档导航" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>文档</th><th>主要问题</th><th>建议读者</th></tr></thead><tbody><tr><td><strong>本页：源码导读入口</strong></td><td>分析范围、阅读顺序、统一术语和证据约定是什么？</td><td>所有人</td></tr><tr><td><a href="./01-project-map" class="internal internal-link alias" data-slug="vllm/01-project-map">01：项目地图</a></td><td>仓库由哪些目录和子系统组成，V1 主链路如何分层？</td><td>首次阅读源码者</td></tr><tr><td><a href="./02-entrypoints-and-request-lifecycle" class="internal internal-link alias" data-slug="vllm/02-entrypoints-and-request-lifecycle">02：入口与请求生命周期</a></td><td>CLI、离线、在线和 Rust 前端如何启动并完成一次请求？</td><td>API、serving、engine 开发者</td></tr><tr><td><a href="./03-core-class-hierarchy" class="internal internal-link alias" data-slug="vllm/03-core-class-hierarchy">03：核心类关系</a></td><td>ABC、Protocol、Mixin、组合与运行时 factory 如何共同构成类型系统？</td><td>engine、model、platform 开发者</td></tr><tr><td><a href="./04-processes-and-module-communication" class="internal internal-link alias" data-slug="vllm/04-processes-and-module-communication">04：进程与模块通信</a></td><td>控制面、数据面、ZMQ、共享内存消息和 distributed collective 如何配合？</td><td>distributed、serving 开发者</td></tr><tr><td><a href="./05-build-and-native-extensions" class="internal internal-link alias" data-slug="vllm/05-build-and-native-extensions">05：构建与原生扩展</a></td><td>setuptools、CMake、Cargo、设备分支与 wheel 如何汇合？</td><td>kernel、platform、release 开发者</td></tr><tr><td><a href="./06-examples-learning-path" class="internal internal-link alias" data-slug="vllm/06-examples-learning-path">06：示例学习路线</a></td><td>应按什么顺序阅读示例、测试和 benchmark？</td><td>希望动手验证的新人</td></tr><tr><td><a href="./07-source-inventory-and-code-index" class="internal internal-link alias" data-slug="vllm/07-source-inventory-and-code-index">07：源码清单与代码索引</a></td><td>分析覆盖了什么，关键结论如何定位到代码？</td><td>查证、评审和维护者</td></tr></tbody></table></div>
+<h2 id="五张图怎么读">五张图怎么读<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#五张图怎么读" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>五张图各自服务于一个问题，不把所有关系挤进同一张图：</p>
+<ul>
+<li><a href="./diagrams/project-architecture.png" class="internal internal-link alias" data-slug="vllm/diagrams/project-architecture.png">项目架构图</a>：入口、V1 core、执行层、平台层和原生内核层，配合 01 阅读。</li>
+<li><a href="./diagrams/online-request-lifecycle.png" class="internal internal-link alias" data-slug="vllm/diagrams/online-request-lifecycle.png">在线请求生命周期图</a>：一次请求的正向调用、采样和流式返回，配合 02 阅读。</li>
+<li><a href="./diagrams/core-class-hierarchy.png" class="internal internal-link alias" data-slug="vllm/diagrams/core-class-hierarchy.png">核心类关系图</a>：继承、Protocol、Mixin、factory 和对象组合，配合 03 阅读。</li>
+<li><a href="./diagrams/process-communication.png" class="internal internal-link alias" data-slug="vllm/diagrams/process-communication.png">进程通信图</a>：API Server、EngineCore、DP Coordinator、Worker 与 Rust 前端的通信边界，配合 04 阅读。</li>
+<li><a href="./diagrams/build-pipeline.png" class="internal internal-link alias" data-slug="vllm/diagrams/build-pipeline.png">构建流水线图</a>：PEP 517、setuptools、CMake、Cargo、设备 target 和 wheel 产物，配合 05 阅读。</li>
+</ul>
+<p>图中实线调用、继承、结构化接口、组合、运行时选择和 IPC 使用不同线型或标签。图是导航和论证工具，不替代正文中的代码证据。</p>
+<h2 id="统一术语表">统一术语表<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#统一术语表" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>其他文章第一次出现术语时会给出简短解释；本表是统一含义的完整版本。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>规范词</th><th>本指南中的含义</th><th>需要避免的混用</th></tr></thead><tbody><tr><td>V1</td><td>当前快照的主 EngineCore、Scheduler、Executor 架构</td><td>不等同于某个单一类名</td></tr><tr><td>前端（frontend）</td><td>HTTP、CLI、schema、rendering、streaming 等北向入口层</td><td>Rust 前端不是推理内核</td></tr><tr><td><code>EngineClient</code></td><td>serving 层依赖的异步 Engine ABC</td><td>不等同于 <code>EngineCoreClient</code></td></tr><tr><td><code>AsyncLLM</code></td><td>当前 Python 在线 V1 <code>EngineClient</code> 实现</td><td>不写成当前实际 <code>AsyncLLMEngine</code> 实例</td></tr><tr><td><code>LLM</code></td><td>面向用户的同步离线批量 API</td><td>内部组合 <code>LLMEngine</code></td></tr><tr><td><code>LLMEngine</code></td><td>同步兼容外观，内部使用 V1 components</td><td>“Legacy”不表示内部仍是 V0 core</td></tr><tr><td><code>EngineCoreClient</code></td><td>Engine 外观到 <code>EngineCore</code> 的传输抽象</td><td>有 in-process、MP 和 DP variants</td></tr><tr><td><code>EngineCore</code></td><td>组合 Scheduler 与 Executor 的核心协调对象</td><td>不负责 HTTP rendering</td></tr><tr><td><code>EngineCoreProc</code></td><td>给 <code>EngineCore</code> 加进程、ZMQ 与运行循环的部署包装</td><td>它继承 <code>EngineCore</code>，但职责更偏部署</td></tr><tr><td><code>EngineCoreRequest</code></td><td>进入 core 的规范请求</td><td>与 OpenAI request schema 区分</td></tr><tr><td><code>SchedulerOutput</code></td><td>Scheduler 交给 Executor、ModelRunner 的本轮工作描述</td><td>不等同于用户输出</td></tr><tr><td><code>ModelRunnerOutput</code></td><td>模型执行或采样返回给 Scheduler 的结果</td><td>还需 Scheduler 更新请求状态</td></tr><tr><td><code>EngineCoreOutputs</code></td><td>core 返回 client 的按请求输出集合</td><td>还需 <code>OutputProcessor</code> 转换</td></tr><tr><td>Scheduler</td><td>管理请求队列、token budget、KV blocks 与每轮工作</td><td>不拆成两个独立 prefill/decode scheduler</td></tr><tr><td>Executor</td><td>把 core 调用分发到一个或多个 Worker 的抽象</td><td>backend 决定 uni、MP、Ray 等实现</td></tr><tr><td>Worker</td><td>设备与分布式进程级执行外观</td><td>委托 ModelRunner，不等同于模型本身</td></tr><tr><td>ModelRunner</td><td>准备 batch、KV、attention，执行 forward 与采样</td><td>消费 <code>SchedulerOutput</code></td></tr><tr><td>ModelLoader</td><td>初始化模型并加载权重的策略对象</td><td>由 <code>load_format</code> registry 选择</td></tr><tr><td>ModelRegistry</td><td>architecture name 到模型实现的懒注册与解析系统</td><td>支持 built-in、Transformers 和 OOT</td></tr><tr><td>KV cache</td><td>保存 attention key/value 状态的块化缓存</td><td>与 prefix cache 命中策略相关但不等同</td></tr><tr><td>prefill</td><td>处理尚未计算的 prompt 或 context tokens</td><td>与 decode 可存在于统一调度模型中</td></tr><tr><td>decode</td><td>逐步生成后续 token</td><td>不代表独立进程或独立 Scheduler</td></tr><tr><td>speculative decoding</td><td>先提出候选 token 再验证的加速路径</td><td>文中也简称 spec decode</td></tr><tr><td>TP</td><td>tensor parallel，层内张量切分</td><td>属于数据面 collective</td></tr><tr><td>PP</td><td>pipeline parallel，按层或阶段流水线</td><td>涉及 intermediate tensors 传输</td></tr><tr><td>DP</td><td>data parallel，请求或 engine 副本分流</td><td>与 TP、PP 维度区分</td></tr><tr><td>EP</td><td>expert parallel，MoE expert 分布</td><td>不与 Executor 进程数直接画等号</td></tr><tr><td>控制面</td><td>请求调度、RPC、状态、握手、健康与关闭消息</td><td>例如 ZMQ、<code>MessageQueue</code>、Ray RPC</td></tr><tr><td>数据面</td><td>模型张量、collective 和 PP intermediate tensors</td><td>例如 torch.distributed、NCCL</td></tr><tr><td>ZMQ</td><td>frontend 与 EngineCore 等边界使用的 socket 层</td><td>必须结合 socket 类型和方向理解</td></tr><tr><td>MessagePack/msgspec</td><td>Python、Rust EngineCore payload 的编码与模型化方式</td><td>不泛写成 JSON</td></tr><tr><td><code>MessageQueue</code></td><td>vLLM 本地多进程 Worker RPC 的共享内存消息队列</td><td>不等同于 ZMQ queue</td></tr><tr><td>ABC</td><td>Python 名义抽象基类，表达必须实现的方法</td><td>与 Protocol 区分</td></tr><tr><td>Protocol</td><td>结构化类型契约，满足形状即可</td><td>模型不必继承共同实体基类</td></tr><tr><td>Mixin</td><td>通过多继承注入横切能力的基类</td><td>不把能力 Mixin 当成主生命周期层级</td></tr><tr><td>factory</td><td>根据配置或环境选择实现类或对象</td><td>图中使用“选择”边而非继承边</td></tr><tr><td>registry</td><td>名称到延迟实现或构造策略的映射</td><td>model、loader、plugin 分别说明</td></tr><tr><td>platform</td><td>CUDA、ROCm、CPU、XPU 等设备能力与实现选择层</td><td>与操作系统概念区分</td></tr><tr><td>原生扩展</td><td>C、C++、CUDA、HIP 或 Rust 编译产物</td><td>Rust executable 与 torch op extension 分列</td></tr><tr><td>custom op</td><td>通过 PyTorch dispatcher 暴露的原生算子</td><td><code>_custom_ops.py</code> 通常只是 Python wrapper</td></tr><tr><td>stable libtorch ABI</td><td>通过 stable registration/API 降低 PyTorch ABI 耦合的扩展路径</td><td>保留实际 target 名</td></tr><tr><td>Rust 前端</td><td><code>vllm-rs</code> 的 HTTP、rendering、streaming 与 client 实现</td><td>实验性；仍连接 Python <code>EngineCore</code></td></tr><tr><td>headless</td><td>只启动 EngineCore、不启动 API frontend 的模式</td><td>供外部或独立 frontend 使用</td></tr><tr><td>OOT plugin</td><td>out-of-tree plugin，通过 entry point 或限定名扩展</td><td>首次出现写出全称</td></tr></tbody></table></div>
+<h2 id="证据与链接约定">证据与链接约定<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#证据与链接约定" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>正文中的源码证据采用以下格式：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="markdown" data-theme="github-light github-dark"><code data-language="markdown" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;" data-token-type="punctuation">[</span><span style="--shiki-light:#005CC5;--shiki-light-text-decoration:underline;--shiki-dark:#79B8FF;--shiki-dark-text-decoration:underline;" data-token-type="punctuation">`QualifiedSymbol`</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;" data-token-type="punctuation">](</span><span style="--shiki-light:#24292E;--shiki-light-text-decoration:underline;--shiki-dark:#E1E4E8;--shiki-dark-text-decoration:underline;" data-token-type="normal">https://github.com/zhiim/vllm/blob/v0.26.0-dev/relative/path.py#L120-L168</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;" data-token-type="punctuation">) — 一句职责或结论说明。</span></span></code></pre></figure>
+<p>例如：<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L581-L611" class="external external-link"><code>EngineCore.step</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 串起 schedule、execute、sample 与状态更新。</p>
+<p>约定如下：</p>
+<ul>
+<li>路径从 <code>guides/</code> 出发，以 <code>https://github.com/zhiim/vllm/blob/v0.26.0-dev/</code> 指向仓库源码；行号为 1-based 闭区间。</li>
+<li>链接文本优先使用 <code>module.Class.method</code>、<code>Class.method</code>、Rust function/trait、CMake target 或配置键的真实名字。</li>
+<li>每个链接都说明“为什么引用”，不只堆砌文件路径。</li>
+<li>动态关系明确写成“选择”“注册”“注入”“组合”或“调用”，不使用继承关系代替。</li>
+<li>行号只对页首 commit 快照有效。集中索引使用稳定分类 ID，见<a href="./07-source-inventory-and-code-index" class="internal internal-link alias" data-slug="vllm/07-source-inventory-and-code-index">07：源码清单与代码索引</a>。</li>
+</ul>
+<h2 id="适用范围与非目标">适用范围与非目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#适用范围与非目标" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>本指南聚焦源码结构、关键调用链、进程通信和构建链。以下主题只帮助定位，不在这里重复官方材料：</p>
+<ul>
+<li>安装矩阵、硬件支持与完整配置项：见<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/docs/getting_started/" class="external external-link">官方 getting started<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>和<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/docs/configuration/" class="external external-link">configuration<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>。</li>
+<li>生产部署、可观测性和扩缩容：见<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/docs/deployment/" class="external external-link">deployment<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>。</li>
+<li>安全边界与部署假设：见<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/SECURITY.md" class="external external-link">SECURITY.md<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>和<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/docs/usage/security.md" class="external external-link">安全文档<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>。</li>
+<li>模型支持声明与新增模型的正式要求：见<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/docs/models/" class="external external-link">模型文档<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>和<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/docs/contributing/model/tests.md" class="external external-link">模型测试指南<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>。</li>
+<li>贡献、测试、lint 和 PR 要求：见<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/AGENTS.md" class="external external-link">AGENTS.md<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>。</li>
+</ul>
+<p>这份材料不会修改公共 API、类型、协议、构建 target 或运行时行为，也不会接入现有 MkDocs 导航。它是固定提交上的独立分析快照。</p>
+<hr/>
+<p>下一页：<a href="./01-project-map" class="internal internal-link alias" data-slug="vllm/01-project-map">01：项目地图</a> · 返回：<a href="./readme" class="internal internal-link alias" data-slug="vllm/readme">指南入口</a></p></div></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>关系图谱</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc"><button type="button" class="toc-header" aria-controls="toc-17" aria-expanded="true"><h3>目录</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#vllm-源码导读" data-for="vllm-源码导读">vLLM 源码导读</a></li><li class="depth-1"><a href="#这套指南解决什么问题" data-for="这套指南解决什么问题">这套指南解决什么问题</a></li><li class="depth-1"><a href="#分析快照与可信范围" data-for="分析快照与可信范围">分析快照与可信范围</a></li><li class="depth-1"><a href="#推荐阅读顺序" data-for="推荐阅读顺序">推荐阅读顺序</a></li><li class="depth-1"><a href="#八篇文档导航" data-for="八篇文档导航">八篇文档导航</a></li><li class="depth-1"><a href="#五张图怎么读" data-for="五张图怎么读">五张图怎么读</a></li><li class="depth-1"><a href="#统一术语表" data-for="统一术语表">统一术语表</a></li><li class="depth-1"><a href="#证据与链接约定" data-for="证据与链接约定">证据与链接约定</a></li><li class="depth-1"><a href="#适用范围与非目标" data-for="适用范围与非目标">适用范围与非目标</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>反向链接</h3><ul id="list-0" class="overflow"><li><a href="../vllm/01-project-map" class="internal">01-project-map</a></li><li><a href="../vllm/02-entrypoints-and-request-lifecycle" class="internal">02-entrypoints-and-request-lifecycle</a></li><li><a href="../vllm/03-core-class-hierarchy" class="internal">03-core-class-hierarchy</a></li><li><a href="../vllm/04-processes-and-module-communication" class="internal">04-processes-and-module-communication</a></li><li><a href="../vllm/05-build-and-native-extensions" class="internal">05-build-and-native-extensions</a></li><li><a href="../vllm/06-examples-learning-path" class="internal">06-examples-learning-path</a></li><li><a href="../vllm/07-source-inventory-and-code-index" class="internal">07-source-inventory-and-code-index</a></li><li><a href="../vllm/readme" class="internal">README</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v5.0.0</a> © 2026</p><ul><li><a href="https://github.com/jackyzha0/quartz">GitHub</a></li><li><a href="https://discord.gg/cRFFHYye7t">Discord Community</a></li></ul></footer></div></div></body><script src="../static/resource-after-e13fffa1.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-8b336f9a.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-baba652b.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-5eb75950.js" type="module" data-persist="true"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript-3eea7814.js" type="module" data-persist="true"></script></html>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+    <channel>
+      <title>Notes</title>
+      <link>https://fmpic.github.io/notes</link>
+      <description>Last 10 notes on Notes</description>
+      <generator>Quartz -- quartz.jzhao.xyz</generator>
+      <item>
+    <title>LMCache</title>
+    <link>https://fmpic.github.io/notes/lmcache/</link>
+    <guid>https://fmpic.github.io/notes/lmcache/</guid>
+    <description><![CDATA[  ]]></description>
+    <pubDate>Sun, 23 Aug 2026 09:18:59 GMT</pubDate>
+  </item><item>
+    <title>diagrams</title>
+    <link>https://fmpic.github.io/notes/lmcache/diagrams/</link>
+    <guid>https://fmpic.github.io/notes/lmcache/diagrams/</guid>
+    <description><![CDATA[  ]]></description>
+    <pubDate>Sun, 23 Aug 2026 09:18:59 GMT</pubDate>
+  </item><item>
+    <title>vLLM</title>
+    <link>https://fmpic.github.io/notes/vllm/</link>
+    <guid>https://fmpic.github.io/notes/vllm/</guid>
+    <description><![CDATA[  ]]></description>
+    <pubDate>Sun, 23 Aug 2026 09:18:59 GMT</pubDate>
+  </item><item>
+    <title>标签索引</title>
+    <link>https://fmpic.github.io/notes/tags/</link>
+    <guid>https://fmpic.github.io/notes/tags/</guid>
+    <description><![CDATA[  ]]></description>
+    <pubDate>Sun, 23 Aug 2026 09:18:59 GMT</pubDate>
+  </item><item>
+    <title>02-entrypoints-and-request-lifecycle</title>
+    <link>https://fmpic.github.io/notes/vllm/02-entrypoints-and-request-lifecycle</link>
+    <guid>https://fmpic.github.io/notes/vllm/02-entrypoints-and-request-lifecycle</guid>
+    <description><![CDATA[ 02：入口与请求生命周期 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 本篇沿“启动 → 接收 → 调度 → 执行 → 返回 → 结束”解释 vLLM 的入口与请求生命周期。主线是当前 V1 Python 在线路径，随后对照离线 LLM、兼容名称和实验性 Rust 前端。类关系与进程通信分别留给03：核心类关系和04：进程与模块通信。 公共导入与 CLI 分派 import vllm 不会立即导入所有实现 包初始化先加载版本与环境覆盖，再把公开名称保存在 MODULE_ATTRS。运行时只有访... ]]></description>
+    <pubDate>Sun, 23 Aug 2026 09:18:46 GMT</pubDate>
+  </item><item>
+    <title>03-core-class-hierarchy</title>
+    <link>https://fmpic.github.io/notes/vllm/03-core-class-hierarchy</link>
+    <guid>https://fmpic.github.io/notes/vllm/03-core-class-hierarchy</guid>
+    <description><![CDATA[ 03：核心类关系、能力接口与运行时工厂 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 vLLM 的对象关系不能用一棵传统继承树完整表达。主干同时使用 ABC、结构化 Protocol、能力 Mixin、对象组合、registry、factory、限定名导入和运行时基类注入。本篇先定义图例，再从 API 一直追到代表性 LlamaForCausalLM。 先读图例 本文和类关系图使用六种关系。阅读源码时，应先判断关系种类，再判断调用方向。 关系图中含义Python/Rust 证据形态典型例子继承... ]]></description>
+    <pubDate>Sun, 23 Aug 2026 09:18:46 GMT</pubDate>
+  </item><item>
+    <title>04-processes-and-module-communication</title>
+    <link>https://fmpic.github.io/notes/vllm/04-processes-and-module-communication</link>
+    <guid>https://fmpic.github.io/notes/vllm/04-processes-and-module-communication</guid>
+    <description><![CDATA[ 04：进程、控制面、数据面与通信协议 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 本篇把请求生命周期中的逻辑调用展开成真实部署边界。核心原则是：先区分控制面和数据面，再判断同一逻辑对象位于当前进程、子进程、Ray actor 还是远端节点。类关系见03：核心类关系。 控制面与数据面先分开 vLLM 同时存在多种通信机制。它们解决的问题不同，不能统称为“RPC”或“NCCL 通信”。 平面传输内容主要参与者当前主要机制北向协议HTTP/gRPC request、SSE/JSON respons... ]]></description>
+    <pubDate>Sun, 23 Aug 2026 09:18:46 GMT</pubDate>
+  </item><item>
+    <title>05-build-and-native-extensions</title>
+    <link>https://fmpic.github.io/notes/vllm/05-build-and-native-extensions</link>
+    <guid>https://fmpic.github.io/notes/vllm/05-build-and-native-extensions</guid>
+    <description><![CDATA[ 05：Python、CMake、Cargo 构建与原生扩展 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 本篇从最终 wheel 逆向解释 Python、CMake 与 Cargo 如何汇聚。重点是“哪个输入决定哪个产物”和“运行时如何找到已编译实现”，而不是复述平台安装教程。运行时的进程边界见04：进程与通信。 从 wheel 反看构建产物 一个 vLLM wheel 不是单一编译器的产物，而是 setuptools 汇总出的部署包： wheel 中的内容代表路径/名称构建者运行时角色Pyt... ]]></description>
+    <pubDate>Sun, 23 Aug 2026 09:18:46 GMT</pubDate>
+  </item><item>
+    <title>06-examples-learning-path</title>
+    <link>https://fmpic.github.io/notes/vllm/06-examples-learning-path</link>
+    <guid>https://fmpic.github.io/notes/vllm/06-examples-learning-path</guid>
+    <description><![CDATA[ 06：示例阅读与实践路线 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 本篇把 examples/、相邻 tests 和 benchmark 组织成一条由浅入深的学习路线。先用最小离线 API 建立输入/输出直觉，再进入在线协议、生成能力、非生成任务、分布式和训练集成。架构名词可先查项目地图，真实请求链见02：入口与请求生命周期。 使用方式与前提 这些示例是源码快照中的可执行说明，不是统一的无依赖教程。阅读或运行前先确认： 模型与网络：多数示例会从 Hugging Face 或其他地址下载模型... ]]></description>
+    <pubDate>Sun, 23 Aug 2026 09:18:46 GMT</pubDate>
+  </item><item>
+    <title>07-source-inventory-and-code-index</title>
+    <link>https://fmpic.github.io/notes/vllm/07-source-inventory-and-code-index</link>
+    <guid>https://fmpic.github.io/notes/vllm/07-source-inventory-and-code-index</guid>
+    <description><![CDATA[ 07：源码清单、扫描证据与集中代码索引 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 本篇保存本轮分析的证据边界，并提供其他文章共享的唯一稳定 ID 索引。它不重复解释请求时序、类型关系、进程协议或构建链；读者可从 ID 直接跳到定义、工厂、调用点或测试。 为什么需要清单 “读过仓库”必须能回答四个可审计问题： 宇宙是什么：以哪个 commit 的哪些 Git tracked paths 为全集。 哪些内容被全文读取：源码、测试、示例、脚本、协议、构建/CI 配置和架构证据文档。 哪些内容没有... ]]></description>
+    <pubDate>Sun, 23 Aug 2026 09:18:46 GMT</pubDate>
+  </item>
+    </channel>
+  </rss>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh" dir="ltr"><head><title>05-build-native-and-deployment</title><meta charset="utf-8"/><link rel="preload" href="../index-bb6c1746.css" as="style"/><link rel="preload" href="../prescript-2bfc6315.js" as="script"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Notes"/><meta property="og:title" content="05-build-native-and-deployment"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="05-build-native-and-deployment"/><meta name="twitter:description" content="构建、原生扩展与部署 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 配套图：构建与部署 PNG · Excalidraw 源文件 · 图索引 两个 Python distribution Distribution元数据依赖产物/用途lmcachepyproject.toml + setup.pycommon + 设备 profile requirements完整 runtime、sdist、native wheellmcache-clipyproject_cli.tomlrequirements..."/><meta property="og:description" content="构建、原生扩展与部署 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 配套图：构建与部署 PNG · Excalidraw 源文件 · 图索引 两个 Python distribution Distribution元数据依赖产物/用途lmcachepyproject.toml + setup.pycommon + 设备 profile requirements完整 runtime、sdist、native wheellmcache-clipyproject_cli.tomlrequirements..."/><meta property="og:image:alt" content="构建、原生扩展与部署 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 配套图：构建与部署 PNG · Excalidraw 源文件 · 图索引 两个 Python distribution Distribution元数据依赖产物/用途lmcachepyproject.toml + setup.pycommon + 设备 profile requirements完整 runtime、sdist、native wheellmcache-clipyproject_cli.tomlrequirements..."/><meta property="twitter:domain" content="fmpic.github.io/notes"/><meta property="og:url" content="https://fmpic.github.io/notes/lmcache/05-build-native-and-deployment"/><meta property="twitter:url" content="https://fmpic.github.io/notes/lmcache/05-build-native-and-deployment"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="构建、原生扩展与部署 分析基准：389b9cfcb5cec502dbba6b5d13725bf2e024610d。代码行号与结论均针对该修订；后续提交可能使行号漂移。 配套图：构建与部署 PNG · Excalidraw 源文件 · 图索引 两个 Python distribution Distribution元数据依赖产物/用途lmcachepyproject.toml + setup.pycommon + 设备 profile requirements完整 runtime、sdist、native wheellmcache-clipyproject_cli.tomlrequirements..."/><meta name="generator" content="Quartz"/><link href="../index-bb6c1746.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-735924e0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-589c1cea.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-bbc3f7c0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-2911f5d1.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-e427079e.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-53b25b2b.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-c93c6a44.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-8a06014f.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-77d6a441.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-6ee21cee.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-1ea6ad18.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-34bdfded.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-788c9ca3.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-642859cd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-4abc06bd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-274a3dfe.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-94cb6c84.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-58d5ff56.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-7262b5a7.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-a5c806d2.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-6bd36952.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-9857b007.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-d3a1a224.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript-2bfc6315.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted%20Grotesk%3Awght%40400%3B700&amp;family=Source%20Sans%20Pro%3Aital%2Cwght%400%2C400%3B0%2C600%3B1%2C400%3B1%2C600&amp;family=IBM%20Plex%20Mono%3Awght%40400%3B600&amp;display=swap"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://fmpic.github.io/notes/lmcache/05-build-native-and-deployment-og-image.webp"/><meta property="og:image:url" content="https://fmpic.github.io/notes/lmcache/05-build-native-and-deployment-og-image.webp"/><meta name="twitter:image" content="https://fmpic.github.io/notes/lmcache/05-build-native-and-deployment-og-image.webp"/><meta property="og:image:type" content="image/webp"/></head><body data-slug="lmcache/05-build-native-and-deployment" data-basepath="/notes"><div id="quartz-root" class="page" data-frame="default"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Notes</a></h2><div class="mobile-only"><div class="spacer"></div></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 0.5rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button" aria-label="搜索" aria-expanded="false"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>搜索</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="搜索内容..." placeholder="搜索内容..."/><div class="search-layout" data-preview="true" data-field-priority="[&quot;title&quot;,&quot;content&quot;,&quot;tags&quot;]"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode" aria-label="暗色模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="暗色模式"><title>暗色模式</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="亮色模式"><title>亮色模式</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode" aria-label="阅读模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="阅读模式"><title>阅读模式</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><div class="explorer nav-files-container" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a2, b2) => {\n    if (!a2.isFolder &amp;&amp; !b2.isFolder || a2.isFolder &amp;&amp; b2.isFolder) {\n      return (a2.displayName || \&quot;\&quot;).localeCompare(b2.displayName || \&quot;\&quot;, void 0, {\n        numeric: true,\n        sensitivity: \&quot;base\&quot;\n      });\n    }\n    if (!a2.isFolder &amp;&amp; b2.isFolder) {\n      return 1;\n    }\n    return -1;\n  }&quot;,&quot;filterFn&quot;:&quot;(node) => node.slugSegment !== \&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;(node) => {\n    return node;\n  }&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-4" aria-label="探索"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>探索</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-4" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#" class="nav-file-title tree-item-self"></a></li></template><template id="template-folder"><li><div class="folder-container nav-folder-title tree-item-self"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon nav-folder-collapse-indicator collapse-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content tree-item-children"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../lmcache/">LMCache</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>05-build-native-and-deployment</a></div></nav><h1 class="article-title">05-build-native-and-deployment</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-23T09:18:46.234Z">2026年8月23日</time><span>5分钟阅读</span></p></div></div><article class="popover-hint"><div class="markdown-preview-view markdown-rendered"><h1 id="构建原生扩展与部署">构建、原生扩展与部署<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#构建原生扩展与部署" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<blockquote>
+<p>分析基准：<code>389b9cfcb5cec502dbba6b5d13725bf2e024610d</code>。代码行号与结论均针对该修订；后续提交可能使行号漂移。</p>
+</blockquote>
+<blockquote>
+<p>配套图：<a href="./diagrams/05-build-and-deployment.png" class="internal internal-link alias" data-slug="lmcache/diagrams/05-build-and-deployment.png">构建与部署 PNG</a> · <a href="./diagrams/05-build-and-deployment.excalidraw" class="internal internal-link alias" data-slug="lmcache/diagrams/05-build-and-deployment.excalidraw">Excalidraw 源文件</a> · <a href="./diagrams/readme" class="internal internal-link alias" data-slug="lmcache/diagrams/readme">图索引</a></p>
+</blockquote>
+<h2 id="两个-python-distribution">两个 Python distribution<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#两个-python-distribution" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Distribution</th><th>元数据</th><th>依赖</th><th>产物/用途</th></tr></thead><tbody><tr><td><code>lmcache</code></td><td><a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/pyproject.toml" class="external external-link"><code>pyproject.toml</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> + <a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/setup.py" class="external external-link"><code>setup.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>common + 设备 profile requirements</td><td>完整 runtime、sdist、native wheel</td></tr><tr><td><code>lmcache-cli</code></td><td><a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/pyproject_cli.toml" class="external external-link"><code>pyproject_cli.toml</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td><code>requirements/cli.txt</code></td><td>无 torch/native 的远程 CLI wheel</td></tr></tbody></table></div>
+<p>两者都由 setuptools-scm 生成版本；完整包通过 <a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/setup_extensions/policy.py#L127" class="external external-link"><code>BuildPolicy</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>setup_extensions/policy.py:127</code> 决定原生扩展。</p>
+<h2 id="buildpolicy-决策">BuildPolicy 决策<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#buildpolicy-决策" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>sdist or NO_NATIVE_EXT=1</span></span>
+<span data-line><span>  -> no native extensions</span></span>
+<span data-line><span>else</span></span>
+<span data-line><span>  -> build 3 common C++ extensions</span></span>
+<span data-line><span>  -> unless NO_GPU_EXT=1:</span></span>
+<span data-line><span>       explicit BUILD_WITH_* (must be at most one)</span></span>
+<span data-line><span>       else compiler auto-detection</span></span>
+<span data-line><span>       -> one device profile</span></span>
+<span data-line><span>  -> discover zero or more optional storage backend profiles</span></span></code></pre></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>模式</th><th>开关</th><th>Common C++</th><th>GPU ops</th><th>结果</th></tr></thead><tbody><tr><td>sdist</td><td><code>python -m build --sdist</code></td><td>否</td><td>否</td><td>源码包</td></tr><tr><td>source-only</td><td><code>NO_NATIVE_EXT=1</code></td><td>否</td><td>否</td><td>Python fallback 可用范围</td></tr><tr><td>CPU/common</td><td><code>NO_GPU_EXT=1</code></td><td>是</td><td>否</td><td>native storage ops/Redis/FS；无 <code>c_ops/xpu_ops</code></td></tr><tr><td>device build</td><td>explicit/auto profile</td><td>是</td><td>是</td><td>common + 一个设备 profile + 可选 storage SDK extensions</td></tr></tbody></table></div>
+<p><code>NO_CUDA_EXT=1</code> 是历史别名，实际等价 <code>NO_NATIVE_EXT=1</code>，并不只是关闭 CUDA。</p>
+<h2 id="公共-c-扩展">公共 C++ 扩展<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#公共-c-扩展" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>模块</th><th>来源</th><th>用途</th></tr></thead><tbody><tr><td><code>lmcache.native_storage_ops</code></td><td><code>csrc/storage_manager/</code></td><td>Bitmap、fold、TTL lock、PeriodicEventNotifier</td></tr><tr><td><code>lmcache.lmcache_redis</code></td><td><code>csrc/storage_backends/redis/</code></td><td>Native RESP connector</td></tr><tr><td><code>lmcache.lmcache_fs</code></td><td><code>csrc/storage_backends/fs/</code></td><td>Native filesystem connector</td></tr></tbody></table></div>
+<p>定义：<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/setup_extensions/common_cpp.py#L29" class="external external-link"><code>COMMON_EXTENSIONS</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>setup_extensions/common_cpp.py:29</code>。</p>
+<h2 id="设备-profile">设备 Profile<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#设备-profile" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Profile</th><th>显式开关/检测</th><th>输出</th><th>关键限制</th></tr></thead><tbody><tr><td>CUDA</td><td><code>BUILD_WITH_CUDA=1</code> / <code>nvcc</code></td><td><code>lmcache.c_ops</code> CUDAExtension</td><td>默认 <code>LMCACHE_CUDA_MAJOR=13</code>，也支持 12；ABI 与 torch/vLLM 必须匹配。</td></tr><tr><td>ROCm</td><td><code>BUILD_WITH_HIP=1</code> / <code>hipcc</code></td><td>hipify 后的 <code>lmcache.c_ops</code></td><td>torch 从 ROCm index 预装；Docker 路径跳过 flashinfer/NIXL。</td></tr><tr><td>SYCL</td><td><code>BUILD_WITH_SYCL=1</code> / <code>icpx</code></td><td><code>lmcache.xpu_ops</code> SyclExtension</td><td>需 oneAPI；profile 指向的 <code>requirements/xpu_core.txt</code> 当前缺失。</td></tr><tr><td>MUSA</td><td><code>BUILD_WITH_MUSA=1</code>，自动检测恒 false</td><td>无设备扩展</td><td>BuildProfile 是 stub；runtime connector 使用 Python/platform 层。</td></tr></tbody></table></div>
+<p>源码：<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/setup_extensions/build_profiles/cuda.py#L23" class="external external-link"><code>CudaProfile</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>setup_extensions/build_profiles/cuda.py:23</code>、<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/setup_extensions/build_profiles/rocm.py#L67" class="external external-link"><code>RocmProfile</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>setup_extensions/build_profiles/rocm.py:67</code>、<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/setup_extensions/build_profiles/sycl.py#L21" class="external external-link"><code>SyclProfile</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>setup_extensions/build_profiles/sycl.py:21</code>、<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/setup_extensions/build_profiles/musa.py#L19" class="external external-link"><code>MusaProfile</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>setup_extensions/build_profiles/musa.py:19</code>。</p>
+<h3 id="已发现的构建缺口">已发现的构建缺口<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#已发现的构建缺口" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/setup_extensions/build_profiles/sycl.py#L91" class="external external-link"><code>SyclProfile.requirements_file</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>setup_extensions/build_profiles/sycl.py:91</code> 返回 <code>xpu_core.txt</code>，但该修订的 <a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/requirements/" class="external external-link"><code>requirements/</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 没有这个文件；<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/setup.py#L27" class="external external-link"><code>_read_requirements missing-file branch</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>setup.py:27</code> 会静默得到空列表。SYCL 用户需手工准备 XPU torch/runtime/oneAPI 依赖。</p>
+<h2 id="可选-native-storage-profile">可选 native storage profile<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#可选-native-storage-profile" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Profile</th><th>输出</th><th>依赖</th></tr></thead><tbody><tr><td>Aerospike</td><td><code>lmcache.lmcache_aerospike</code></td><td>libaerospike、OpenSSL、pthread/z/rt、libuv、yaml</td></tr><tr><td>Mooncake</td><td><code>lmcache.lmcache_mooncake</code></td><td>mooncake_store、C++20、可选 include/lib 路径</td></tr></tbody></table></div>
+<p>多个 storage profiles 可同时启用；设备 profile 只能选一个。入口：<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/setup_extensions/policy.py#L232" class="external external-link"><code>collect_storage_backends</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>setup_extensions/policy.py:232</code>。</p>
+<h2 id="rust-raw-block">Rust raw-block<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#rust-raw-block" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/rust/raw_block/pyproject.toml" class="external external-link"><code>rust/raw_block/pyproject.toml</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 是独立 maturin/PyO3 项目，生成 <code>lmcache_rust_raw_block_io</code> cdylib。它供 legacy <code>RustRawBlockBackend</code> 与 MP <code>RawBlockL2Adapter</code> 共用；Python 负责 slot/checkpoint/task orchestration，Rust 只负责 raw I/O。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;" data-token-type="function">cd</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;" data-token-type="string"> rust/raw_block</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;" data-token-type="function">maturin</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;" data-token-type="string"> develop</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;" data-token-type="value"> --release</span></span></code></pre></figure>
+<p>限制：Linux only；O_DIRECT 要求 offset/size/user buffer 对齐；示例 raw device 操作可能清除目标设备。</p>
+<h2 id="docker-矩阵">Docker 矩阵<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#docker-矩阵" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Dockerfile</th><th>角色</th><th>原生能力</th><th>默认启动/限制</th></tr></thead><tbody><tr><td><code>docker/Dockerfile</code></td><td>full CUDA LMCache + vLLM</td><td>CUDA/common + full dependencies/NIXL</td><td><code>vllm serve</code>；大镜像，版本与 torch/vLLM 绑定</td></tr><tr><td><code>Dockerfile.lightweight</code></td><td>快速 released LMCache + vLLM</td><td>使用发布 wheel</td><td>无 NIXL，因此无相应 PD 路径</td></tr><tr><td><code>Dockerfile.standalone</code></td><td>独立 MP server runtime</td><td>构建并安装匹配 torch 的 CUDA wheel</td><td>默认 <code>CMD /bin/bash</code>，手工执行 <code>lmcache server</code></td></tr><tr><td><code>Dockerfile.rocm</code></td><td>full ROCm + vLLM-ROCm</td><td>HIP/common</td><td>无 flashinfer/NIXL</td></tr><tr><td><code>Dockerfile.rocm-lightweight</code></td><td>release-oriented ROCm</td><td>clone source 后 HIP build</td><td>无 NIXL/PD，需要 ROCm arch 设置</td></tr></tbody></table></div>
+<p>说明入口：<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/docker/README.md" class="external external-link"><code>docker/README.md</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>。</p>
+<h2 id="operator-构建与部署">Operator 构建与部署<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#operator-构建与部署" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Operator Makefile 分拆为 <code>tools/dev/unit/build/deploy/lint/e2e/e2e-gpu</code>，静态扫描到 <strong>38</strong> 个目标。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>目标</th><th>结果</th></tr></thead><tbody><tr><td><code>make build</code></td><td>先 manifests/generate/fmt/vet，再生成 <code>operator/bin/manager</code>。</td></tr><tr><td><code>make run</code></td><td>本地主机运行 controller，<code>ENABLE_WEBHOOKS=false</code>。</td></tr><tr><td><code>make manifests</code></td><td>controller-gen 生成 CRD/RBAC/webhook。</td></tr><tr><td><code>make generate</code></td><td>生成 DeepCopy。</td></tr><tr><td><code>make docker-build</code> / <code>docker-buildx</code></td><td>distroless nonroot manager image。</td></tr><tr><td><code>make build-installer IMG=...</code></td><td>Kustomize 生成 <code>dist/install.yaml</code>。</td></tr><tr><td><code>make deploy IMG=...</code></td><td>部署 <code>config/default</code>。</td></tr><tr><td><code>make test</code> / <code>lint</code></td><td>envtest、coverage、golangci-lint。</td></tr><tr><td><code>make test-e2e-kind</code></td><td>no-GPU Kind smoke。</td></tr><tr><td><code>make test-e2e-gpu-kind</code></td><td>Kind + NVIDIA GPU Operator + GPU integration。</td></tr></tbody></table></div>
+<p>当前 CRD 产物：<code>LMCacheEngine</code>/<code>CacheBlendEngine</code> DaemonSet 与 <code>LMCacheCoordinator</code> Deployment。生成文件不可手工编辑，改 API marker 后必须重跑 manifests/generate。</p>
+<h2 id="ci-与发布链">CI 与发布链<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#ci-与发布链" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>系统</th><th>主要任务</th><th>产物</th></tr></thead><tbody><tr><td>GHA main artifacts</td><td>source-only sdist + CUDA 13 cibuildwheel</td><td><code>release-artifacts</code></td></tr><tr><td>GHA CLI artifacts</td><td>pure Python、no-torch smoke</td><td><code>release-cli-artifacts</code></td></tr><tr><td>GHA CPU artifacts</td><td><code>NO_GPU_EXT=1</code> common native wheel</td><td><code>release-cpu-artifacts</code></td></tr><tr><td>GHA cu129</td><td>CUDA 12.9 variant</td><td>独立 GitHub Release，不发 PyPI</td></tr><tr><td>GHA publish</td><td>tests/quality 后发布</td><td>TestPyPI、PyPI、GitHub、DockerHub</td></tr><tr><td>GHA nightly</td><td>cu13/cu129 wheels + full/standalone images</td><td>rolling nightly releases/tags</td></tr><tr><td>GHA Operator</td><td>Go CI/release</td><td>operator image + <code>install.yaml</code></td></tr><tr><td>Buildkite</td><td>NVIDIA/AMD unit、vLLM、correctness、MP、E2E</td><td>logs/coverage/perf artifacts</td></tr></tbody></table></div>
+<p>发布图的权威文件：<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/.github/workflows/build_main_artifacts.yml" class="external external-link"><code>build_main_artifacts.yml</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/.github/workflows/publish.yml" class="external external-link"><code>publish.yml</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/.github/workflows/nightly_build.yml" class="external external-link"><code>nightly_build.yml</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/LMCache/blob/v0.5.0-dev/.github/workflows/operator_release.yml" class="external external-link"><code>operator_release.yml</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>。</p>
+<h2 id="本地验证基线">本地验证基线<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#本地验证基线" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;" data-token-type="comment"># 文档任务最相关</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;" data-token-type="function">pre-commit</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;" data-token-type="string"> run</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;" data-token-type="value"> --all-files</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;" data-token-type="function">cd</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;" data-token-type="string"> docs</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;" data-token-type="punctuation"> &amp;&amp; </span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;" data-token-type="function">make</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;" data-token-type="string"> clean</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;" data-token-type="punctuation"> &amp;&amp; </span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;" data-token-type="function">make</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;" data-token-type="string"> html</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;" data-token-type="comment"># Python 测试主入口（GPU/分布式环境按需裁剪）</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;" data-token-type="function">pytest</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;" data-token-type="value"> -xvs</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;" data-token-type="value"> --ignore=tests/disagg</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;" data-token-type="value">   --ignore=tests/v1/multiprocess/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;" data-token-type="value">   --ignore=tests/v1/distributed/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;" data-token-type="value">   --ignore=tests/skipped</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;" data-token-type="value">   --ignore=tests/v1/storage_backend/test_eic.py</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;" data-token-type="comment"># Operator</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;" data-token-type="function">cd</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;" data-token-type="string"> operator</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;" data-token-type="punctuation"> &amp;&amp; </span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;" data-token-type="function">make</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;" data-token-type="string"> fmt</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;" data-token-type="string"> lint</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;" data-token-type="string"> test</span></span></code></pre></figure></div></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>关系图谱</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc"><button type="button" class="toc-header" aria-controls="toc-4" aria-expanded="true"><h3>目录</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#构建原生扩展与部署" data-for="构建原生扩展与部署">构建、原生扩展与部署</a></li><li class="depth-1"><a href="#两个-python-distribution" data-for="两个-python-distribution">两个 Python distribution</a></li><li class="depth-1"><a href="#buildpolicy-决策" data-for="buildpolicy-决策">BuildPolicy 决策</a></li><li class="depth-1"><a href="#公共-c-扩展" data-for="公共-c-扩展">公共 C++ 扩展</a></li><li class="depth-1"><a href="#设备-profile" data-for="设备-profile">设备 Profile</a></li><li class="depth-2"><a href="#已发现的构建缺口" data-for="已发现的构建缺口">已发现的构建缺口</a></li><li class="depth-1"><a href="#可选-native-storage-profile" data-for="可选-native-storage-profile">可选 native storage profile</a></li><li class="depth-1"><a href="#rust-raw-block" data-for="rust-raw-block">Rust raw-block</a></li><li class="depth-1"><a href="#docker-矩阵" data-for="docker-矩阵">Docker 矩阵</a></li><li class="depth-1"><a href="#operator-构建与部署" data-for="operator-构建与部署">Operator 构建与部署</a></li><li class="depth-1"><a href="#ci-与发布链" data-for="ci-与发布链">CI 与发布链</a></li><li class="depth-1"><a href="#本地验证基线" data-for="本地验证基线">本地验证基线</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>反向链接</h3><ul id="list-0" class="overflow"><li><a href="../lmcache/readme" class="internal">README</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v5.0.0</a> © 2026</p><ul><li><a href="https://github.com/jackyzha0/quartz">GitHub</a></li><li><a href="https://discord.gg/cRFFHYye7t">Discord Community</a></li></ul></footer></div></div></body><script src="../static/resource-after-e13fffa1.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-8b336f9a.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-baba652b.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-5eb75950.js" type="module" data-persist="true"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript-3eea7814.js" type="module" data-persist="true"></script></html>

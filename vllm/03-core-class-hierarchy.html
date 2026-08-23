@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh" dir="ltr"><head><title>03-core-class-hierarchy</title><meta charset="utf-8"/><link rel="preload" href="../index-bb6c1746.css" as="style"/><link rel="preload" href="../prescript-2bfc6315.js" as="script"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Notes"/><meta property="og:title" content="03-core-class-hierarchy"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="03-core-class-hierarchy"/><meta name="twitter:description" content="03：核心类关系、能力接口与运行时工厂 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 vLLM 的对象关系不能用一棵传统继承树完整表达。主干同时使用 ABC、结构化 Protocol、能力 Mixin、对象组合、registry、factory、限定名导入和运行时基类注入。本篇先定义图例，再从 API 一直追到代表性 LlamaForCausalLM。 先读图例 本文和类关系图使用六种关系。阅读源码时，应先判断关系种类，再判断调用方向。 关系图中含义Python/Rust 证据形态典型例子继承..."/><meta property="og:description" content="03：核心类关系、能力接口与运行时工厂 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 vLLM 的对象关系不能用一棵传统继承树完整表达。主干同时使用 ABC、结构化 Protocol、能力 Mixin、对象组合、registry、factory、限定名导入和运行时基类注入。本篇先定义图例，再从 API 一直追到代表性 LlamaForCausalLM。 先读图例 本文和类关系图使用六种关系。阅读源码时，应先判断关系种类，再判断调用方向。 关系图中含义Python/Rust 证据形态典型例子继承..."/><meta property="og:image:alt" content="03：核心类关系、能力接口与运行时工厂 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 vLLM 的对象关系不能用一棵传统继承树完整表达。主干同时使用 ABC、结构化 Protocol、能力 Mixin、对象组合、registry、factory、限定名导入和运行时基类注入。本篇先定义图例，再从 API 一直追到代表性 LlamaForCausalLM。 先读图例 本文和类关系图使用六种关系。阅读源码时，应先判断关系种类，再判断调用方向。 关系图中含义Python/Rust 证据形态典型例子继承..."/><meta property="twitter:domain" content="fmpic.github.io/notes"/><meta property="og:url" content="https://fmpic.github.io/notes/vllm/03-core-class-hierarchy"/><meta property="twitter:url" content="https://fmpic.github.io/notes/vllm/03-core-class-hierarchy"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="03：核心类关系、能力接口与运行时工厂 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 vLLM 的对象关系不能用一棵传统继承树完整表达。主干同时使用 ABC、结构化 Protocol、能力 Mixin、对象组合、registry、factory、限定名导入和运行时基类注入。本篇先定义图例，再从 API 一直追到代表性 LlamaForCausalLM。 先读图例 本文和类关系图使用六种关系。阅读源码时，应先判断关系种类，再判断调用方向。 关系图中含义Python/Rust 证据形态典型例子继承..."/><meta name="generator" content="Quartz"/><link href="../index-bb6c1746.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-735924e0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-589c1cea.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-bbc3f7c0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-2911f5d1.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-e427079e.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-53b25b2b.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-c93c6a44.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-8a06014f.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-77d6a441.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-6ee21cee.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-1ea6ad18.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-34bdfded.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-788c9ca3.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-642859cd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-4abc06bd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-274a3dfe.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-94cb6c84.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-58d5ff56.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-7262b5a7.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-a5c806d2.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-6bd36952.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-9857b007.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-d3a1a224.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript-2bfc6315.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted%20Grotesk%3Awght%40400%3B700&amp;family=Source%20Sans%20Pro%3Aital%2Cwght%400%2C400%3B0%2C600%3B1%2C400%3B1%2C600&amp;family=IBM%20Plex%20Mono%3Awght%40400%3B600&amp;display=swap"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://fmpic.github.io/notes/vllm/03-core-class-hierarchy-og-image.webp"/><meta property="og:image:url" content="https://fmpic.github.io/notes/vllm/03-core-class-hierarchy-og-image.webp"/><meta name="twitter:image" content="https://fmpic.github.io/notes/vllm/03-core-class-hierarchy-og-image.webp"/><meta property="og:image:type" content="image/webp"/></head><body data-slug="vllm/03-core-class-hierarchy" data-basepath="/notes"><div id="quartz-root" class="page" data-frame="default"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Notes</a></h2><div class="mobile-only"><div class="spacer"></div></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 0.5rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button" aria-label="搜索" aria-expanded="false"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>搜索</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="搜索内容..." placeholder="搜索内容..."/><div class="search-layout" data-preview="true" data-field-priority="[&quot;title&quot;,&quot;content&quot;,&quot;tags&quot;]"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode" aria-label="暗色模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="暗色模式"><title>暗色模式</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="亮色模式"><title>亮色模式</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode" aria-label="阅读模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="阅读模式"><title>阅读模式</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><div class="explorer nav-files-container" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a2, b2) => {\n    if (!a2.isFolder &amp;&amp; !b2.isFolder || a2.isFolder &amp;&amp; b2.isFolder) {\n      return (a2.displayName || \&quot;\&quot;).localeCompare(b2.displayName || \&quot;\&quot;, void 0, {\n        numeric: true,\n        sensitivity: \&quot;base\&quot;\n      });\n    }\n    if (!a2.isFolder &amp;&amp; b2.isFolder) {\n      return 1;\n    }\n    return -1;\n  }&quot;,&quot;filterFn&quot;:&quot;(node) => node.slugSegment !== \&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;(node) => {\n    return node;\n  }&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-13" aria-label="探索"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>探索</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-13" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#" class="nav-file-title tree-item-self"></a></li></template><template id="template-folder"><li><div class="folder-container nav-folder-title tree-item-self"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon nav-folder-collapse-indicator collapse-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content tree-item-children"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../vllm/">vLLM</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>03-core-class-hierarchy</a></div></nav><h1 class="article-title">03-core-class-hierarchy</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-23T09:18:46.293Z">2026年8月23日</time><span>19分钟阅读</span></p></div></div><article class="popover-hint"><div class="markdown-preview-view markdown-rendered"><h1 id="03核心类关系能力接口与运行时工厂">03：核心类关系、能力接口与运行时工厂<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#03核心类关系能力接口与运行时工厂" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<blockquote>
+<p><strong>代码快照</strong>：<code>0934b267906f8cd9459f287b31647c3ed5c58e01</code>。
+行号、类型关系和调用链均以此提交为准；返回<a href="./readme" class="internal internal-link alias" data-slug="vllm/readme">指南入口</a>。</p>
+</blockquote>
+<p><img src="./diagrams/core-class-hierarchy.png" alt="vLLM 核心类关系图"/></p>
+<p>vLLM 的对象关系不能用一棵传统继承树完整表达。主干同时使用 ABC、结构化 Protocol、能力 Mixin、对象组合、registry、factory、限定名导入和运行时基类注入。本篇先定义图例，再从 API 一直追到代表性 <code>LlamaForCausalLM</code>。</p>
+<h2 id="先读图例">先读图例<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#先读图例" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>本文和类关系图使用六种关系。阅读源码时，应先判断关系种类，再判断调用方向。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>关系</th><th>图中含义</th><th>Python/Rust 证据形态</th><th>典型例子</th></tr></thead><tbody><tr><td>继承</td><td>子类复用父类实现或满足名义抽象</td><td><code>class Child(Parent)</code></td><td><code>AsyncLLM(EngineClient)</code></td></tr><tr><td>Protocol</td><td>结构化能力契约；对象满足所需属性和方法即可</td><td><code>@runtime_checkable class X(Protocol)</code></td><td><code>VllmModel</code>、<code>SupportsLoRA</code></td></tr><tr><td>Mixin</td><td>通过多继承注入一组横切实现</td><td>名称通常为 <code>*Mixin</code>，不独立拥有主生命周期</td><td><code>LoRAModelRunnerMixin</code></td></tr><tr><td>组合</td><td>一个对象持有并驱动另一个对象</td><td><code>self.x = X(...)</code></td><td><code>EngineCore.scheduler</code></td></tr><tr><td>factory 选择</td><td>配置或环境在多个实现类之间做运行时选择</td><td><code>get_class()</code>、<code>get_*_cls()</code>、registry lookup</td><td><code>Executor.get_class()</code></td></tr><tr><td>运行时注入</td><td>import、plugin 或修改基类在进程启动时改变可用行为</td><td><code>resolve_obj_by_qualname()</code>、<code>__bases__ += ...</code></td><td><code>worker_extension_cls</code></td></tr></tbody></table></div>
+<p>有三条容易混淆的规则：</p>
+<ol>
+<li><strong>类名含 “Protocol” 不等于继承 <code>typing.Protocol</code>。</strong> <code>EngineClient</code> 的 docstring 称它为 protocol class，但源码实际是 <code>EngineClient(ABC)</code>；本篇按 Python 类型事实称为 ABC。</li>
+<li><strong>“接口”不一定是 ABC。</strong> <code>WorkerBase</code> 没有继承 <code>ABC</code>，许多方法只是抛 <code>NotImplementedError</code>；它是 interface-like base class，而非受 <code>abstractmethod</code> 强制的 ABC。</li>
+<li><strong>Protocol 也可能出现在真实 MRO 中。</strong> <code>LlamaForCausalLM</code> 直接列出 <code>SupportsLoRA</code>、<code>SupportsPP</code> 等 Protocol 基类，但它们表达的是能力契约，不是请求生命周期主干。</li>
+</ol>
+<p>因此，图中实线继承、虚线 Protocol、Mixin 标记、组合菱形和 factory 虚线箭头各自表达不同事实，不能全部简化为“继承”。</p>
+<h2 id="api-与-engine-抽象">API 与 Engine 抽象<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#api-与-engine-抽象" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="在线抽象engineclient-abc">在线抽象：<code>EngineClient</code> ABC<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#在线抽象engineclient-abc" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>EngineClient</code> 定义 serving 层所依赖的异步能力：generation、pooling、abort、health、profiling、cache reset、sleep/wake、LoRA、pause/resume 与 shutdown。它还约定实现对象暴露 <code>VllmConfig</code>、<code>ModelConfig</code>、renderer 和 <code>InputProcessor</code>（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/engine/protocol.py#L41-L244" class="external external-link"><code>EngineClient</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>当前 Python 在线实现关系很直接：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>EngineClient (ABC)</span></span>
+<span data-line><span>       △</span></span>
+<span data-line><span>       │ inheritance</span></span>
+<span data-line><span>   AsyncLLM</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/async_llm.py#L71-L147" class="external external-link"><code>AsyncLLM(EngineClient)</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 实现异步 serving contract，并<strong>组合</strong> renderer、<code>InputProcessor</code>、<code>OutputProcessor</code>、统计管理器与 <code>EngineCoreClient</code>。<code>AsyncLLM</code> 不是 <code>EngineCore</code> 的子类，也不直接持有 Worker。</p>
+<p>公共名称 <code>AsyncLLMEngine</code> 只是 <code>AsyncLLM</code> 的兼容 alias，不形成新继承节点（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/engine/async_llm_engine.py#L1-L7" class="external external-link"><code>AsyncLLMEngine = AsyncLLM</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<h3 id="离线外观mixin-加对象组合">离线外观：Mixin 加对象组合<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#离线外观mixin-加对象组合" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>LLM</code> 不继承 <code>EngineClient</code>。它把离线能力拆成三个 Mixin：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>BeamSearchOfflineMixin ─┐</span></span>
+<span data-line><span>PoolingOfflineMixin ────┼──> LLM</span></span>
+<span data-line><span>OfflineInferenceMixin ──┘       │</span></span>
+<span data-line><span>                                ◆ composition</span></span>
+<span data-line><span>                                ▼</span></span>
+<span data-line><span>                             LLMEngine</span></span>
+<span data-line><span>                                │</span></span>
+<span data-line><span>                                ◆</span></span>
+<span data-line><span>                                ▼</span></span>
+<span data-line><span>                        EngineCoreClient</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/llm.py#L66-L74" class="external external-link"><code>LLM</code> 的直接基类<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — generation/pooling/beam-search 的同步批量外观。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/llm.py#L336-L386" class="external external-link"><code>LLM.__init__</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 通过 <code>LLMEngine.from_engine_args()</code> 构造并保存 <code>self.llm_engine</code>，同时暴露 renderer、model config 和 input processor。</p>
+<p><code>LLMEngine</code> 自身也不是 <code>EngineClient</code> 子类。它是同步兼容外观，组合 V1 <code>InputProcessor</code>、<code>OutputProcessor</code> 和同步 <code>EngineCoreClient</code>（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/llm_engine.py#L48-L139" class="external external-link"><code>LLMEngine</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。公共 <code>vllm.engine.llm_engine.LLMEngine</code> 同样只是 V1 类的 alias（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/engine/llm_engine.py#L1-L7" class="external external-link"><code>LLMEngine = V1LLMEngine</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>这组关系说明：“在线/离线”不是 <code>AsyncLLM</code> 与 <code>LLM</code> 的简单兄弟子类关系。在线入口通过 <code>EngineClient</code> ABC 解耦 serving；离线入口通过 Mixin 和 <code>LLMEngine</code> 组合提供同步批处理。</p>
+<h2 id="enginecoreclient-家族"><code>EngineCoreClient</code> 家族<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#enginecoreclient-家族" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><code>EngineCoreClient(ABC)</code> 是 frontend Engine 与 core 的传输抽象。它的继承树是：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>EngineCoreClient (ABC)</span></span>
+<span data-line><span>├── InprocClient</span></span>
+<span data-line><span>└── MPClient</span></span>
+<span data-line><span>    ├── SyncMPClient</span></span>
+<span data-line><span>    └── AsyncMPClient</span></span>
+<span data-line><span>        └── DPAsyncMPClient</span></span>
+<span data-line><span>            └── DPLBAsyncMPClient</span></span></code></pre></figure>
+<ul>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L78-L154" class="external external-link"><code>EngineCoreClient</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 定义同步和异步 add/output/abort/utility 等 client contract。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L291-L340" class="external external-link"><code>InprocClient</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 组合一个同进程 <code>EngineCore</code>，直接调用 <code>step_fn()</code>、<code>add_request()</code> 与 <code>abort_requests()</code>。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L482-L520" class="external external-link"><code>MPClient</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 多进程共同基类，管理 ZMQ resources、后台 core process 与公共收发状态。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L794-L818" class="external external-link"><code>SyncMPClient</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 为同步 <code>LLMEngine</code> 提供阻塞式 output queue。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L965-L993" class="external external-link"><code>AsyncMPClient</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 为 <code>AsyncLLM</code> 提供 <code>asyncio.Queue</code> 与异步 API。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L1250-L1427" class="external external-link"><code>DPAsyncMPClient</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 加入多 EngineCore、coordinator wave 与外部 LB 语义。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L1430-L1469" class="external external-link"><code>DPLBAsyncMPClient</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 在 DP client 上增加内部 load balancing 和 request-to-engine 追踪。</li>
+</ul>
+<p>继承树只解释复用关系，实际实例由 factory 决定：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th><code>multiprocess_mode</code></th><th><code>asyncio_mode</code></th><th>DP 条件</th><th>实际实现</th></tr></thead><tbody><tr><td><code>False</code></td><td><code>False</code></td><td>不适用</td><td><code>InprocClient</code></td></tr><tr><td><code>True</code></td><td><code>False</code></td><td>任意</td><td><code>SyncMPClient</code></td></tr><tr><td><code>True</code></td><td><code>True</code></td><td>DP size = 1</td><td><code>AsyncMPClient</code></td></tr><tr><td><code>True</code></td><td><code>True</code></td><td>DP > 1 且 external LB</td><td><code>DPAsyncMPClient</code></td></tr><tr><td><code>True</code></td><td><code>True</code></td><td>DP > 1 且 internal/hybrid LB</td><td><code>DPLBAsyncMPClient</code></td></tr><tr><td><code>False</code></td><td><code>True</code></td><td>任意</td><td>当前不支持，抛 <code>NotImplementedError</code></td></tr></tbody></table></div>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L90-L141" class="external external-link"><code>EngineCoreClient.make_client</code> 与 <code>make_async_mp_client</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 上表的权威选择点。</p>
+<p>所以，类图中应同时存在两组边：从 concrete client 指向父类的<strong>继承边</strong>，以及从 factory 指向运行时实现的<strong>选择边</strong>。只画继承树会漏掉“为什么在线总是进入 async MP client”和“为什么同一个 DP 基类产生两种 routing 行为”。</p>
+<h2 id="enginecore-与-scheduler-的组合"><code>EngineCore</code> 与 Scheduler 的组合<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#enginecore-与-scheduler-的组合" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="core-是协调对象proc-是部署包装">Core 是协调对象，Proc 是部署包装<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#core-是协调对象proc-是部署包装" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>EngineCore</code> 没有抽象父类；它是 V1 内循环的具体协调对象。构造时加载 general plugin，实例化传入的 Executor class，初始化 KV cache/structured output manager，再通过 Scheduler factory 构造 <code>self.scheduler</code>（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L103-L178" class="external external-link"><code>EngineCore.__init__</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>EngineCore</span></span>
+<span data-line><span>├──◆ model_executor: Executor</span></span>
+<span data-line><span>├──◆ scheduler: SchedulerInterface</span></span>
+<span data-line><span>├──◆ structured_output_manager</span></span>
+<span data-line><span>└──◆ multimodal receiver cache</span></span>
+<span data-line> </span>
+<span data-line><span>EngineCore</span></span>
+<span data-line><span>   △</span></span>
+<span data-line><span>   └── EngineCoreProc</span></span>
+<span data-line><span>           △</span></span>
+<span data-line><span>           ├── DPEngineCoreProc</span></span>
+<span data-line><span>           └── EngineCoreActor  ◁── EngineCoreActorMixin</span></span></code></pre></figure>
+<ul>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L1000-L1059" class="external external-link"><code>EngineCoreProc(EngineCore)</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 增加 ZMQ、IO queues、handshake、后台 loop、engine index 和 tensor IPC receiver；调度语义仍继承自 <code>EngineCore</code>。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L1868-L1895" class="external external-link"><code>DPEngineCoreProc(EngineCoreProc)</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 为 MoE/DP cadence、wave 和 coordinator 状态增加包装。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L2404-L2425" class="external external-link"><code>EngineCoreActor(EngineCoreActorMixin, EngineCoreProc)</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 用 Mixin 叠加 Ray actor 生命周期，而不是重写 Scheduler/Worker 主链路。</li>
+</ul>
+<p><code>EngineCoreProc</code> 的继承是“部署能力增强”，<code>EngineCore.scheduler</code> 与 <code>model_executor</code> 则是对象组合。不要把 Scheduler 或 Executor 画成 <code>EngineCore</code> 基类。</p>
+<h3 id="scheduler-是-abc-加可替换实现">Scheduler 是 ABC 加可替换实现<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#scheduler-是-abc-加可替换实现" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>SchedulerInterface(ABC)</code> 定义 <code>schedule()</code>、grammar bitmask、<code>update_from_output()</code>、request add/finish 和 cache/connector 操作（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/core/sched/interface.py#L37-L159" class="external external-link"><code>SchedulerInterface</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。默认实现关系为：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>SchedulerInterface (ABC)</span></span>
+<span data-line><span>          △</span></span>
+<span data-line><span>          └── Scheduler</span></span>
+<span data-line><span>                  △</span></span>
+<span data-line><span>                  └── AsyncScheduler</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/core/sched/scheduler.py#L69-L119" class="external external-link"><code>Scheduler(SchedulerInterface)</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 默认统一调度器。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/core/sched/async_scheduler.py#L12-L35" class="external external-link"><code>AsyncScheduler(Scheduler)</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 在默认 Scheduler 上增加异步 scheduling 所需状态与行为。</p>
+<p><code>SchedulerConfig.get_scheduler_cls()</code> 在 <code>scheduler_cls is None</code> 时根据 <code>async_scheduling</code> 返回默认或异步实现；也接受 class object 或限定名字符串，并明确警告这个 custom interface 不是稳定公共接口（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/config/scheduler.py#L170-L194" class="external external-link"><code>SchedulerConfig.get_scheduler_cls</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>因此，类型标注是 <code>SchedulerInterface</code>，实际类由配置选择。<code>EngineCore</code> 对 Scheduler 的稳定依赖是 contract 与组合，不是对默认 <code>Scheduler</code> 的硬编码继承。</p>
+<h2 id="executor-家族">Executor 家族<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#executor-家族" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><code>Executor(ABC)</code> 把“在一个或多个设备上执行模型”抽象为 Worker collective RPC。它拥有统一 config 字段，并把 <code>execute_model()</code>、<code>sample_tokens()</code>、cache init、profile、sleep/wake 等操作下沉到 Worker（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/abstract.py#L37-L229" class="external external-link"><code>Executor</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>主要名义继承关系：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Executor (ABC)</span></span>
+<span data-line><span>├── UniProcExecutor</span></span>
+<span data-line><span>│   └── ExecutorWithExternalLauncher</span></span>
+<span data-line><span>├── MultiprocExecutor</span></span>
+<span data-line><span>│   └── RayExecutorV2</span></span>
+<span data-line><span>└── RayDistributedExecutor</span></span></code></pre></figure>
+<ul>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/uniproc_executor.py#L45-L124" class="external external-link"><code>UniProcExecutor</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 在当前进程创建一个 <code>WorkerWrapperBase</code>，RPC 退化为直接 <code>run_method()</code>。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/uniproc_executor.py#L150-L196" class="external external-link"><code>ExecutorWithExternalLauncher</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 复用单 Worker Executor，由 torchrun-compatible launcher 在进程外创建多个 Engine/Executor。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/multiproc_executor.py#L103-L144" class="external external-link"><code>MultiprocExecutor</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 启动/连接多个 Worker process，控制面使用 <code>MessageQueue</code>。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/ray_executor.py#L64-L89" class="external external-link"><code>RayDistributedExecutor</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 直接以 Ray actor 管理 distributed Workers。</li>
+<li><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/ray_executor_v2.py#L219-L224" class="external external-link"><code>RayExecutorV2(MultiprocExecutor)</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 复用 MQ control plane，但 Worker 是 Ray actors；它不是 <code>RayDistributedExecutor</code> 的子类。</li>
+</ul>
+<p><code>Executor.get_class()</code> 是真正入口：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th><code>distributed_executor_backend</code></th><th>额外条件</th><th>返回类</th></tr></thead><tbody><tr><td>class object</td><td>必须为 <code>Executor</code> 子类</td><td>原 class</td></tr><tr><td><code>&quot;uni&quot;</code></td><td>无</td><td><code>UniProcExecutor</code></td></tr><tr><td><code>&quot;mp&quot;</code></td><td>无</td><td><code>MultiprocExecutor</code></td></tr><tr><td><code>&quot;ray&quot;</code></td><td><code>VLLM_USE_RAY_V2_EXECUTOR_BACKEND=False</code></td><td><code>RayDistributedExecutor</code></td></tr><tr><td><code>&quot;ray&quot;</code></td><td>Ray V2 env 为真</td><td><code>RayExecutorV2</code></td></tr><tr><td><code>&quot;external_launcher&quot;</code></td><td>无</td><td><code>ExecutorWithExternalLauncher</code></td></tr><tr><td>其他字符串</td><td>解析限定名且验证子类</td><td>OOT custom Executor</td></tr></tbody></table></div>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/abstract.py#L48-L91" class="external external-link"><code>Executor.get_class</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — backend 到具体类的动态映射。</p>
+<p>一个常见误读是“Ray V2 一定继承旧 Ray Executor”。源码恰好相反：Ray V2 更接近 <code>MultiprocExecutor</code> 的 message-queue 模型。类关系能直接提示控制面实现差异，但具体 IPC 留给下一篇。</p>
+<h2 id="worker-家族">Worker 家族<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#worker-家族" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="workerbase-与-workerwrapperbase-是组合不是继承"><code>WorkerBase</code> 与 <code>WorkerWrapperBase</code> 是组合，不是继承<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#workerbase-与-workerwrapperbase-是组合不是继承" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>WorkerBase</code> 汇总设备无关 config/state，并定义 device init、model load、KV cache、execute/sample、LoRA 和 shutdown 等 interface-like methods。它没有继承 <code>ABC</code>，也没有 <code>@abstractmethod</code>，所以 Python 不会在实例化时强制完整实现（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/worker_base.py#L39-L181" class="external external-link"><code>WorkerBase</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p><code>WorkerWrapperBase</code> 表示 Executor 眼中的一个 process/rank。它负责环境、plugin、限定名解析和延迟构造，并通过 <code>self.worker</code> <strong>组合</strong>真正的 <code>WorkerBase</code> 实例（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/worker_base.py#L187-L240" class="external external-link"><code>WorkerWrapperBase</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Executor</span></span>
+<span data-line><span>  ◆ owns one or more WorkerWrapperBase</span></span>
+<span data-line><span>                         │</span></span>
+<span data-line><span>                         ◆ self.worker</span></span>
+<span data-line><span>                         ▼</span></span>
+<span data-line><span>                    WorkerBase-like implementation</span></span></code></pre></figure>
+<p><code>UniProcExecutor</code> 也使用 wrapper；“wrapper”不等于“只用于 multiprocessing”。它统一了直接调用、MP process 和 Ray actor 中的 Worker 初始化外观。</p>
+<h3 id="平台-worker-的名义继承">平台 Worker 的名义继承<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#平台-worker-的名义继承" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>当前主要设备类关系是：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>WorkerBase</span></span>
+<span data-line><span>    △</span></span>
+<span data-line><span>    └── gpu_worker.Worker</span></span>
+<span data-line><span>            △</span></span>
+<span data-line><span>            ├── CPUWorker</span></span>
+<span data-line><span>            └── XPUWorker</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_worker.py#L128-L180" class="external external-link"><code>gpu_worker.Worker(WorkerBase)</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — CUDA/ROCm 主 Worker，拥有 profiler、elastic EP、fault-tolerance、weight transfer 和 ModelRunner 状态。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/cpu_worker.py#L33-L80" class="external external-link"><code>CPUWorker(Worker)</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 与 <a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/xpu_worker.py#L24-L63" class="external external-link"><code>XPUWorker(Worker)</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 复用通用 Worker 行为，再覆盖 device、memory、runner 或 backend 细节。类名 <code>gpu_worker.Worker</code> 不意味着其所有子类都在 GPU 上执行。</p>
+<p>实际 Worker class 先由 platform 写入限定名：CUDA 使用 <code>vllm.v1.worker.gpu_worker.Worker</code>，CPU 使用 <code>CPUWorker</code>，XPU 使用 <code>XPUWorker</code>（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/platforms/cuda.py#L308-L315" class="external external-link"><code>CUDA platform 选择</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/platforms/cpu.py#L152-L160" class="external external-link"><code>CPU platform 选择</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/platforms/xpu.py#L318-L325" class="external external-link"><code>XPU platform 选择</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<h3 id="限定名解析与运行时-mro-注入">限定名解析与运行时 MRO 注入<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#限定名解析与运行时-mro-注入" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>WorkerWrapperBase.init_worker()</code> 并不静态 import 当前 Worker。它：</p>
+<ol>
+<li>在 Worker process 中加载 general plugins。</li>
+<li>用 <code>resolve_obj_by_qualname(parallel_config.worker_cls)</code> 找到 class。</li>
+<li>若配置 <code>worker_extension_cls</code>，解析 extension class。</li>
+<li>检查 extension 的属性不会覆盖 Worker 现有属性。</li>
+<li>直接执行 <code>worker_class.__bases__ = worker_class.__bases__ + (worker_extension_cls,)</code>。</li>
+<li>最后实例化 <code>self.worker = worker_class(**kwargs)</code>。</li>
+</ol>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/worker_base.py#L230-L320" class="external external-link"><code>WorkerWrapperBase.init_worker</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — Worker class factory 与运行时基类注入的完整证据。</p>
+<p>这条边是本项目最重要的静态分析陷阱之一：扫描 class declaration 得不到 extension 后的 MRO。图中必须把 <code>worker_extension_cls</code> 画成“运行时注入”，不能画成仓库内固定父类。</p>
+<h2 id="modelrunner-与能力-mixin">ModelRunner 与能力 Mixin<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#modelrunner-与能力-mixin" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Worker 处理 device/distributed/process 边界，ModelRunner 处理 batch/KV/attention/forward/sampling。两者是组合：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Worker</span></span>
+<span data-line><span>  ◆ self.model_runner</span></span>
+<span data-line><span>  ├── GPUModelRunner V1</span></span>
+<span data-line><span>  ├── GPUModelRunner V2</span></span>
+<span data-line><span>  ├── CPUModelRunner</span></span>
+<span data-line><span>  └── platform-specific runner</span></span></code></pre></figure>
+<p>GPU Worker 在 device/distributed 初始化后，根据 <code>vllm_config.use_v2_model_runner</code> 动态构造两个同名但位于不同模块的类（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_worker.py#L375-L428" class="external external-link"><code>Worker.init_device</code> 的 runner 选择<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）：</p>
+<ul>
+<li>V1：<code>vllm.v1.worker.gpu_model_runner.GPUModelRunner</code>。</li>
+<li>V2：<code>vllm.v1.worker.gpu.model_runner.GPUModelRunner</code>。</li>
+</ul>
+<p>V1 runner 的直接基类全部是横切能力 Mixin：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>LoRAModelRunnerMixin ───────┐</span></span>
+<span data-line><span>KVConnectorModelRunnerMixin ├──> GPUModelRunner V1</span></span>
+<span data-line><span>ECConnectorModelRunnerMixin ┘</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_model_runner.py#L453-L493" class="external external-link"><code>GPUModelRunner V1</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 组合 LoRA、KV transfer 与 encoder-cache connector 行为。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/lora_model_runner_mixin.py#L29-L45" class="external external-link"><code>LoRAModelRunnerMixin</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/kv_connector_model_runner_mixin.py#L33-L59" class="external external-link"><code>KVConnectorModelRunnerMixin</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 和 <a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/ec_connector_model_runner_mixin.py#L24-L45" class="external external-link"><code>ECConnectorModelRunnerMixin</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 各自提供一组可插入的横切操作，不独立代表一个可运行 runner。</p>
+<p>V2 runner 当前只直接继承 <code>LoRAModelRunnerMixin</code>（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu/model_runner.py#L126-L154" class="external external-link"><code>GPUModelRunner V2</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。这不是“V2 是 V1 的子类”；它是并列实现，由 Worker factory branch 选择。</p>
+<p>Worker 的执行方法负责 pipeline intermediate tensors，然后委托 <code>self.model_runner.execute_model()</code>；sampling 同样直接委托 runner（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_worker.py#L1011-L1107" class="external external-link"><code>Worker.execute_model</code> 与 <code>sample_tokens</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。因此图中 <code>Worker → ModelRunner</code> 是<strong>对象组合和调用边</strong>，不是继承。</p>
+<h2 id="模型接口与代表性-llama">模型接口与代表性 Llama<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#模型接口与代表性-llama" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="所有模型依赖结构化接口而非共同实体基类">所有模型依赖结构化接口，而非共同实体基类<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#所有模型依赖结构化接口而非共同实体基类" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>VllmModel</code> 是 <code>@runtime_checkable Protocol</code>，要求新式构造签名、<code>embed_input_ids()</code> 与 <code>forward(input_ids, positions, ...)</code>。生成模型再满足 <code>VllmModelForTextGeneration.compute_logits()</code>，pooling 模型满足对应 pooling Protocol（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/interfaces_base.py#L46-L149" class="external external-link"><code>VllmModel</code> 与 generation/pooling Protocol`<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>能力接口分布在 <code>interfaces.py</code>，例如：</p>
+<ul>
+<li><code>SupportsMultiModal(Protocol)</code>：multimodal embedding 与 language/tower model 发现（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/interfaces.py#L91-L193" class="external external-link"><code>SupportsMultiModal</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li><code>SupportsLoRA(Protocol)</code>：LoRA module/embedding metadata（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/interfaces.py#L545-L620" class="external external-link"><code>SupportsLoRA</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li><code>SupportsPP(Protocol)</code>：pipeline-parallel intermediate tensor contract（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/interfaces.py#L624-L683" class="external external-link"><code>SupportsPP</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li><code>SupportsEagle</code>、<code>SupportsEagle3</code>：EAGLE speculative decoding capability（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/interfaces.py#L1303-L1432" class="external external-link"><code>SupportsEagleBase</code> 与 variants<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li><code>SupportsQuant</code>：量化 metadata/helper 的普通基类，不是 <code>Protocol</code>（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/interfaces.py#L1031-L1070" class="external external-link"><code>SupportsQuant</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+</ul>
+<p>Registry 通过结构化检查和 capability tags 判断 runner type、multimodal、PP、LoRA、EAGLE 等能力；模型不必继承一个名为 <code>BaseVllmModel</code> 的实体类。</p>
+<h3 id="llamaforcausallm-的实际关系"><code>LlamaForCausalLM</code> 的实际关系<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#llamaforcausallm-的实际关系" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>代表性 Llama 既展示名义多继承，也展示深层对象组合：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>LocalArgmaxMixin ───────────┐</span></span>
+<span data-line><span>nn.Module ──────────────────┤</span></span>
+<span data-line><span>SupportsLoRA (Protocol) ────┤</span></span>
+<span data-line><span>SupportsPP (Protocol) ──────┼──> LlamaForCausalLM</span></span>
+<span data-line><span>SupportsEagle (Protocol) ───┤          │</span></span>
+<span data-line><span>SupportsEagle3 (Protocol) ──┤          ◆ self.model</span></span>
+<span data-line><span>SupportsQuant ──────────────┘          ▼</span></span>
+<span data-line><span>                                      LlamaModel(nn.Module, EagleModelMixin)</span></span>
+<span data-line><span>                                          │ ◆ layers</span></span>
+<span data-line><span>                                          ▼</span></span>
+<span data-line><span>                                      LlamaDecoderLayer(nn.Module)</span></span>
+<span data-line><span>                                       ├──◆ LlamaAttention(nn.Module)</span></span>
+<span data-line><span>                                       ├──◆ LlamaMLP(nn.Module)</span></span>
+<span data-line><span>                                       └──◆ RMSNorm</span></span>
+<span data-line> </span>
+<span data-line><span>LlamaForCausalLM</span></span>
+<span data-line><span>├──◆ ParallelLMHead / PPMissingLayer</span></span>
+<span data-line><span>└──◆ LogitsProcessor</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/llama.py#L446-L553" class="external external-link"><code>LlamaForCausalLM</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 直接基类、<code>self.model</code>、PP-aware LM head、<code>forward()</code>、<code>compute_logits()</code> 与 weight loading。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/llama.py#L344-L443" class="external external-link"><code>LlamaModel</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — <code>nn.Module + EagleModelMixin</code>，组合 embeddings、按 PP rank 切分的 decoder layers、norm 与 intermediate tensor factory。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/llama.py#L248-L327" class="external external-link"><code>LlamaDecoderLayer</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 组合 attention、MLP 和两个 RMSNorm，并实现 residual path。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/llama.py#L122-L246" class="external external-link"><code>LlamaAttention</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 组合 tensor-parallel QKV/output projections、RoPE 与选择出的 attention implementation。</p>
+<p>这棵树要分三层理解：</p>
+<ol>
+<li><code>nn.Module</code> 是 PyTorch 模块生命周期的名义主基类。</li>
+<li><code>Supports*</code> 与 <code>LocalArgmaxMixin</code> 表达可选能力，其中多数 <code>Supports*</code> 是 runtime Protocol。</li>
+<li><code>LlamaForCausalLM → LlamaModel → DecoderLayer → Attention/MLP</code> 是真正承载权重和 forward 的对象组合树。</li>
+</ol>
+<p>把所有 <code>Supports*</code> 画成普通业务父类，会掩盖结构化能力设计；只画组合树，又会漏掉 LoRA、PP、EAGLE 和 quantization 的 capability contract。</p>
+<h2 id="模型注册与加载工厂">模型注册与加载工厂<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#模型注册与加载工厂" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>模型“类型选择”和“权重加载策略”是两套独立 factory。</p>
+<h3 id="modelregistryarchitecture-到-model-class">ModelRegistry：architecture 到 model class<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#modelregistryarchitecture-到-model-class" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Registry 内部先抽象注册项：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>_BaseRegisteredModel (ABC)</span></span>
+<span data-line><span>├── _RegisteredModel        # 已有 class object</span></span>
+<span data-line><span>└── _LazyRegisteredModel    # module_name + class_name</span></span>
+<span data-line> </span>
+<span data-line><span>_ModelRegistry</span></span>
+<span data-line><span>  ◆ models: dict[architecture, _BaseRegisteredModel]</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/registry.py#L833-L881" class="external external-link"><code>_BaseRegisteredModel</code>、eager 与 lazy 注册项<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 区分已导入 class 与延迟模块描述。</p>
+<p><code>_LazyRegisteredModel.load_model_cls()</code> 才执行 <code>importlib.import_module()</code>；能力检查可走缓存或隔离子进程，避免主进程过早导入模型并初始化 CUDA（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/registry.py#L867-L1001" class="external external-link"><code>_LazyRegisteredModel</code> inspection/load<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p><code>register_model(architecture, model_cls)</code> 接受 <code>nn.Module</code> class 或 <code>&quot;&lt;module>:&lt;class>&quot;</code> 字符串；后者生成 lazy entry（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/registry.py#L1032-L1081" class="external external-link"><code>ModelRegistry.register_model</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p><code>resolve_model_cls()</code> 还会考虑：</p>
+<ul>
+<li><code>model_impl=&quot;transformers&quot;</code> 强制 Transformers backend；</li>
+<li><code>model_impl=&quot;auto&quot;</code> 的 Transformers fallback；</li>
+<li>runner/convert type 对 architecture 的规范化；</li>
+<li>in-tree 与 OOT registration；</li>
+<li>unsupported/previously-supported model 错误；</li>
+<li>最终 platform model-architecture 验证。</li>
+</ul>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/registry.py#L1215-L1335" class="external external-link"><code>ModelRegistry.resolve_model_cls</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — architecture 到 concrete <code>nn.Module</code> class 的动态选择。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/model_loader/utils.py#L200-L260" class="external external-link"><code>get_model_architecture</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 调 registry 后再按 <code>convert_type</code> 包装 embedding/classification adapter，并缓存结果。</p>
+<h3 id="modelloaderload-format-到加载策略">ModelLoader：load format 到加载策略<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#modelloaderload-format-到加载策略" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>BaseModelLoader(ABC)</code> 定义 <code>download_model()</code> 与 <code>load_weights()</code>，公共 <code>load_model()</code> 负责创建模型、记录 inspection、调用具体权重加载和 post-load processing（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/model_loader/base_loader.py#L25-L82" class="external external-link"><code>BaseModelLoader</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p><code>_LOAD_FORMAT_TO_MODEL_LOADER</code> 把 <code>auto</code>、<code>safetensors</code>、<code>bitsandbytes</code>、<code>dummy</code>、<code>sharded_state</code>、<code>tensorizer</code> 等格式映射到 loader class；<code>register_model_loader()</code> 允许扩展或覆盖，<code>get_model_loader()</code> 实例化选中的策略（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/model_loader/__init__.py#L27-L127" class="external external-link"><code>ModelLoader registry 与 factory</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>最终加载链是：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>GPUModelRunner.load_model()</span></span>
+<span data-line><span>  → get_model_loader(load_config)</span></span>
+<span data-line><span>  → BaseModelLoader.load_model()</span></span>
+<span data-line><span>      → initialize_model()</span></span>
+<span data-line><span>          → get_model_architecture()</span></span>
+<span data-line><span>          → ModelRegistry.resolve_model_cls()</span></span>
+<span data-line><span>          → model_cls(vllm_config, prefix)</span></span>
+<span data-line><span>      → concrete_loader.load_weights(model, model_config)</span></span>
+<span data-line><span>      → post-load quant/kernel processing</span></span>
+<span data-line><span>  → optional LoRA / drafter / EPLB wrapping</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_model_runner.py#L5294-L5326" class="external external-link"><code>GPUModelRunner.load_model</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — runner 到 loader 的入口。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/model_loader/utils.py#L41-L108" class="external external-link"><code>initialize_model</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — model class 解析与新式/兼容构造签名。</p>
+<p>关键区分：ModelRegistry 选择“实例化哪个模型类”，ModelLoader 选择“如何取得并写入权重”。二者都叫 registry/factory，但不能合并成同一继承树。</p>
+<h2 id="静态图看不到的动态边">静态图看不到的动态边<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#静态图看不到的动态边" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>下表汇总必须人工补到类图旁的动态关系。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>动态边</th><th>静态扫描为何会漏</th><th>运行时依据</th><th>证据</th></tr></thead><tbody><tr><td><code>AsyncLLMEngine → AsyncLLM</code></td><td>不是 class declaration</td><td>module alias</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/engine/async_llm_engine.py#L1-L7" class="external external-link"><code>async_llm_engine.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Scheduler implementation</td><td><code>EngineCore</code> 只标注 <code>SchedulerInterface</code></td><td>async flag、class object、限定名</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/config/scheduler.py#L170-L194" class="external external-link"><code>get_scheduler_cls</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Executor implementation</td><td>concrete class 在函数内延迟 import</td><td>backend、Ray V2 env、class path</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/abstract.py#L48-L91" class="external external-link"><code>Executor.get_class</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Worker implementation</td><td>wrapper 只看到字符串</td><td>platform 写入 <code>worker_cls</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/worker_base.py#L230-L275" class="external external-link"><code>init_worker</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Worker extension MRO</td><td>class source中不存在该基类</td><td><code>worker_extension_cls</code> 修改 <code>__bases__</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/worker_base.py#L265-L300" class="external external-link"><code>init_worker</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>GPUModelRunner V1/V2</td><td>两个模块存在同名 class</td><td><code>use_v2_model_runner</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_worker.py#L407-L425" class="external external-link"><code>Worker.init_device</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Model class</td><td>architecture 映射默认是 lazy string</td><td>registry、model_impl、Transformers fallback</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/registry.py#L1278-L1331" class="external external-link"><code>resolve_model_cls</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Loader class</td><td>runner 只调用 factory</td><td><code>LoadConfig.load_format</code> registry</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/model_loader/__init__.py#L122-L127" class="external external-link"><code>get_model_loader</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>General plugin effects</td><td>entry point 在每个相关进程动态执行</td><td><code>VLLM_PLUGINS</code> 与 plugin group</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/plugins/__init__.py#L31-L91" class="external external-link"><code>load_general_plugins</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td>Platform model gate</td><td>model class 已解析仍可能被拒绝</td><td>current platform</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/platforms/interface.py#L943-L954" class="external external-link"><code>Platform.verify_model_arch</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr></tbody></table></div>
+<p>General plugins 可以在 process 0、EngineCore 和 Worker process 分别加载，且被要求可重复调用；<code>EngineCore.__init__</code> 和 <code>WorkerWrapperBase.init_worker()</code> 都显式触发它们。由 plugin 注册的新模型、loader 或行为不会出现在仓库静态 class 图中。</p>
+<h3 id="阅读一个动态对象的通用方法">阅读一个动态对象的通用方法<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阅读一个动态对象的通用方法" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>以后遇到任何抽象类型，可按以下顺序定位：</p>
+<ol>
+<li>找 contract：ABC、Protocol 或 interface-like base。</li>
+<li>找名义实现：<code>class X(Base)</code>。</li>
+<li>找 factory：<code>get_class()</code>、<code>get_*_cls()</code>、<code>create_*()</code>。</li>
+<li>找 registry：字符串键、entry point 或限定名。</li>
+<li>找配置写入者：platform、<code>VllmConfig.__post_init__</code>、CLI/env。</li>
+<li>找组合点：谁把 concrete object 保存到 <code>self.*</code>。</li>
+<li>最后检查 plugin、Mixin 和 <code>__bases__</code> 注入。</li>
+</ol>
+<p>这比只做“查找所有子类”更接近 vLLM 的真实运行时结构。</p>
+<h2 id="关键代码索引">关键代码索引<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#关键代码索引" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>本表只列本篇的类型与选择节点；全局稳定 ID 在<a href="./07-source-inventory-and-code-index" class="internal internal-link alias" data-slug="vllm/07-source-inventory-and-code-index">07：源码清单与代码索引</a>统一维护。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>符号或目标</th><th>代码位置</th><th>本篇用途</th></tr></thead><tbody><tr><td><code>EngineClient</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/engine/protocol.py#L41-L244" class="external external-link"><code>protocol.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>在线 serving ABC</td></tr><tr><td><code>AsyncLLM</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/async_llm.py#L71-L147" class="external external-link"><code>async_llm.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>当前 Python 在线 concrete Engine</td></tr><tr><td><code>LLM</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/llm.py#L66-L74" class="external external-link"><code>llm.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>三个 offline Mixin 的同步外观</td></tr><tr><td><code>LLMEngine</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/llm_engine.py#L48-L139" class="external external-link"><code>llm_engine.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>组合 V1 processor 与 core client 的兼容外观</td></tr><tr><td><code>EngineCoreClient.make_client</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L78-L141" class="external external-link"><code>core_client.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>client 家族 ABC 与 factory</td></tr><tr><td><code>InprocClient</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L291-L340" class="external external-link"><code>core_client.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>同进程 core 组合</td></tr><tr><td><code>MPClient</code> family</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L482-L520" class="external external-link"><code>core_client.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>sync/async/DP 多进程共同父类</td></tr><tr><td><code>EngineCore.__init__</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L103-L178" class="external external-link"><code>core.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>Executor、Scheduler 和 manager 组合点</td></tr><tr><td><code>EngineCoreProc</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L1000-L1059" class="external external-link"><code>core.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>core 的进程/IPC 部署子类</td></tr><tr><td><code>SchedulerInterface</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/core/sched/interface.py#L37-L159" class="external external-link"><code>interface.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>Scheduler ABC contract</td></tr><tr><td><code>SchedulerConfig.get_scheduler_cls</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/config/scheduler.py#L170-L194" class="external external-link"><code>scheduler.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>默认、async 与 custom Scheduler 选择</td></tr><tr><td><code>Executor.get_class</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/abstract.py#L37-L91" class="external external-link"><code>abstract.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>Executor ABC 与 backend factory</td></tr><tr><td><code>UniProcExecutor</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/uniproc_executor.py#L45-L124" class="external external-link"><code>uniproc_executor.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>直接 WorkerWrapper 调用</td></tr><tr><td><code>MultiprocExecutor</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/multiproc_executor.py#L103-L144" class="external external-link"><code>multiproc_executor.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>MQ-based multi-worker 实现</td></tr><tr><td><code>RayDistributedExecutor</code> / <code>RayExecutorV2</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/ray_executor.py#L64-L89" class="external external-link"><code>ray_executor.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/ray_executor_v2.py#L219-L224" class="external external-link"><code>ray_executor_v2.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>两条不同的 Ray 继承路径</td></tr><tr><td><code>WorkerBase</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/worker_base.py#L39-L181" class="external external-link"><code>worker_base.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>interface-like device Worker 基类</td></tr><tr><td><code>WorkerWrapperBase.init_worker</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/worker_base.py#L187-L319" class="external external-link"><code>worker_base.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>Worker 组合、限定名解析和动态 MRO 注入</td></tr><tr><td>GPU <code>Worker</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_worker.py#L128-L180" class="external external-link"><code>gpu_worker.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>设备/distributed 生命周期与 runner 组合</td></tr><tr><td>GPUModelRunner V1/V2</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_model_runner.py#L453-L493" class="external external-link"><code>gpu_model_runner.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu/model_runner.py#L126-L154" class="external external-link"><code>gpu/model_runner.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>并列 runner 与 Mixin 差异</td></tr><tr><td><code>VllmModel</code> Protocols</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/interfaces_base.py#L46-L149" class="external external-link"><code>interfaces_base.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>所有模型的结构化 contract</td></tr><tr><td><code>Supports*</code> capabilities</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/interfaces.py#L545-L683" class="external external-link"><code>interfaces.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>LoRA 与 PP 能力示例</td></tr><tr><td><code>LlamaForCausalLM</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/llama.py#L446-L553" class="external external-link"><code>llama.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>代表性模型多继承与组合根</td></tr><tr><td><code>_ModelRegistry</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/registry.py#L1032-L1081" class="external external-link"><code>registry.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>eager/lazy model 注册</td></tr><tr><td><code>resolve_model_cls</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/models/registry.py#L1278-L1331" class="external external-link"><code>registry.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>model_impl、in-tree、Transformers/OOT 选择</td></tr><tr><td>ModelLoader factory</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/model_loader/__init__.py#L27-L127" class="external external-link"><code>model_loader/__init__.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>load format 到 loader class</td></tr><tr><td><code>BaseModelLoader.load_model</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/model_executor/model_loader/base_loader.py#L25-L82" class="external external-link"><code>base_loader.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>模型实例化、权重写入和 post-load</td></tr></tbody></table></div>
+<hr/>
+<p>上一页：<a href="./02-entrypoints-and-request-lifecycle" class="internal internal-link alias" data-slug="vllm/02-entrypoints-and-request-lifecycle">02：入口与请求生命周期</a> · 下一页：<a href="./04-processes-and-module-communication" class="internal internal-link alias" data-slug="vllm/04-processes-and-module-communication">04：进程与模块通信</a> · 返回：<a href="./readme" class="internal internal-link alias" data-slug="vllm/readme">指南入口</a></p></div></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>关系图谱</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc"><button type="button" class="toc-header" aria-controls="toc-12" aria-expanded="true"><h3>目录</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#03核心类关系能力接口与运行时工厂" data-for="03核心类关系能力接口与运行时工厂">03：核心类关系、能力接口与运行时工厂</a></li><li class="depth-1"><a href="#先读图例" data-for="先读图例">先读图例</a></li><li class="depth-1"><a href="#api-与-engine-抽象" data-for="api-与-engine-抽象">API 与 Engine 抽象</a></li><li class="depth-2"><a href="#在线抽象engineclient-abc" data-for="在线抽象engineclient-abc">在线抽象：EngineClient ABC</a></li><li class="depth-2"><a href="#离线外观mixin-加对象组合" data-for="离线外观mixin-加对象组合">离线外观：Mixin 加对象组合</a></li><li class="depth-1"><a href="#enginecoreclient-家族" data-for="enginecoreclient-家族">EngineCoreClient 家族</a></li><li class="depth-1"><a href="#enginecore-与-scheduler-的组合" data-for="enginecore-与-scheduler-的组合">EngineCore 与 Scheduler 的组合</a></li><li class="depth-2"><a href="#core-是协调对象proc-是部署包装" data-for="core-是协调对象proc-是部署包装">Core 是协调对象，Proc 是部署包装</a></li><li class="depth-2"><a href="#scheduler-是-abc-加可替换实现" data-for="scheduler-是-abc-加可替换实现">Scheduler 是 ABC 加可替换实现</a></li><li class="depth-1"><a href="#executor-家族" data-for="executor-家族">Executor 家族</a></li><li class="depth-1"><a href="#worker-家族" data-for="worker-家族">Worker 家族</a></li><li class="depth-2"><a href="#workerbase-与-workerwrapperbase-是组合不是继承" data-for="workerbase-与-workerwrapperbase-是组合不是继承">WorkerBase 与 WorkerWrapperBase 是组合，不是继承</a></li><li class="depth-2"><a href="#平台-worker-的名义继承" data-for="平台-worker-的名义继承">平台 Worker 的名义继承</a></li><li class="depth-2"><a href="#限定名解析与运行时-mro-注入" data-for="限定名解析与运行时-mro-注入">限定名解析与运行时 MRO 注入</a></li><li class="depth-1"><a href="#modelrunner-与能力-mixin" data-for="modelrunner-与能力-mixin">ModelRunner 与能力 Mixin</a></li><li class="depth-1"><a href="#模型接口与代表性-llama" data-for="模型接口与代表性-llama">模型接口与代表性 Llama</a></li><li class="depth-2"><a href="#所有模型依赖结构化接口而非共同实体基类" data-for="所有模型依赖结构化接口而非共同实体基类">所有模型依赖结构化接口，而非共同实体基类</a></li><li class="depth-2"><a href="#llamaforcausallm-的实际关系" data-for="llamaforcausallm-的实际关系">LlamaForCausalLM 的实际关系</a></li><li class="depth-1"><a href="#模型注册与加载工厂" data-for="模型注册与加载工厂">模型注册与加载工厂</a></li><li class="depth-2"><a href="#modelregistryarchitecture-到-model-class" data-for="modelregistryarchitecture-到-model-class">ModelRegistry：architecture 到 model class</a></li><li class="depth-2"><a href="#modelloaderload-format-到加载策略" data-for="modelloaderload-format-到加载策略">ModelLoader：load format 到加载策略</a></li><li class="depth-1"><a href="#静态图看不到的动态边" data-for="静态图看不到的动态边">静态图看不到的动态边</a></li><li class="depth-2"><a href="#阅读一个动态对象的通用方法" data-for="阅读一个动态对象的通用方法">阅读一个动态对象的通用方法</a></li><li class="depth-1"><a href="#关键代码索引" data-for="关键代码索引">关键代码索引</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>反向链接</h3><ul id="list-0" class="overflow"><li><a href="../vllm/01-project-map" class="internal">01-project-map</a></li><li><a href="../vllm/02-entrypoints-and-request-lifecycle" class="internal">02-entrypoints-and-request-lifecycle</a></li><li><a href="../vllm/04-processes-and-module-communication" class="internal">04-processes-and-module-communication</a></li><li><a href="../vllm/07-source-inventory-and-code-index" class="internal">07-source-inventory-and-code-index</a></li><li><a href="../vllm/readme" class="internal">README</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v5.0.0</a> © 2026</p><ul><li><a href="https://github.com/jackyzha0/quartz">GitHub</a></li><li><a href="https://discord.gg/cRFFHYye7t">Discord Community</a></li></ul></footer></div></div></body><script src="../static/resource-after-e13fffa1.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-8b336f9a.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-baba652b.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-5eb75950.js" type="module" data-persist="true"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript-3eea7814.js" type="module" data-persist="true"></script></html>

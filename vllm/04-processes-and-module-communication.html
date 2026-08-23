@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh" dir="ltr"><head><title>04-processes-and-module-communication</title><meta charset="utf-8"/><link rel="preload" href="../index-bb6c1746.css" as="style"/><link rel="preload" href="../prescript-2bfc6315.js" as="script"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Notes"/><meta property="og:title" content="04-processes-and-module-communication"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="04-processes-and-module-communication"/><meta name="twitter:description" content="04：进程、控制面、数据面与通信协议 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 本篇把请求生命周期中的逻辑调用展开成真实部署边界。核心原则是：先区分控制面和数据面，再判断同一逻辑对象位于当前进程、子进程、Ray actor 还是远端节点。类关系见03：核心类关系。 控制面与数据面先分开 vLLM 同时存在多种通信机制。它们解决的问题不同，不能统称为“RPC”或“NCCL 通信”。 平面传输内容主要参与者当前主要机制北向协议HTTP/gRPC request、SSE/JSON respons..."/><meta property="og:description" content="04：进程、控制面、数据面与通信协议 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 本篇把请求生命周期中的逻辑调用展开成真实部署边界。核心原则是：先区分控制面和数据面，再判断同一逻辑对象位于当前进程、子进程、Ray actor 还是远端节点。类关系见03：核心类关系。 控制面与数据面先分开 vLLM 同时存在多种通信机制。它们解决的问题不同，不能统称为“RPC”或“NCCL 通信”。 平面传输内容主要参与者当前主要机制北向协议HTTP/gRPC request、SSE/JSON respons..."/><meta property="og:image:alt" content="04：进程、控制面、数据面与通信协议 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 本篇把请求生命周期中的逻辑调用展开成真实部署边界。核心原则是：先区分控制面和数据面，再判断同一逻辑对象位于当前进程、子进程、Ray actor 还是远端节点。类关系见03：核心类关系。 控制面与数据面先分开 vLLM 同时存在多种通信机制。它们解决的问题不同，不能统称为“RPC”或“NCCL 通信”。 平面传输内容主要参与者当前主要机制北向协议HTTP/gRPC request、SSE/JSON respons..."/><meta property="twitter:domain" content="fmpic.github.io/notes"/><meta property="og:url" content="https://fmpic.github.io/notes/vllm/04-processes-and-module-communication"/><meta property="twitter:url" content="https://fmpic.github.io/notes/vllm/04-processes-and-module-communication"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="04：进程、控制面、数据面与通信协议 代码快照：0934b267906f8cd9459f287b31647c3ed5c58e01。 行号、类型关系和调用链均以此提交为准；返回指南入口。 本篇把请求生命周期中的逻辑调用展开成真实部署边界。核心原则是：先区分控制面和数据面，再判断同一逻辑对象位于当前进程、子进程、Ray actor 还是远端节点。类关系见03：核心类关系。 控制面与数据面先分开 vLLM 同时存在多种通信机制。它们解决的问题不同，不能统称为“RPC”或“NCCL 通信”。 平面传输内容主要参与者当前主要机制北向协议HTTP/gRPC request、SSE/JSON respons..."/><meta name="generator" content="Quartz"/><link href="../index-bb6c1746.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-735924e0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-589c1cea.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-bbc3f7c0.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-2911f5d1.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-e427079e.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-53b25b2b.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-c93c6a44.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-8a06014f.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-77d6a441.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-6ee21cee.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-1ea6ad18.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-34bdfded.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-788c9ca3.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-642859cd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-4abc06bd.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-274a3dfe.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-94cb6c84.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-58d5ff56.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../component-7262b5a7.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-a5c806d2.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-6bd36952.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-9857b007.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="../static/resource-style-d3a1a224.css" rel="stylesheet" type="text/css" data-persist="true"/><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript-2bfc6315.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted%20Grotesk%3Awght%40400%3B700&amp;family=Source%20Sans%20Pro%3Aital%2Cwght%400%2C400%3B0%2C600%3B1%2C400%3B1%2C600&amp;family=IBM%20Plex%20Mono%3Awght%40400%3B600&amp;display=swap"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://fmpic.github.io/notes/vllm/04-processes-and-module-communication-og-image.webp"/><meta property="og:image:url" content="https://fmpic.github.io/notes/vllm/04-processes-and-module-communication-og-image.webp"/><meta name="twitter:image" content="https://fmpic.github.io/notes/vllm/04-processes-and-module-communication-og-image.webp"/><meta property="og:image:type" content="image/webp"/></head><body data-slug="vllm/04-processes-and-module-communication" data-basepath="/notes"><div id="quartz-root" class="page" data-frame="default"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Notes</a></h2><div class="mobile-only"><div class="spacer"></div></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 0.5rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button" aria-label="搜索" aria-expanded="false"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>搜索</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="搜索内容..." placeholder="搜索内容..."/><div class="search-layout" data-preview="true" data-field-priority="[&quot;title&quot;,&quot;content&quot;,&quot;tags&quot;]"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode" aria-label="暗色模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="暗色模式"><title>暗色模式</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="亮色模式"><title>亮色模式</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode" aria-label="阅读模式"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="阅读模式"><title>阅读模式</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><div class="explorer nav-files-container" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a2, b2) => {\n    if (!a2.isFolder &amp;&amp; !b2.isFolder || a2.isFolder &amp;&amp; b2.isFolder) {\n      return (a2.displayName || \&quot;\&quot;).localeCompare(b2.displayName || \&quot;\&quot;, void 0, {\n        numeric: true,\n        sensitivity: \&quot;base\&quot;\n      });\n    }\n    if (!a2.isFolder &amp;&amp; b2.isFolder) {\n      return 1;\n    }\n    return -1;\n  }&quot;,&quot;filterFn&quot;:&quot;(node) => node.slugSegment !== \&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;(node) => {\n    return node;\n  }&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-14" aria-label="探索"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>探索</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-14" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#" class="nav-file-title tree-item-self"></a></li></template><template id="template-folder"><li><div class="folder-container nav-folder-title tree-item-self"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon nav-folder-collapse-indicator collapse-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content tree-item-children"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../vllm/">vLLM</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>04-processes-and-module-communication</a></div></nav><h1 class="article-title">04-processes-and-module-communication</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-23T09:18:46.293Z">2026年8月23日</time><span>21分钟阅读</span></p></div></div><article class="popover-hint"><div class="markdown-preview-view markdown-rendered"><h1 id="04进程控制面数据面与通信协议">04：进程、控制面、数据面与通信协议<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#04进程控制面数据面与通信协议" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<blockquote>
+<p><strong>代码快照</strong>：<code>0934b267906f8cd9459f287b31647c3ed5c58e01</code>。
+行号、类型关系和调用链均以此提交为准；返回<a href="./readme" class="internal internal-link alias" data-slug="vllm/readme">指南入口</a>。</p>
+</blockquote>
+<p><img src="./diagrams/process-communication.png" alt="vLLM 进程与通信图"/></p>
+<p>本篇把<a href="./02-entrypoints-and-request-lifecycle" class="internal internal-link alias" data-slug="vllm/02-entrypoints-and-request-lifecycle">请求生命周期</a>中的逻辑调用展开成真实部署边界。核心原则是：先区分控制面和数据面，再判断同一逻辑对象位于当前进程、子进程、Ray actor 还是远端节点。类关系见<a href="./03-core-class-hierarchy" class="internal internal-link alias" data-slug="vllm/03-core-class-hierarchy">03：核心类关系</a>。</p>
+<h2 id="控制面与数据面先分开">控制面与数据面先分开<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#控制面与数据面先分开" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>vLLM 同时存在多种通信机制。它们解决的问题不同，不能统称为“RPC”或“NCCL 通信”。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>平面</th><th>传输内容</th><th>主要参与者</th><th>当前主要机制</th></tr></thead><tbody><tr><td>北向协议</td><td>HTTP/gRPC request、SSE/JSON response</td><td>client ↔ Python/Rust frontend</td><td>FastAPI/Uvicorn、Axum/Hyper、tonic</td></tr><tr><td>Engine 控制面</td><td>add/abort/utility、request output、ready/health、DP wave/stats</td><td>frontend <code>EngineCoreClient</code> ↔ <code>EngineCoreProc</code></td><td>ZMQ、MessagePack/msgspec、可选 tensor IPC</td></tr><tr><td>Executor 控制面</td><td>method name、<code>SchedulerOutput</code>、grammar、返回状态/<code>ModelRunnerOutput</code></td><td><code>EngineCore</code>/Executor ↔ Worker process</td><td>vLLM <code>MessageQueue</code>、Ray RPC 或直接调用</td></tr><tr><td>模型数据面</td><td>activation、logits、KV/hidden tensors、collective payload</td><td>Worker ranks ↔ Worker ranks</td><td>torch.distributed、NCCL/Gloo/XCCL 及 platform communicator</td></tr><tr><td>Connector 数据面</td><td>KV cache、encoder cache、disaggregated prefill/decode 数据</td><td>connector peers/storage</td><td>KV/EC connector 自身 transport</td></tr><tr><td>构建/插件边界</td><td>不是每 token 的传输；决定进程里加载什么实现</td><td>process-local registry/plugin loader</td><td>Python entry points、限定名 import</td></tr></tbody></table></div>
+<p>本文把“控制面”定义为请求、调度、RPC、状态、握手、健康和关闭消息；把“数据面”定义为模型张量与设备 collective。<code>SchedulerOutput</code> 虽然可能带 tensor/grammar buffer，语义上仍是 Executor 控制消息；TP all-reduce 和 PP intermediate tensors 才是模型数据面。</p>
+<p>源码也明确要求 Executor <code>collective_rpc()</code> 主要传控制消息，并建议另设数据面通信（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/abstract.py#L129-L184" class="external external-link"><code>Executor.collective_rpc</code> contract<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<h2 id="最小进程内拓扑">最小进程内拓扑<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#最小进程内拓扑" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>当同步 <code>LLMEngine</code> 不启用 V1 multiprocessing 时，<code>EngineCoreClient.make_client()</code> 返回 <code>InprocClient</code>。此时没有 frontend ↔ core ZMQ：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>单个 Python 进程</span></span>
+<span data-line><span>┌──────────────────────────────────────────────────────────────┐</span></span>
+<span data-line><span>│ LLM → LLMEngine → InprocClient ◆→ EngineCore               │</span></span>
+<span data-line><span>│                                  ├─ Scheduler                │</span></span>
+<span data-line><span>│                                  └─ Executor                 │</span></span>
+<span data-line><span>│                                      └─ Worker/ModelRunner   │</span></span>
+<span data-line><span>└──────────────────────────────────────────────────────────────┘</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L291-L340" class="external external-link"><code>InprocClient</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 直接构造 <code>EngineCore</code>：</p>
+<ul>
+<li><code>add_request()</code> 直接调用 core preprocessing 与 add。</li>
+<li><code>get_output()</code> 直接调用 <code>EngineCore.step_fn()</code> 和 <code>post_step()</code>。</li>
+<li>abort、cache reset、profile、sleep/wake 都是普通方法调用。</li>
+</ul>
+<p>Executor 是否再创建 Worker 子进程是另一维度：</p>
+<ul>
+<li><code>UniProcExecutor</code> 的 <code>WorkerWrapperBase</code>、Worker 和 ModelRunner 仍在同一进程。</li>
+<li><code>MultiprocExecutor</code> 即使 core 是 in-process，也可创建 Worker processes。</li>
+<li><code>external_launcher</code>、Ray 或多节点配置还能把 Worker/Engine 的所有权交给外部 launcher。</li>
+</ul>
+<p>所以，“InprocClient”只说明 frontend Engine 与 <code>EngineCore</code> 同进程，不等于整个模型一定单进程或单 GPU。</p>
+<h2 id="默认多进程拓扑">默认多进程拓扑<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#默认多进程拓扑" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>在线 <code>AsyncLLM</code> 当前不支持 async in-process core，因此至少有 frontend process 与 <code>EngineCoreProc</code> 两个进程。常见拓扑可按 Executor backend 再分两类。</p>
+<h3 id="单设备uni-executor">单设备/<code>uni</code> Executor<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#单设备uni-executor" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Process A: API Server</span></span>
+<span data-line><span>  FastAPI → serving → AsyncLLM → AsyncMPClient</span></span>
+<span data-line><span>                              │ ZMQ control/output</span></span>
+<span data-line><span>                              ▼</span></span>
+<span data-line><span>Process B: EngineCoreProc</span></span>
+<span data-line><span>  EngineCore → Scheduler → UniProcExecutor</span></span>
+<span data-line><span>                           → WorkerWrapper → Worker → ModelRunner → GPU</span></span></code></pre></figure>
+<p>这里 Worker 是对象，不是额外 OS process。<code>UniProcExecutor.collective_rpc()</code> 在 Process B 里直接 <code>run_method()</code>。</p>
+<h3 id="mp-executor"><code>mp</code> Executor<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#mp-executor" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Process A: API Server</span></span>
+<span data-line><span>  AsyncLLM + AsyncMPClient</span></span>
+<span data-line><span>          │ ZMQ</span></span>
+<span data-line><span>          ▼</span></span>
+<span data-line><span>Process B: EngineCoreProc</span></span>
+<span data-line><span>  Scheduler + MultiprocExecutor</span></span>
+<span data-line><span>          │ MessageQueue broadcast / response queues</span></span>
+<span data-line><span>          ├──────────────┬──────────────┐</span></span>
+<span data-line><span>          ▼              ▼              ▼</span></span>
+<span data-line><span>Process C: Worker 0  Process D: Worker 1  ... Worker N</span></span>
+<span data-line><span>  ModelRunner         ModelRunner</span></span>
+<span data-line><span>       ╲                 ╱</span></span>
+<span data-line><span>        torch.distributed model data plane</span></span></code></pre></figure>
+<p><code>CoreEngineProcManager</code> 按 local DP rank 创建名为 <code>EngineCore</code> 或 <code>EngineCore_DP&lt;n></code> 的后台进程，并监控 sentinel/liveness（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/utils.py#L120-L243" class="external external-link"><code>CoreEngineProcManager</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。<code>MultiprocExecutor</code> 再为 TP/PP/PCP world 启动或连接 Worker processes。</p>
+<p>必须区分三个“rank”：</p>
+<ul>
+<li><code>client_index</code>：多个 API process 中，输出应返回哪个 frontend。</li>
+<li><code>engine_index</code>/DP rank：请求被哪个 <code>EngineCoreProc</code> 调度。</li>
+<li>Worker/global rank：模型 parallel group 中的 rank。</li>
+</ul>
+<p>它们可能都从 0 开始，但用于不同 routing key，不能在图中合并。</p>
+<h3 id="多-api-server-与-dp">多 API Server 与 DP<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#多-api-server-与-dp" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>扩展后拓扑是 N 个 API processes、一个或多个 DP EngineCore，以及每个 core 所属的 Executor/Worker 集合。父 supervisor 只负责 socket、进程所有权、handshake 和关闭，不参与每轮 Scheduler step。<code>launch_core_engines()</code> 决定是否创建 DP Coordinator、local processes 或 Ray actors，以及是否为 multimodal tensor IPC 创建共享 queue（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/utils.py#L1068-L1208" class="external external-link"><code>launch_core_engines</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<h2 id="frontend--enginecore">Frontend ↔ EngineCore<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#frontend--enginecore" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="socket-方向和所有权">socket 方向和所有权<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#socket-方向和所有权" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Python <code>MPClient</code> 在 frontend 一侧 bind 两类 socket：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Frontend / MPClient                         EngineCoreProc</span></span>
+<span data-line> </span>
+<span data-line><span>ROUTER input socket (bind)  ─────────────▶  DEALER input socket(s) (connect)</span></span>
+<span data-line><span>  [engine identity]                           [request type][msgpack][aux...]</span></span>
+<span data-line><span>  [request type][msgpack][aux...]</span></span>
+<span data-line> </span>
+<span data-line><span>PULL output socket (bind)   ◀─────────────  PUSH output socket(s) (connect)</span></span>
+<span data-line><span>  [msgpack EngineCoreOutputs][aux...]         按 client_index 选择目标 socket</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L482-L658" class="external external-link"><code>MPClient.__init__</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — frontend bind <code>ROUTER</code>/<code>PULL</code>，解析 IPC/TCP 实际 endpoint，创建 encoder/decoder，等待每个 engine identity 的 ready response。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L1599-L1710" class="external external-link"><code>EngineCoreProc.process_input_sockets</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — core IO thread 以固定两字节 engine identity connect <code>DEALER</code>，poll frontend 与 coordinator 输入，解码后放入 <code>input_queue</code>。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L1712-L1772" class="external external-link"><code>EngineCoreProc.process_output_sockets</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — output IO thread connect <code>PUSH</code>，按 <code>client_index</code> 选择 frontend socket，并用 zero-copy multipart 发送 <code>EngineCoreOutputs</code>。</p>
+<p>为什么输入使用 ROUTER/DEALER，而输出使用 PUSH/PULL：</p>
+<ul>
+<li>frontend 需要通过 engine identity 把请求定向到某个 DP core，因此输入需要 routing frame。</li>
+<li>core 已从 request 保存 <code>client_index</code>，输出只需选择对应的单向 PUSH socket。</li>
+<li>utility call 与 request output 共用 output channel，但通过 <code>utility_output.call_id</code> 分流。</li>
+</ul>
+<h3 id="请求-frame-与消息类型">请求 frame 与消息类型<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#请求-frame-与消息类型" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Python frontend 发送的 multipart 逻辑布局是：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>ROUTER side: [engine_identity][request_type_byte][msgpack_root][aux_buffer_0]...</span></span>
+<span data-line><span>DEALER side:                  [request_type_byte][msgpack_root][aux_buffer_0]...</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L876-L888" class="external external-link"><code>MPClient._send_input</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 在 request type 前加入目标 engine identity；有 auxiliary buffers 时保留对象引用直到 ZMQ tracker 完成。</p>
+<p><code>EngineCoreRequestType</code> 使用单字节 frame，无需再对类型编码：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:right;">值</th><th>类型</th><th>payload/作用域</th></tr></thead><tbody><tr><td style="text-align:right;"><code>0x00</code></td><td><code>ADD</code></td><td><code>EngineCoreRequest</code></td></tr><tr><td style="text-align:right;"><code>0x01</code></td><td><code>ABORT</code></td><td>request ID 列表</td></tr><tr><td style="text-align:right;"><code>0x02</code></td><td><code>START_DP_WAVE</code></td><td>coordinator 的 <code>(wave, exclude_engine_index)</code></td></tr><tr><td style="text-align:right;"><code>0x03</code></td><td><code>UTILITY</code></td><td><code>(client_index, call_id, method_name, args)</code></td></tr><tr><td style="text-align:right;"><code>0x04</code></td><td><code>EXECUTOR_FAILED</code></td><td>core 内部 sentinel，不是 Rust 公共 wire type</td></tr><tr><td style="text-align:right;"><code>0x05</code></td><td><code>WAKEUP</code></td><td>core shutdown 时唤醒本地 queue 的 sentinel</td></tr></tbody></table></div>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/__init__.py#L254-L269" class="external external-link"><code>EngineCoreRequestType</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — Python wire/control type 定义。Rust compatibility enum只公开前四个跨语言值（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/rust/src/engine-core-client/src/protocol/request.rs#L13-L57" class="external external-link"><code>Rust EngineCoreRequestType</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p><code>EngineCoreProc._handle_client_request()</code> 再把这些类型分派到 add、abort、utility 或 executor-failure 处理。abort 会同时进入 eager <code>aborts_queue</code> 和有序 <code>input_queue</code>，既能尽快取消正在执行的 request，又避免请求/取消重排造成泄漏（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L1415-L1537" class="external external-link"><code>EngineCoreProc request dispatch</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L1671-L1710" class="external external-link"><code>input IO abort handling</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<h3 id="请求与输出-schema">请求与输出 schema<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#请求与输出-schema" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>EngineCoreRequest</code> 是 array-like <code>msgspec.Struct</code>，包含 request ID、token/multimodal 输入、sampling/pooling 参数、LoRA、cache salt、DP rank、prompt embeds、<code>client_index</code>、wave、priority、trace 与 resumable/reasoning fields（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/__init__.py#L90-L164" class="external external-link"><code>EngineCoreRequest</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>反向输出分两层：</p>
+<ul>
+<li><code>EngineCoreOutput</code>：单 request 的新 token/logprobs/pooling/finish/stop/event/KV/EC/routed-expert 信息。</li>
+<li><code>EngineCoreOutputs</code>：一个 core step 的 request outputs、scheduler stats、timestamp、utility result、finished set 与 DP wave signal。</li>
+</ul>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/__init__.py#L168-L252" class="external external-link"><code>EngineCoreOutput</code> 与 <code>EngineCoreOutputs</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 都以 array-like、omit-default 的 <code>msgspec.Struct</code> 定义。字段顺序因此是 Python/Rust compatibility 的一部分。</p>
+<h3 id="messagepackauxiliary-frames-与-tensor-ipc">MessagePack、auxiliary frames 与 tensor IPC<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#messagepackauxiliary-frames-与-tensor-ipc" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>frontend/core wire format不是 JSON：</p>
+<ol>
+<li><code>MsgpackEncoder</code> 用 msgspec MessagePack 编码 root object。</li>
+<li>较大的 <code>torch.Tensor</code>/NumPy array 可以拆成 multipart auxiliary buffers，减少复制。</li>
+<li>启用 multimodal <code>mm_tensor_ipc=&quot;torch_shm&quot;</code> 且存在 tensor queue 时，<code>TensorIpcSender</code> 将 tensor out-of-band 交给 <code>TensorIpcReceiver</code>；MsgPack 中只保留 placeholder。</li>
+<li>utility result 默认必须是安全可编码类型。只有显式开启 <code>VLLM_ALLOW_INSECURE_SERIALIZATION=1</code> 才允许 pickle/cloudpickle fallback。</li>
+</ol>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/serial_utils.py#L136-L232" class="external external-link"><code>MsgpackEncoder</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — MessagePack root、tensor/ndarray auxiliary buffer 和 insecure fallback gate。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/serial_utils.py#L313-L443" class="external external-link"><code>MsgpackDecoder</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — root/auxiliary buffers 解码、OOB tensor provider 与安全 utility result 恢复；它和 encoder 是同一 wire contract 的两端，不是同一个类。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/tensor_ipc.py#L45-L108" class="external external-link"><code>TensorIpcSender</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 与 <a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/tensor_ipc.py#L114-L168" class="external external-link"><code>TensorIpcReceiver</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — multimodal tensor 的 torch multiprocessing queue 路径；当前注释明确 DP > 1 不支持这条共享 tensor 流。</p>
+<h3 id="启动-handshake-与-ready-response">启动 handshake 与 ready response<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#启动-handshake-与-ready-response" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>启动 handshake 使用独立 ROUTER/DEALER socket，状态机是：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>EngineCoreProc ── HELLO(local, headless, identity) ──▶ supervisor/frontend</span></span>
+<span data-line><span>EngineCoreProc ◀─ INIT(addresses, selected DP config) ── supervisor/frontend</span></span>
+<span data-line><span>EngineCoreProc ── READY(config hash) ───────────────▶ supervisor/frontend</span></span>
+<span data-line> </span>
+<span data-line><span>随后每个 core 在正式 input DEALER 上发送 EngineCoreReadyResponse</span></span>
+<span data-line><span>frontend 收齐 identity 后才开始正常请求</span></span></code></pre></figure>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L1230-L1266" class="external external-link"><code>EngineCoreProc.startup_handshake</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — HELLO/INIT/READY 的 engine 侧实现。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/utils.py#L1222-L1362" class="external external-link"><code>wait_for_engine_startup</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — supervisor 验证 identity、local/headless 角色、DP config hash 和 process sentinel。</p>
+<p><code>EngineCoreReadyResponse</code> 还把 KV profiling 后的 <code>max_model_len</code>、GPU blocks、block size、dtype、world/DP size 与 coordinator stats address 回传 frontend；client 将这些 post-init 值同步回本地 config（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/__init__.py#L69-L87" class="external external-link"><code>EngineCoreReadyResponse</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L729-L764" class="external external-link"><code>MPClient._apply_ready_response</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<h2 id="enginecore--worker-控制面">EngineCore ↔ Worker 控制面<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#enginecore--worker-控制面" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="executor-是通信策略边界">Executor 是通信策略边界<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#executor-是通信策略边界" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>EngineCore</code> 只调用抽象 Executor。不同 backend 的控制面如下：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Executor</th><th>Core 到 Worker 的机制</th><th>Worker 是否独立进程</th></tr></thead><tbody><tr><td><code>UniProcExecutor</code></td><td>直接 <code>run_method(driver_worker, ...)</code></td><td>否</td></tr><tr><td><code>MultiprocExecutor</code></td><td>broadcast <code>MessageQueue</code> + 每 rank response queue</td><td>是</td></tr><tr><td><code>RayDistributedExecutor</code></td><td>Ray actor method/DAG</td><td>是，Ray actors</td></tr><tr><td><code>RayExecutorV2</code></td><td>复用 <code>MultiprocExecutor</code> MQ 语义，Worker 由 Ray actor 承载</td><td>是</td></tr><tr><td><code>ExecutorWithExternalLauncher</code></td><td>每 Engine 一个本地 Worker；外部 launcher 同步多个 Engine</td><td>由外部拓扑决定</td></tr></tbody></table></div>
+<h3 id="multiproc-requestreply">Multiproc request/reply<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#multiproc-requestreply" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>MultiprocExecutor.collective_rpc()</code> 把 <code>(method, args, kwargs, output_rank)</code> 放入 broadcast queue。method 可以是字符串，也可以是 cloudpickle 后的 callable；若只需唯一结果（例如 driver/output rank 的 <code>ModelRunnerOutput</code>），只等待对应 response queue（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/multiproc_executor.py#L320-L424" class="external external-link"><code>MultiprocExecutor.collective_rpc</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>每个 Worker process 的 busy loop：</p>
+<ol>
+<li>从 <code>rpc_broadcast_mq.dequeue()</code> 取同一 control tuple。</li>
+<li>字符串用 <code>getattr(self.worker, method)</code>；bytes 则 cloudpickle load callable。</li>
+<li>执行 Worker 方法。</li>
+<li>只有 <code>output_rank is None</code> 或当前 rank 被指定时才写 response queue。</li>
+<li>exception 转成 FAILURE status/string，让 Executor 抛错并触发 shutdown。</li>
+</ol>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/multiproc_executor.py#L997-L1027" class="external external-link"><code>WorkerProc.worker_busy_loop</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — broadcast control 到 rank-local Worker 调用的接收端。</p>
+<h3 id="messagequeue-不是-frontend-zmq-协议"><code>MessageQueue</code> 不是 frontend ZMQ 协议<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#messagequeue-不是-frontend-zmq-协议" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>vLLM <code>MessageQueue</code> 对 local readers 使用共享内存 ring buffer，小消息直接写 ring；溢出/大消息通过 IPC XPUB/SUB multipart。remote readers 使用 TCP XPUB/SUB。它以 pickle protocol 5 和 out-of-band <code>PickleBuffer</code> 编码，并通过 reader flags、memory fence 与 spin condition 控制 ring slot 生命周期（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/distributed/device_communicators/shm_broadcast.py#L370-L504" class="external external-link"><code>MessageQueue</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/distributed/device_communicators/shm_broadcast.py#L729-L808" class="external external-link"><code>MessageQueue.enqueue/dequeue</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>因此：</p>
+<ul>
+<li>frontend ↔ core 是跨 Python/Rust 的显式 MessagePack schema。</li>
+<li>Executor ↔ Worker <code>MessageQueue</code> 是受控进程拓扑内的 Python object transport。</li>
+<li>两者都可能使用 ZMQ socket 作为一部分，但 wire compatibility、安全边界和 routing semantics 完全不同。</li>
+</ul>
+<p>不要把 <code>MessageQueue</code> 名称误解为某个通用外部 message broker。</p>
+<h2 id="worker-间数据面">Worker 间数据面<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#worker-间数据面" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Worker 启动时先初始化 torch distributed world，再创建 model-parallel groups。<code>init_distributed_environment()</code> 根据 backend、rank、DP/multi-node 配置调用 <code>torch.distributed.init_process_group()</code>，并在 backend 不可用时受控 fallback 到 Gloo（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/distributed/parallel_state.py#L1582-L1737" class="external external-link"><code>init_distributed_environment</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p><code>initialize_model_parallel()</code> 按 <code>ExternalDP × DP × PP × PCP × TP</code> 维度重排 rank，建立 TP、decode-context parallel、prefill-context parallel、PP、DP、EP 和可选 EPLB groups（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/distributed/parallel_state.py#L1740-L1979" class="external external-link"><code>initialize_model_parallel</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>维度</th><th>典型数据面通信</th><th>目的</th><th>与控制面的区别</th></tr></thead><tbody><tr><td>TP</td><td>all-reduce、all-gather、reduce-scatter</td><td>在一层内切分 linear/attention 权重与 activation</td><td>不负责分配 HTTP request</td></tr><tr><td>PP</td><td>point-to-point send/recv intermediate tensor dict</td><td>在 pipeline stage 间传 hidden/residual</td><td><code>SchedulerOutput</code> 仍由 Executor 广播</td></tr><tr><td>DP</td><td>group all-reduce/状态同步；不同 EngineCore 可独立接请求</td><td>多副本或 MoE 同步</td><td>DPCoordinator 只做负载/wave 控制</td></tr><tr><td>EP</td><td>token/expert dispatch、all-to-all 与 combine</td><td>将 MoE tokens 路由到 expert ranks</td><td>与 API LB 无关</td></tr><tr><td>PCP/DCP</td><td>context shard 的 gather/all-to-all 等</td><td>切分 prefill/decode context 工作</td><td>不改变 frontend schema</td></tr></tbody></table></div>
+<p>TP helper 直接通过 <code>get_tp_group()</code> 调用 group collective（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/distributed/communication_op.py#L12-L37" class="external external-link"><code>tensor_model_parallel_all_reduce</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。<code>GroupCoordinator</code> 封装绑定特定 backend 的 PyTorch ProcessGroup 和 device communicator（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/distributed/parallel_state.py#L380-L455" class="external external-link"><code>GroupCoordinator</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>PP 的数据路径在 GPU Worker 中可见：非 first rank 先 <code>irecv_tensor_dict()</code>，ModelRunner forward 若返回 <code>IntermediateTensors</code>，非 last rank 再 <code>isend_tensor_dict()</code>，并保存 non-blocking handles 到下一轮等待（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_worker.py#L1018-L1107" class="external external-link"><code>Worker.execute_model</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/distributed/parallel_state.py#L1017-L1168" class="external external-link"><code>GroupCoordinator.isend/irecv_tensor_dict</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>一个关键分界：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>EngineCore → Worker：本轮做什么（control）</span></span>
+<span data-line><span>Worker rank ↔ Worker rank：完成这一轮所需的 tensor（data）</span></span>
+<span data-line><span>Worker → EngineCore：可观察执行结果（control response）</span></span></code></pre></figure>
+<p>NCCL/torch.distributed 出现故障时，表象可能是 Executor timeout；但根因通常在 Worker data plane。反过来，frontend ZMQ 断开不会自动说明 NCCL group 已损坏。</p>
+<h2 id="dp-coordinator-与负载均衡">DP Coordinator 与负载均衡<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#dp-coordinator-与负载均衡" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><code>DPCoordinator</code> 是独立控制进程，仅在在线 DP 且配置需要时由 rank 0 frontend/supervisor 创建。它不是模型 tensor data-plane coordinator（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/coordinator.py#L23-L137" class="external external-link"><code>DPCoordinator</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<h3 id="三条-coordinator-channel">三条 coordinator channel<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#三条-coordinator-channel" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>EngineCoreProc(s) ── PUSH scheduler stats/wave ──▶ PULL output_back</span></span>
+<span data-line><span>EngineCoreProc(s) ◀─ XSUB / START_DP_WAVE ─────── XPUB publish_back</span></span>
+<span data-line><span>Frontend client(s) ◀─ XSUB load snapshots ─────── XPUB publish_front</span></span>
+<span data-line><span>                           ▲</span></span>
+<span data-line><span>                           └─ first request / scale notification from frontend</span></span></code></pre></figure>
+<p><code>DPCoordinatorProc</code>：</p>
+<ul>
+<li>收集每个 engine 的 <code>[waiting, running]</code> counts。</li>
+<li>按最小间隔或 heartbeat 发布 <code>(counts, current_wave, engines_running)</code>。</li>
+<li>维护 MoE DP global running/paused wave。</li>
+<li>某 engine 在 paused 状态收到新请求时，向其他 engines 广播 <code>START_DP_WAVE</code>。</li>
+<li>处理 elastic EP engine count 变化。</li>
+</ul>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/coordinator.py#L145-L453" class="external external-link"><code>DPCoordinatorProc.process_input_socket</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — XPUB/PULL/XPUB socket、stats snapshot 与 wave 状态机。</p>
+<h3 id="client-variants-与-routing">client variants 与 routing<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#client-variants-与-routing" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><code>DPAsyncMPClient</code> 默认用于 external LB：每个 frontend client 管理指定 DP rank，但仍订阅 coordinator wave/running 状态。</li>
+<li><code>DPLBAsyncMPClient</code> 用于 internal/hybrid LB：维护每个 engine 的 waiting/running counts，选择目标 engine，并记录 request-to-engine 以便 abort 正确路由。</li>
+<li><code>data_parallel_rank</code> 可显式指定 engine；否则 internal LB 根据可见负载选择。</li>
+</ul>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L1250-L1427" class="external external-link"><code>DPAsyncMPClient</code> stats/wave loop<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 与 <a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L1430-L1515" class="external external-link"><code>DPLBAsyncMPClient</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — DP client 选择和 coordinator feedback 的落点。</p>
+<p>DP Coordinator 和 torch distributed DP group 的职责不同：前者分发控制状态和 API-side load signal；后者参与 ranks 之间的同步/collective。图中应分别标成控制面和数据面。</p>
+<h2 id="python-多-api-server-与-rust-前端">Python 多 API Server 与 Rust 前端<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#python-多-api-server-与-rust-前端" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="多-python-api-server">多 Python API Server<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#多-python-api-server" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>run_multi_api_server()</code> 的父进程顺序是：</p>
+<ol>
+<li>先创建监听 socket 与 <code>VllmConfig</code>，解析 Executor。</li>
+<li>生成每个 API child 的 Engine ZMQ input/output 地址。</li>
+<li>在 <code>launch_core_engines()</code> context 中创建 coordinator 与 EngineCore processes/actors。</li>
+<li>创建 <code>APIServerProcessManager</code>，每个 child 获得 <code>client_index</code>、地址、stats address 和可选 tensor queue。</li>
+<li>普通 Python/非 Ray DP 情况下，child bind <code>tcp://host:0</code> 后通过 one-way pipe 回报真实 endpoint；父进程再把地址放入 engine handshake。</li>
+<li>监控 frontend、core 和 coordinator；任一异常退出触发整体清理。</li>
+</ol>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/entrypoints/cli/serve.py#L257-L394" class="external external-link"><code>run_multi_api_server</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — 父 supervisor 的完整所有权与 shutdown 顺序。</p>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/utils.py#L166-L325" class="external external-link"><code>APIServerProcessManager</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — spawn API workers、传递共享监听 socket 和 per-client Engine 地址，并收集 child 实际 bound endpoint。延迟 child bind 避免普通路径的 port allocation TOCTOU；Rust frontend 和 Ray DP 因无法回报重绑定地址而在父进程预分配端口。</p>
+<h3 id="python-supervised-rust-frontend">Python-supervised Rust frontend<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#python-supervised-rust-frontend" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Rust frontend 替换 API process，但不替换 Python EngineCore：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Python supervisor</span></span>
+<span data-line><span>├── EngineCoreProc(s) → Executor/Worker(s)</span></span>
+<span data-line><span>└── vllm-rs frontend subprocess</span></span>
+<span data-line><span>      ├── inherited HTTP listen fd</span></span>
+<span data-line><span>      ├── Rust renderer/parser/router</span></span>
+<span data-line><span>      └── Rust EngineCoreClient</span></span>
+<span data-line><span>            ├── ROUTER input bind</span></span>
+<span data-line><span>            └── PULL output bind</span></span></code></pre></figure>
+<p><code>RustFrontendProcessManager</code> 把监听 fd、input/output address、engine rank range、coordinator address 和 JSON args 交给 <code>vllm-rs frontend</code>（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/utils.py#L325-L390" class="external external-link"><code>RustFrontendProcessManager</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>Rust client 保持相同协议：<code>EngineCoreClient.connect()</code> 在 <code>HandshakeOwner</code> 和 Python 已 bootstrap 的 <code>Bootstrapped</code> transport 间选择，并启动 output loop、request dispatcher、abort worker 与可选 coordinator tasks（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/rust/src/engine-core-client/src/client.rs#L211-L355" class="external external-link"><code>Rust EngineCoreClient.connect/from_connected</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>Rust transport 同样提供 shared <code>RouterSendHalf</code> 与 <code>PullSocket</code>，engine identity 为 Python 兼容的两字节 little-endian DP index（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/rust/src/engine-core-client/src/transport.rs#L29-L137" class="external external-link"><code>Rust ConnectedTransport/EngineId</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。<code>connect_bootstrapped()</code> 绑定 Python 给出的地址并等待连续 engine identities 注册（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/rust/src/engine-core-client/src/transport.rs#L321-L383" class="external external-link"><code>connect_bootstrapped</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>Rust <code>EngineCoreClient.call()</code> 发送 Add 并返回 request-scoped output stream；drop 未结束 stream 会进入 auto-abort worker（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/rust/src/engine-core-client/src/client.rs#L475-L555" class="external external-link"><code>Rust client call/abort</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。Rust 侧使用 serde tuple 与 MessagePack 保持 Python array-like struct 字段顺序，不把 payload 改成 JSON。</p>
+<h2 id="插件与跨模块边界">插件与跨模块边界<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#插件与跨模块边界" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>插件在不同进程加载，作用域本身就是通信边界。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>plugin group</th><th>加载位置</th><th>能改变什么</th><th>不能假设什么</th></tr></thead><tbody><tr><td><code>vllm.general_plugins</code></td><td>process 0、EngineCore、Worker 等相关进程各自一次</td><td>注册 model/loader/quantization、注入 engine/worker-side 行为</td><td>在 frontend 加载不代表 Worker process 已共享 Python 内存状态</td></tr><tr><td><code>vllm.endpoint_plugins</code></td><td>API frontend only</td><td>增加/覆盖 HTTP routes，初始化 app state</td><td>不会自动安装 engine-side method</td></tr><tr><td><code>vllm.io_processor_plugins</code></td><td>process 0/input side</td><td>选择 renderer/IO preprocessing</td><td>不直接出现在 Scheduler/Worker</td></tr><tr><td><code>vllm.platform_plugins</code></td><td>各进程首次解析 <code>current_platform</code></td><td>选择 platform class、Worker/backend/kernel import</td><td>各进程都要独立解析</td></tr><tr><td><code>vllm.stat_logger_plugins</code></td><td>async serving 的 process 0</td><td>消费 stats 并输出自定义 metrics/log</td><td>不参与模型 tensor collective</td></tr></tbody></table></div>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/plugins/__init__.py#L15-L90" class="external external-link"><code>plugin groups 与 loader</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — entry-point group、<code>VLLM_PLUGINS</code> allowlist 和 process-local “once” gate。注释明确 general plugin 可能在多个进程分别加载，plugin 必须可重复执行。</p>
+<p>Endpoint plugin 是更严格的 opt-in：未设置 <code>VLLM_PLUGINS</code> 时即使发现 plugin 也不加载；还会按 <code>required_tasks</code> 过滤（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/plugins/__init__.py#L93-L155" class="external external-link"><code>load_endpoint_plugins</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>若 endpoint 需要 Worker/Engine 行为，必须把 engine-side registration 放在独立 <code>general_plugins</code> entry point，并通过既有 <code>EngineClient</code>（例如 <code>collective_rpc</code>）访问；endpoint 与 general 两个 entry point 独立加载，彼此不蕴含（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/plugins/endpoint_plugins/interface.py#L1-L81" class="external external-link"><code>EndpointPlugin</code> contract<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。这条规则防止 plugin 绕过既有进程/协议边界新开不可监控通道。</p>
+<p>Platform plugin 则与所有进程的设备选择相关：builtin 与 installed plugin 一起检测，要求最多一个 platform 被激活，最后才按限定名导入 class（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/platforms/__init__.py#L211-L252" class="external external-link"><code>resolve_current_platform_cls_qualname</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<h3 id="如何设计跨边界扩展">如何设计跨边界扩展<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#如何设计跨边界扩展" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>只改 HTTP surface：endpoint plugin，状态留在 API process。</li>
+<li>需要 Worker method：general plugin/worker extension 在 Worker process 注册，再走 <code>EngineClient → EngineCore utility → Executor.collective_rpc</code>。</li>
+<li>需要新模型：general plugin 修改 process-local ModelRegistry；每个需要 inspect/load 的进程都必须加载。</li>
+<li>需要新设备：platform plugin 返回 platform class qualified name，由 platform 再选择 Worker/backend。</li>
+<li>需要传大 tensor：不要把它塞进 endpoint plugin 自建 socket；使用现有 distributed/connector/tensor IPC 机制并明确所有权。</li>
+</ul>
+<h2 id="启动健康检查错误传播与关闭">启动、健康检查、错误传播与关闭<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#启动健康检查错误传播与关闭" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="启动-barrier">启动 barrier<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#启动-barrier" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>一个可接收请求的多进程实例至少通过三层 ready gate：</p>
+<ol>
+<li><strong>EngineCore process handshake</strong>：HELLO/INIT/READY，检查 DP identity、local/headless 与 config hash。</li>
+<li><strong>正式 Engine channel ready</strong>：每个 core 的 input DEALER 向 frontend ROUTER 发送 <code>EngineCoreReadyResponse</code>；client 收齐所有 identity。</li>
+<li><strong>Worker ready</strong>：每个 Worker 完成 WorkerWrapper、device、distributed、model load 与 MQ subscription 后，通过 pipe 返回 response queue handle；Executor 才进入 collective RPC。</li>
+</ol>
+<p>DP Coordinator 还会等待全部 engine XSUB subscription，再广播 <code>READY</code>。任何 barrier 提前放行都可能造成 ROUTER 无法向尚未注册的 identity 发送，或 MQ PUB 丢失第一条消息。</p>
+<h3 id="分层健康监控">分层健康监控<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#分层健康监控" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><code>CoreEngineProcManager.monitor_engine_liveness()</code> 监控 EngineCore process sentinel。</li>
+<li><code>MPClient.start_engine_core_monitor()</code> 发现 core 意外退出后设置 <code>engine_dead</code>、关闭 client，后续操作抛 <code>EngineDeadError</code>（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L704-L728" class="external external-link"><code>MPClient core monitor</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li><code>MultiprocExecutor</code> 监控 Worker sentinels；任一 Worker 死亡会 shutdown Executor 并调用 failure callback，将 <code>EXECUTOR_FAILED</code> 注入 EngineCore（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/multiproc_executor.py#L280-L318" class="external external-link"><code>MultiprocExecutor worker monitor</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li>多 frontend supervisor 同时监控 API/Rust process、coordinator 和 Engine manager（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/utils.py#L517-L588" class="external external-link"><code>wait_for_completion_or_failure</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</li>
+<li>output socket 发送专用单 frame <code>ENGINE_CORE_DEAD</code>；Python/Rust client 都将其视为永久 health failure。</li>
+</ul>
+<p>错误传播方向通常是：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Worker exception/death</span></span>
+<span data-line><span>  → response FAILURE 或 Executor failure callback</span></span>
+<span data-line><span>  → EngineCore failure / ENGINE_CORE_DEAD</span></span>
+<span data-line><span>  → EngineCoreClient marks dead</span></span>
+<span data-line><span>  → AsyncLLM output handler propagates error</span></span>
+<span data-line><span>  → waiting request generators / HTTP handlers fail</span></span>
+<span data-line><span>  → supervisor shuts down sibling processes</span></span></code></pre></figure>
+<p>请求级 validation/preprocessing error 则形成 request-scoped <code>EngineCoreOutput</code>，不必杀死整个 engine。分清 request error、utility error、Worker RPC failure 与 process death，能避免把可恢复错误误判成 cluster failure。</p>
+<h3 id="关闭顺序">关闭顺序<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#关闭顺序" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>run_multi_api_server()</code> 的 finally 先关闭 frontend manager，再按同一个 deadline 关闭 local Engine manager 与 coordinator。EngineCore 内部根据 <code>shutdown_timeout</code> 选择：</p>
+<ul>
+<li>timeout 为 0：立即将所有未完成请求标为 aborted，发送最终输出。</li>
+<li>timeout 大于 0：拒绝新 add/utility，继续 drain 现有工作直至完成或外部超时。</li>
+</ul>
+<p><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L1433-L1517" class="external external-link"><code>EngineCoreProc shutdown state</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — running/requested/shutting-down 状态和 add/utility rejection。</p>
+<p>Worker shutdown 先唤醒/关闭 MQ，等待 graceful exit，超时后再 terminate/kill；parent-death pipe 也可让 Worker 自行结束。通用 process <code>shutdown()</code> 给出 grace period、terminate、join 与后续 kill 逻辑（<a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/utils.py#L591-L633" class="external external-link"><code>process shutdown</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）。</p>
+<p>关闭顺序体现资源所有权：frontend 不应在 core 尚需回传 final abort output 时过早销毁 channel；core 不应在 Worker collective 未退出时先销毁 process group；supervisor 最终负责清理孤儿进程和 coordinator。</p>
+<h2 id="关键代码索引">关键代码索引<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#关键代码索引" class="internal internal-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>本表只列本篇通信节点；全局稳定 ID 见<a href="./07-source-inventory-and-code-index" class="internal internal-link alias" data-slug="vllm/07-source-inventory-and-code-index">07：源码清单与代码索引</a>。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>符号或目标</th><th>代码位置</th><th>本篇用途</th></tr></thead><tbody><tr><td><code>InprocClient</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L291-L340" class="external external-link"><code>core_client.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>无 frontend/core IPC 的直接调用</td></tr><tr><td><code>CoreEngineProcManager</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/utils.py#L120-L243" class="external external-link"><code>engine/utils.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>EngineCore 子进程创建与 liveness</td></tr><tr><td><code>get_engine_zmq_addresses</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/utils.py#L1018-L1065" class="external external-link"><code>engine/utils.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>IPC/TCP 地址与 deferred port allocation</td></tr><tr><td><code>launch_core_engines</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/utils.py#L1068-L1208" class="external external-link"><code>engine/utils.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>core、coordinator、Ray 与 tensor queue 汇聚</td></tr><tr><td><code>MPClient.__init__</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L482-L658" class="external external-link"><code>core_client.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>frontend ROUTER/PULL、ready 与 serialization</td></tr><tr><td><code>MPClient._send_input</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core_client.py#L876-L888" class="external external-link"><code>core_client.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>identity/type/msgpack/aux multipart 发送</td></tr><tr><td><code>EngineCoreProc.process_input_sockets</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L1599-L1710" class="external external-link"><code>core.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>DEALER/XSUB decode 到 core queue</td></tr><tr><td><code>EngineCoreProc.process_output_sockets</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/core.py#L1712-L1772" class="external external-link"><code>core.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>client-indexed PUSH outputs</td></tr><tr><td><code>EngineCoreRequestType</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/__init__.py#L254-L269" class="external external-link"><code>engine/__init__.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>单字节 control message types</td></tr><tr><td><code>EngineCoreRequest</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/__init__.py#L90-L164" class="external external-link"><code>engine/__init__.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>frontend → core array-like schema</td></tr><tr><td><code>EngineCoreOutputs</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/__init__.py#L168-L252" class="external external-link"><code>engine/__init__.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>core → frontend request/utility/stats schema</td></tr><tr><td><code>MsgpackEncoder</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/serial_utils.py#L136-L232" class="external external-link"><code>serial_utils.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>MessagePack 编码与 tensor auxiliary buffers</td></tr><tr><td><code>MsgpackDecoder</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/serial_utils.py#L313-L443" class="external external-link"><code>serial_utils.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>root/auxiliary/OOB tensor 解码</td></tr><tr><td><code>wait_for_engine_startup</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/utils.py#L1222-L1362" class="external external-link"><code>engine/utils.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>HELLO/INIT/READY 角色与 config 验证</td></tr><tr><td><code>MultiprocExecutor.collective_rpc</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/multiproc_executor.py#L320-L424" class="external external-link"><code>multiproc_executor.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>core → Worker broadcast 与 response routing</td></tr><tr><td><code>WorkerProc.worker_busy_loop</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/executor/multiproc_executor.py#L997-L1027" class="external external-link"><code>multiproc_executor.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>Worker control receive/execute/reply</td></tr><tr><td><code>MessageQueue</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/distributed/device_communicators/shm_broadcast.py#L370-L504" class="external external-link"><code>shm_broadcast.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>shared-memory/TCP control transport</td></tr><tr><td><code>init_distributed_environment</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/distributed/parallel_state.py#L1582-L1737" class="external external-link"><code>parallel_state.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>torch distributed world 初始化</td></tr><tr><td><code>initialize_model_parallel</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/distributed/parallel_state.py#L1740-L1979" class="external external-link"><code>parallel_state.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>TP/PP/DP/EP/PCP/DCP groups</td></tr><tr><td><code>Worker.execute_model</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/worker/gpu_worker.py#L1018-L1107" class="external external-link"><code>gpu_worker.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>PP intermediate tensor 数据面</td></tr><tr><td><code>DPCoordinator</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/coordinator.py#L23-L137" class="external external-link"><code>coordinator.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>DP load stats 与 wave control process</td></tr><tr><td><code>DPCoordinatorProc.process_input_socket</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/engine/coordinator.py#L176-L453" class="external external-link"><code>coordinator.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>三类 coordinator channels 与状态机</td></tr><tr><td><code>APIServerProcessManager</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/utils.py#L166-L325" class="external external-link"><code>v1/utils.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>多 API process 与地址回报 pipe</td></tr><tr><td><code>RustFrontendProcessManager</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/utils.py#L325-L390" class="external external-link"><code>v1/utils.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>inherited fd 与 bootstrapped Rust transport</td></tr><tr><td>Rust <code>EngineCoreClient</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/rust/src/engine-core-client/src/client.rs#L211-L355" class="external external-link"><code>client.rs</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>跨语言 client tasks/coordinator</td></tr><tr><td>Rust transport</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/rust/src/engine-core-client/src/transport.rs#L29-L137" class="external external-link"><code>transport.rs</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>Python-compatible identity/ROUTER/PULL</td></tr><tr><td>plugin groups</td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/plugins/__init__.py#L15-L90" class="external external-link"><code>plugins/__init__.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>process-local plugin 边界</td></tr><tr><td><code>EndpointPlugin</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/plugins/endpoint_plugins/interface.py#L1-L81" class="external external-link"><code>interface.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>HTTP 与 engine-side extension 分工</td></tr><tr><td><code>wait_for_completion_or_failure</code></td><td><a href="https://github.com/zhiim/vllm/blob/v0.26.0-dev/vllm/v1/utils.py#L517-L588" class="external external-link"><code>v1/utils.py</code><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td>supervisor failure fan-in</td></tr></tbody></table></div>
+<hr/>
+<p>上一页：<a href="./03-core-class-hierarchy" class="internal internal-link alias" data-slug="vllm/03-core-class-hierarchy">03：核心类关系</a> · 下一页：<a href="./05-build-and-native-extensions" class="internal internal-link alias" data-slug="vllm/05-build-and-native-extensions">05：构建与原生扩展</a> · 返回：<a href="./readme" class="internal internal-link alias" data-slug="vllm/readme">指南入口</a></p></div></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>关系图谱</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc"><button type="button" class="toc-header" aria-controls="toc-13" aria-expanded="true"><h3>目录</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#04进程控制面数据面与通信协议" data-for="04进程控制面数据面与通信协议">04：进程、控制面、数据面与通信协议</a></li><li class="depth-1"><a href="#控制面与数据面先分开" data-for="控制面与数据面先分开">控制面与数据面先分开</a></li><li class="depth-1"><a href="#最小进程内拓扑" data-for="最小进程内拓扑">最小进程内拓扑</a></li><li class="depth-1"><a href="#默认多进程拓扑" data-for="默认多进程拓扑">默认多进程拓扑</a></li><li class="depth-2"><a href="#单设备uni-executor" data-for="单设备uni-executor">单设备/uni Executor</a></li><li class="depth-2"><a href="#mp-executor" data-for="mp-executor">mp Executor</a></li><li class="depth-2"><a href="#多-api-server-与-dp" data-for="多-api-server-与-dp">多 API Server 与 DP</a></li><li class="depth-1"><a href="#frontend--enginecore" data-for="frontend--enginecore">Frontend ↔ EngineCore</a></li><li class="depth-2"><a href="#socket-方向和所有权" data-for="socket-方向和所有权">socket 方向和所有权</a></li><li class="depth-2"><a href="#请求-frame-与消息类型" data-for="请求-frame-与消息类型">请求 frame 与消息类型</a></li><li class="depth-2"><a href="#请求与输出-schema" data-for="请求与输出-schema">请求与输出 schema</a></li><li class="depth-2"><a href="#messagepackauxiliary-frames-与-tensor-ipc" data-for="messagepackauxiliary-frames-与-tensor-ipc">MessagePack、auxiliary frames 与 tensor IPC</a></li><li class="depth-2"><a href="#启动-handshake-与-ready-response" data-for="启动-handshake-与-ready-response">启动 handshake 与 ready response</a></li><li class="depth-1"><a href="#enginecore--worker-控制面" data-for="enginecore--worker-控制面">EngineCore ↔ Worker 控制面</a></li><li class="depth-2"><a href="#executor-是通信策略边界" data-for="executor-是通信策略边界">Executor 是通信策略边界</a></li><li class="depth-2"><a href="#multiproc-requestreply" data-for="multiproc-requestreply">Multiproc request/reply</a></li><li class="depth-2"><a href="#messagequeue-不是-frontend-zmq-协议" data-for="messagequeue-不是-frontend-zmq-协议">MessageQueue 不是 frontend ZMQ 协议</a></li><li class="depth-1"><a href="#worker-间数据面" data-for="worker-间数据面">Worker 间数据面</a></li><li class="depth-1"><a href="#dp-coordinator-与负载均衡" data-for="dp-coordinator-与负载均衡">DP Coordinator 与负载均衡</a></li><li class="depth-2"><a href="#三条-coordinator-channel" data-for="三条-coordinator-channel">三条 coordinator channel</a></li><li class="depth-2"><a href="#client-variants-与-routing" data-for="client-variants-与-routing">client variants 与 routing</a></li><li class="depth-1"><a href="#python-多-api-server-与-rust-前端" data-for="python-多-api-server-与-rust-前端">Python 多 API Server 与 Rust 前端</a></li><li class="depth-2"><a href="#多-python-api-server" data-for="多-python-api-server">多 Python API Server</a></li><li class="depth-2"><a href="#python-supervised-rust-frontend" data-for="python-supervised-rust-frontend">Python-supervised Rust frontend</a></li><li class="depth-1"><a href="#插件与跨模块边界" data-for="插件与跨模块边界">插件与跨模块边界</a></li><li class="depth-2"><a href="#如何设计跨边界扩展" data-for="如何设计跨边界扩展">如何设计跨边界扩展</a></li><li class="depth-1"><a href="#启动健康检查错误传播与关闭" data-for="启动健康检查错误传播与关闭">启动、健康检查、错误传播与关闭</a></li><li class="depth-2"><a href="#启动-barrier" data-for="启动-barrier">启动 barrier</a></li><li class="depth-2"><a href="#分层健康监控" data-for="分层健康监控">分层健康监控</a></li><li class="depth-2"><a href="#关闭顺序" data-for="关闭顺序">关闭顺序</a></li><li class="depth-1"><a href="#关键代码索引" data-for="关键代码索引">关键代码索引</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>反向链接</h3><ul id="list-0" class="overflow"><li><a href="../vllm/01-project-map" class="internal">01-project-map</a></li><li><a href="../vllm/02-entrypoints-and-request-lifecycle" class="internal">02-entrypoints-and-request-lifecycle</a></li><li><a href="../vllm/03-core-class-hierarchy" class="internal">03-core-class-hierarchy</a></li><li><a href="../vllm/05-build-and-native-extensions" class="internal">05-build-and-native-extensions</a></li><li><a href="../vllm/06-examples-learning-path" class="internal">06-examples-learning-path</a></li><li><a href="../vllm/07-source-inventory-and-code-index" class="internal">07-source-inventory-and-code-index</a></li><li><a href="../vllm/readme" class="internal">README</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v5.0.0</a> © 2026</p><ul><li><a href="https://github.com/jackyzha0/quartz">GitHub</a></li><li><a href="https://discord.gg/cRFFHYye7t">Discord Community</a></li></ul></footer></div></div></body><script src="../static/resource-after-e13fffa1.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-8b336f9a.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-baba652b.js" type="application/javascript" data-persist="true"></script><script src="../static/resource-after-5eb75950.js" type="module" data-persist="true"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript-3eea7814.js" type="module" data-persist="true"></script></html>
