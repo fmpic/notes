@@ -1,0 +1,620 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {
+      "type": "text", "id": "h0_title", "x": 80, "y": 35, "width": 1050, "height": 44,
+      "text": "LMCache 核心类关系：继承定义能力，组合决定运行时", "originalText": "LMCache 核心类关系：继承定义能力，组合决定运行时",
+      "fontSize": 32, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600001, "version": 1, "versionNonce": 600002, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "h0_subtitle", "x": 82, "y": 85, "width": 1300, "height": 25,
+      "text": "基准 389b9cf · 真实 ABC/Protocol/Factory/Registry · 路径与行号是源码证据", "originalText": "基准 389b9cf · 真实 ABC/Protocol/Factory/Registry · 路径与行号是源码证据",
+      "fontSize": 16, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600003, "version": 1, "versionNonce": 600004, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h0_interface", "x": 200, "y": 145, "width": 285, "height": 78,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600005, "version": 1, "versionNonce": 600006, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h0_interface_text", "x": 230, "y": 164, "width": 225, "height": 42,
+      "text": "ABC / Protocol\n定义最小能力与不变量", "originalText": "ABC / Protocol\n定义最小能力与不变量",
+      "fontSize": 16, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600007, "version": 1, "versionNonce": 600008, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "diamond", "id": "h0_registry", "x": 660, "y": 133, "width": 230, "height": 102,
+      "strokeColor": "#b45309", "backgroundColor": "#fef3c7", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600009, "version": 1, "versionNonce": 600010, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "h0_registry_text", "x": 708, "y": 162, "width": 135, "height": 42,
+      "text": "Factory / Registry\n按配置选择实现", "originalText": "Factory / Registry\n按配置选择实现",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600011, "version": 1, "versionNonce": 600012, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "ellipse", "id": "h0_impl", "x": 1070, "y": 145, "width": 300, "height": 78,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600013, "version": 1, "versionNonce": 600014, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "h0_impl_text", "x": 1100, "y": 164, "width": 240, "height": 42,
+      "text": "Concrete Implementations\n设备 / 后端 / 框架专用", "originalText": "Concrete Implementations\n设备 / 后端 / 框架专用",
+      "fontSize": 16, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600015, "version": 1, "versionNonce": 600016, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h0_composition", "x": 1550, "y": 145, "width": 370, "height": 78,
+      "strokeColor": "#6d28d9", "backgroundColor": "#ddd6fe", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600017, "version": 1, "versionNonce": 600018, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h0_composition_text", "x": 1580, "y": 164, "width": 310, "height": 42,
+      "text": "Composition / Injection\nManager 与 Context 决定对象如何协作", "originalText": "Composition / Injection\nManager 与 Context 决定对象如何协作",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600019, "version": 1, "versionNonce": 600020, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "h0_a1", "x": 487, "y": 184, "width": 170, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600021, "version": 1, "versionNonce": 600022, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[170,0]], "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "h0_a2", "x": 892, "y": 184, "width": 175, "height": 0,
+      "strokeColor": "#b45309", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600023, "version": 1, "versionNonce": 600024, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[175,0]], "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "h0_a3", "x": 1372, "y": 184, "width": 175, "height": 0,
+      "strokeColor": "#6d28d9", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600025, "version": 1, "versionNonce": 600026, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[175,0]], "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "h0_legend", "x": 2020, "y": 142, "width": 570, "height": 85,
+      "text": "图例\n蓝色实心：当前扩展接口 / 主实现   绿色：具体实现\n黄色：选择/实验约束   蓝色虚线：兼容/可选   紫色虚线箭头：组合而非继承", "originalText": "图例\n蓝色实心：当前扩展接口 / 主实现   绿色：具体实现\n黄色：选择/实验约束   蓝色虚线：兼容/可选   紫色虚线箭头：组合而非继承",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 600027, "version": 1, "versionNonce": 600028, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h1_boundary", "x": 60, "y": 275, "width": 800, "height": 770,
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700001, "version": 1, "versionNonce": 700002, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h1_title", "x": 88, "y": 297, "width": 530, "height": 35,
+      "text": "A · 生命周期与 Serving 集成", "originalText": "A · 生命周期与 Serving 集成",
+      "fontSize": 23, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700003, "version": 1, "versionNonce": 700004, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h1_factory_root", "x": 105, "y": 370, "width": 255, "height": 82,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700005, "version": 1, "versionNonce": 700006, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h1_factory_root_text", "x": 125, "y": 389, "width": 215, "height": 46,
+      "text": "BaseServiceFactory (ABC)\n10 个 create/maybe_create hooks", "originalText": "BaseServiceFactory (ABC)\n10 个 create/maybe_create hooks",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700007, "version": 1, "versionNonce": 700008, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h1_factory_trunk", "x": 232, "y": 452, "width": 0, "height": 105,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700009, "version": 1, "versionNonce": 700010, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[0,105]]
+    },
+    {
+      "type": "line", "id": "h1_factory_branch1", "x": 232, "y": 500, "width": 65, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700011, "version": 1, "versionNonce": 700012, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[65,0]]
+    },
+    {
+      "type": "text", "id": "h1_vllm_factory", "x": 315, "y": 483, "width": 205, "height": 42,
+      "text": "VllmServiceFactory\nscheduler / worker / DP0", "originalText": "VllmServiceFactory\nscheduler / worker / DP0",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700013, "version": 1, "versionNonce": 700014, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h1_factory_branch2", "x": 232, "y": 557, "width": 65, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700015, "version": 1, "versionNonce": 700016, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[65,0]]
+    },
+    {
+      "type": "text", "id": "h1_standalone_factory", "x": 315, "y": 540, "width": 220, "height": 42,
+      "text": "StandaloneServiceFactory\nmock connector + API", "originalText": "StandaloneServiceFactory\nmock connector + API",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700017, "version": 1, "versionNonce": 700018, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h1_manager", "x": 545, "y": 465, "width": 260, "height": 122,
+      "strokeColor": "#6d28d9", "backgroundColor": "#ddd6fe", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700019, "version": 1, "versionNonce": 700020, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h1_manager_text", "x": 570, "y": 486, "width": 210, "height": 80,
+      "text": "LMCacheManager\n组合而非继承\nengine · lookup · offload\nAPI · plugin · health", "originalText": "LMCacheManager\n组合而非继承\nengine · lookup · offload\nAPI · plugin · health",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700021, "version": 1, "versionNonce": 700022, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "h1_compose_arrow", "x": 505, "y": 524, "width": 38, "height": 0,
+      "strokeColor": "#6d28d9", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700023, "version": 1, "versionNonce": 700024, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[38,0]], "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "rectangle", "id": "h1_engine", "x": 105, "y": 675, "width": 255, "height": 105,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700025, "version": 1, "versionNonce": 700026, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h1_engine_text", "x": 130, "y": 696, "width": 205, "height": 65,
+      "text": "LMCacheEngine\npublic cache API\nstore · retrieve · lookup\nmove · compress · clear", "originalText": "LMCacheEngine\npublic cache API\nstore · retrieve · lookup\nmove · compress · clear",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700027, "version": 1, "versionNonce": 700028, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h1_builder", "x": 445, "y": 675, "width": 215, "height": 105,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#93c5fd", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700029, "version": 1, "versionNonce": 700030, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h1_builder_text", "x": 465, "y": 698, "width": 175, "height": 58,
+      "text": "LMCacheEngineBuilder\nget_or_create()\ndestroy()\ninstance-id registry", "originalText": "LMCacheEngineBuilder\nget_or_create()\ndestroy()\ninstance-id registry",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700031, "version": 1, "versionNonce": 700032, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "h1_services", "x": 690, "y": 674, "width": 135, "height": 112,
+      "text": "Injected services\nLookupClient/Server\nZMQOffloadServer\nInternalAPIServer\nRuntimePluginLauncher\nHealthMonitor", "originalText": "Injected services\nLookupClient/Server\nZMQOffloadServer\nInternalAPIServer\nRuntimePluginLauncher\nHealthMonitor",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700033, "version": 1, "versionNonce": 700034, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "h1_manager_engine", "x": 640, "y": 590, "width": 405, "height": 82,
+      "strokeColor": "#6d28d9", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700035, "version": 1, "versionNonce": 700036, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[-310,30],[-405,82]], "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "h1_manager_builder", "x": 675, "y": 590, "width": 120, "height": 82,
+      "strokeColor": "#6d28d9", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700037, "version": 1, "versionNonce": 700038, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[-55,30],[-120,82]], "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "rectangle", "id": "h1_cli", "x": 105, "y": 835, "width": 310, "height": 105,
+      "strokeColor": "#1e40af", "backgroundColor": "#dbeafe", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700039, "version": 1, "versionNonce": 700040, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h1_cli_text", "x": 125, "y": 851, "width": 270, "height": 72,
+      "text": "BaseCommand (ABC)\n→ CompositeCommand\nfilesystem discovery\n→ 28 command classes", "originalText": "BaseCommand (ABC)\n→ CompositeCommand\nfilesystem discovery\n→ 28 command classes",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700041, "version": 1, "versionNonce": 700042, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h1_evidence", "x": 450, "y": 835, "width": 355, "height": 165,
+      "strokeColor": "#1e293b", "backgroundColor": "#1e293b", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700043, "version": 1, "versionNonce": 700044, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h1_evidence_text", "x": 470, "y": 855, "width": 315, "height": 125,
+      "text": "源码证据\nlmcache/integration/base_service_factory.py:40\nclass BaseServiceFactory(ABC)\n\nlmcache/v1/manager.py:40\nclass LMCacheManager\n  start_services() · post_init()\n  stop_services()", "originalText": "源码证据\nlmcache/integration/base_service_factory.py:40\nclass BaseServiceFactory(ABC)\n\nlmcache/v1/manager.py:40\nclass LMCacheManager\n  start_services() · post_init()\n  stop_services()",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 700045, "version": 1, "versionNonce": 700046, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h2_boundary", "x": 900, "y": 275, "width": 900, "height": 770,
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800001, "version": 1, "versionNonce": 800002, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h2_title", "x": 930, "y": 297, "width": 620, "height": 35,
+      "text": "B · 两套 Storage 抽象：进程内 Backend 与 MP Adapter", "originalText": "B · 两套 Storage 抽象：进程内 Backend 与 MP Adapter",
+      "fontSize": 23, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800003, "version": 1, "versionNonce": 800004, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h2_backend_root", "x": 940, "y": 370, "width": 310, "height": 90,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800005, "version": 1, "versionNonce": 800006, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h2_backend_root_text", "x": 965, "y": 389, "width": 260, "height": 52,
+      "text": "StorageBackendInterface (ABC)\ncontains · put · get · pin · remove", "originalText": "StorageBackendInterface (ABC)\ncontains · put · get · pin · remove",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800007, "version": 1, "versionNonce": 800008, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h2_backend_trunk", "x": 1095, "y": 460, "width": 0, "height": 170,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800009, "version": 1, "versionNonce": 800010, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[0,170]]
+    },
+    {
+      "type": "line", "id": "h2_backend_b1", "x": 1095, "y": 505, "width": 70, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800011, "version": 1, "versionNonce": 800012, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[70,0]]
+    },
+    {
+      "type": "text", "id": "h2_allocator", "x": 1180, "y": 486, "width": 245, "height": 48,
+      "text": "AllocatorBackendInterface\nallocate / batched_allocate", "originalText": "AllocatorBackendInterface\nallocate / batched_allocate",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800013, "version": 1, "versionNonce": 800014, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "h2_allocator_impl", "x": 1450, "y": 486, "width": 290, "height": 62,
+      "text": "LocalCPUBackend · GdsBackend\nNixlStorageBackend · PDBackend\nMaruBackend", "originalText": "LocalCPUBackend · GdsBackend\nNixlStorageBackend · PDBackend\nMaruBackend",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800015, "version": 1, "versionNonce": 800016, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h2_backend_b2", "x": 1095, "y": 570, "width": 70, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800017, "version": 1, "versionNonce": 800018, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[70,0]]
+    },
+    {
+      "type": "text", "id": "h2_plugin", "x": 1180, "y": 551, "width": 245, "height": 48,
+      "text": "StoragePluginInterface\nconfigurable / plug-and-play", "originalText": "StoragePluginInterface\nconfigurable / plug-and-play",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800019, "version": 1, "versionNonce": 800020, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "h2_plugin_impl", "x": 1450, "y": 551, "width": 275, "height": 48,
+      "text": "DaxBackend · RustRawBlockBackend\ncompat alias: ConfigurableStorageBackendInterface", "originalText": "DaxBackend · RustRawBlockBackend\ncompat alias: ConfigurableStorageBackendInterface",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800021, "version": 1, "versionNonce": 800022, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h2_backend_b3", "x": 1095, "y": 630, "width": 70, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800023, "version": 1, "versionNonce": 800024, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[70,0]]
+    },
+    {
+      "type": "text", "id": "h2_direct_impl", "x": 1180, "y": 611, "width": 525, "height": 48,
+      "text": "Direct implementations: LocalDiskBackend · RemoteBackend · P2PBackend · AuditBackend", "originalText": "Direct implementations: LocalDiskBackend · RemoteBackend · P2PBackend · AuditBackend",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800025, "version": 1, "versionNonce": 800026, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h2_l2_root", "x": 940, "y": 700, "width": 300, "height": 90,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800027, "version": 1, "versionNonce": 800028, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h2_l2_root_text", "x": 965, "y": 718, "width": 250, "height": 54,
+      "text": "L2AdapterInterface (ABC)\nsubmit → eventfd → query\ncaller owns MemoryObj buffers", "originalText": "L2AdapterInterface (ABC)\nsubmit → eventfd → query\ncaller owns MemoryObj buffers",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800029, "version": 1, "versionNonce": 800030, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h2_l2_trunk", "x": 1240, "y": 745, "width": 95, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800031, "version": 1, "versionNonce": 800032, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[95,0]]
+    },
+    {
+      "type": "text", "id": "h2_l2_impls", "x": 1355, "y": 700, "width": 390, "height": 96,
+      "text": "FSL2Adapter · S3L2Adapter · DaxL2Adapter\nNixlStoreL2Adapter · MooncakeStoreL2Adapter\nNativeConnectorL2Adapter · P2PL2Adapter\nSerdeL2AdapterWrapper · PluginL2Adapter\nMock / FaultInject (test/experimental)", "originalText": "FSL2Adapter · S3L2Adapter · DaxL2Adapter\nNixlStoreL2Adapter · MooncakeStoreL2Adapter\nNativeConnectorL2Adapter · P2PL2Adapter\nSerdeL2AdapterWrapper · PluginL2Adapter\nMock / FaultInject (test/experimental)",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800033, "version": 1, "versionNonce": 800034, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h2_dist_sm", "x": 940, "y": 850, "width": 300, "height": 102,
+      "strokeColor": "#6d28d9", "backgroundColor": "#ddd6fe", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800035, "version": 1, "versionNonce": 800036, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h2_dist_sm_text", "x": 965, "y": 870, "width": 250, "height": 62,
+      "text": "distributed.StorageManager\n组合 L1Manager + Controllers\n+ ordered L2Adapter list", "originalText": "distributed.StorageManager\n组合 L1Manager + Controllers\n+ ordered L2Adapter list",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800037, "version": 1, "versionNonce": 800038, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h2_controller_root", "x": 1350, "y": 850, "width": 290, "height": 102,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#93c5fd", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800039, "version": 1, "versionNonce": 800040, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h2_controller_root_text", "x": 1370, "y": 867, "width": 250, "height": 70,
+      "text": "StorageControllerInterface\nstart() · stop() · report_status()\nStoreController · PrefetchController\nL1/L2 EvictionController", "originalText": "StorageControllerInterface\nstart() · stop() · report_status()\nStoreController · PrefetchController\nL1/L2 EvictionController",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800041, "version": 1, "versionNonce": 800042, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "h2_sm_l2", "x": 1090, "y": 848, "width": 0, "height": 56,
+      "strokeColor": "#6d28d9", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800043, "version": 1, "versionNonce": 800044, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[0,-56]], "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "h2_sm_ctrl", "x": 1242, "y": 900, "width": 105, "height": 0,
+      "strokeColor": "#6d28d9", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800045, "version": 1, "versionNonce": 800046, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[105,0]], "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "rectangle", "id": "h2_evidence", "x": 940, "y": 975, "width": 810, "height": 50,
+      "strokeColor": "#1e293b", "backgroundColor": "#1e293b", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800047, "version": 1, "versionNonce": 800048, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h2_evidence_text", "x": 960, "y": 988, "width": 770, "height": 25,
+      "text": "证据：storage_backend/abstract_backend.py:27 · distributed/l2_adapters/base.py:78 · distributed/storage_manager.py:63", "originalText": "证据：storage_backend/abstract_backend.py:27 · distributed/l2_adapters/base.py:78 · distributed/storage_manager.py:63",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 800049, "version": 1, "versionNonce": 800050, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h3_boundary", "x": 1840, "y": 275, "width": 800, "height": 770,
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900001, "version": 1, "versionNonce": 900002, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h3_title", "x": 1870, "y": 297, "width": 520, "height": 35,
+      "text": "C · 设备、布局与 IPC 能力树", "originalText": "C · 设备、布局与 IPC 能力树",
+      "fontSize": 23, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900003, "version": 1, "versionNonce": 900004, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h3_gpu_root", "x": 1880, "y": 370, "width": 300, "height": 90,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900005, "version": 1, "versionNonce": 900006, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h3_gpu_root_text", "x": 1905, "y": 389, "width": 250, "height": 52,
+      "text": "GPUConnectorInterface (ABC)\nto_gpu · from_gpu · batched_*\nget_shape · initialize_kvcaches_ptr", "originalText": "GPUConnectorInterface (ABC)\nto_gpu · from_gpu · batched_*\nget_shape · initialize_kvcaches_ptr",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900007, "version": 1, "versionNonce": 900008, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h3_gpu_trunk", "x": 2180, "y": 415, "width": 75, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900009, "version": 1, "versionNonce": 900010, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[75,0]]
+    },
+    {
+      "type": "text", "id": "h3_cuda_impl", "x": 2275, "y": 360, "width": 330, "height": 74,
+      "text": "CUDA\nVLLMPagedMemGPUConnectorV2 / V3\nVLLMPagedMemLayerwiseGPUConnector\nSGLangGPUConnector · TRTLLMGPUConnector", "originalText": "CUDA\nVLLMPagedMemGPUConnectorV2 / V3\nVLLMPagedMemLayerwiseGPUConnector\nSGLangGPUConnector · TRTLLMGPUConnector",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900011, "version": 1, "versionNonce": 900012, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "h3_other_impl", "x": 2275, "y": 455, "width": 330, "height": 102,
+      "text": "XPU: VLLMPagedMemXPUConnectorV2/V3 + SGLangXPU\nHPU: VLLMPagedMemHPUConnectorV2\nMUSA: VLLMPagedMemMUSAConnectorV2 + Layerwise\nMockGPUConnector\n\n限制：HPU no layerwise · MUSA no SGLang/blend/v3", "originalText": "XPU: VLLMPagedMemXPUConnectorV2/V3 + SGLangXPU\nHPU: VLLMPagedMemHPUConnectorV2\nMUSA: VLLMPagedMemMUSAConnectorV2 + Layerwise\nMockGPUConnector\n\n限制：HPU no layerwise · MUSA no SGLang/blend/v3",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900013, "version": 1, "versionNonce": 900014, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "diamond", "id": "h3_create_factory", "x": 1900, "y": 505, "width": 250, "height": 100,
+      "strokeColor": "#b45309", "backgroundColor": "#fef3c7", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900015, "version": 1, "versionNonce": 900016, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "h3_create_factory_text", "x": 1950, "y": 534, "width": 150, "height": 42,
+      "text": "CreateGPUConnector()\nengine × device × config", "originalText": "CreateGPUConnector()\nengine × device × config",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900017, "version": 1, "versionNonce": 900018, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h3_ipc_root", "x": 1880, "y": 650, "width": 300, "height": 88,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900019, "version": 1, "versionNonce": 900020, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h3_ipc_root_text", "x": 1910, "y": 670, "width": 240, "height": 48,
+      "text": "DeviceIPCWrapper\nSerialize / Deserialize · to_tensor()", "originalText": "DeviceIPCWrapper\nSerialize / Deserialize · to_tensor()",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900021, "version": 1, "versionNonce": 900022, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h3_ipc_trunk", "x": 2180, "y": 694, "width": 75, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900023, "version": 1, "versionNonce": 900024, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[75,0]]
+    },
+    {
+      "type": "text", "id": "h3_ipc_impls", "x": 2275, "y": 650, "width": 330, "height": 96,
+      "text": "CudaIPCWrapper\n  torch storage._share_cuda_()\nRawCudaIPCWrapper\n  cudaIpcGet/OpenMemHandle (TRT-LLM)\nCpuShmTensorWrapper\n  POSIX shm_open / mmap\n共同 wire type: list[DeviceIPCWrapper]", "originalText": "CudaIPCWrapper\n  torch storage._share_cuda_()\nRawCudaIPCWrapper\n  cudaIpcGet/OpenMemHandle (TRT-LLM)\nCpuShmTensorWrapper\n  POSIX shm_open / mmap\n共同 wire type: list[DeviceIPCWrapper]",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900025, "version": 1, "versionNonce": 900026, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h3_context_root", "x": 1880, "y": 810, "width": 300, "height": 88,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#93c5fd", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900027, "version": 1, "versionNonce": 900028, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h3_context_root_text", "x": 1910, "y": 830, "width": 240, "height": 48,
+      "text": "BaseCacheContext (ABC)\nregister buffers · transfer metadata", "originalText": "BaseCacheContext (ABC)\nregister buffers · transfer metadata",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900029, "version": 1, "versionNonce": 900030, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "h3_context_impls", "x": 2275, "y": 808, "width": 330, "height": 82,
+      "text": "GPUCacheContext\n  KVLayerGroupsManager + streams/events\nCPUCacheContext\n  CpuShmTensorWrapper + engine-driven fallback\nPlainGPUCacheContext (specialized)", "originalText": "GPUCacheContext\n  KVLayerGroupsManager + streams/events\nCPUCacheContext\n  CpuShmTensorWrapper + engine-driven fallback\nPlainGPUCacheContext (specialized)",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900031, "version": 1, "versionNonce": 900032, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h3_context_line", "x": 2180, "y": 854, "width": 75, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900033, "version": 1, "versionNonce": 900034, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[75,0]]
+    },
+    {
+      "type": "rectangle", "id": "h3_format", "x": 1880, "y": 920, "width": 725, "height": 92,
+      "strokeColor": "#1e40af", "backgroundColor": "#dbeafe", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900035, "version": 1, "versionNonce": 900036, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h3_format_text", "x": 1905, "y": 937, "width": 675, "height": 62,
+      "text": "EngineDetector (ABC) → VLLM / SGLANG / TRTLLM detectors\nKVFormatSpec (ABC) → layout-specific specs\nfilesystem subclass discovery\nnormalize_kv_and_discover_format()", "originalText": "EngineDetector (ABC) → VLLM / SGLANG / TRTLLM detectors\nKVFormatSpec (ABC) → layout-specific specs\nfilesystem subclass discovery\nnormalize_kv_and_discover_format()",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900037, "version": 1, "versionNonce": 900038, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h3_evidence", "x": 1880, "y": 1020, "width": 725, "height": 55,
+      "strokeColor": "#1e293b", "backgroundColor": "#1e293b", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900039, "version": 1, "versionNonce": 900040, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h3_evidence_text", "x": 1900, "y": 1033, "width": 685, "height": 28,
+      "text": "证据：gpu_connector/gpu_connectors.py:42 · multiprocess/custom_types.py:26 · platform/base_cache_context.py:36", "originalText": "证据：gpu_connector/gpu_connectors.py:42 · multiprocess/custom_types.py:26 · platform/base_cache_context.py:36",
+      "fontSize": 11, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 900041, "version": 1, "versionNonce": 900042, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h4_boundary", "x": 60, "y": 1100, "width": 2580, "height": 650,
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000001, "version": 1, "versionNonce": 1000002, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h4_title", "x": 90, "y": 1122, "width": 720, "height": 35,
+      "text": "D · MP 模块、传输、Serde 与注册表：Protocol + composition", "originalText": "D · MP 模块、传输、Serde 与注册表：Protocol + composition",
+      "fontSize": 23, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000003, "version": 1, "versionNonce": 1000004, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "h4_col1_title", "x": 100, "y": 1190, "width": 360, "height": 28,
+      "text": "EngineModule Protocol：按 handler 能力组合", "originalText": "EngineModule Protocol：按 handler 能力组合",
+      "fontSize": 17, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#3b82f6", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000005, "version": 1, "versionNonce": 1000006, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h4_engine_module", "x": 100, "y": 1240, "width": 310, "height": 92,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000007, "version": 1, "versionNonce": 1000008, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h4_engine_module_text", "x": 125, "y": 1253, "width": 260, "height": 68,
+      "text": "EngineModule\n(typing.Protocol)\nget_handlers()\nreport_status() · close()\nHandlerSpec(type, handler, pool)", "originalText": "EngineModule\n(typing.Protocol)\nget_handlers()\nreport_status() · close()\nHandlerSpec(type, handler, pool)",
+      "fontSize": 11, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000009, "version": 1, "versionNonce": 1000010, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h4_module_trunk", "x": 255, "y": 1332, "width": 0, "height": 205,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000011, "version": 1, "versionNonce": 1000012, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[0,205]]
+    },
+    {
+      "type": "text", "id": "h4_modules", "x": 315, "y": 1360, "width": 330, "height": 205,
+      "text": "LookupModule\nManagementModule\nP2PController\nLMCacheDrivenTransferModule\nEngineDrivenTransferModule\nBlendModule (legacy)\nBlendV3Module (current)\n\nInstanceLivenessTarget Protocol\n→ transfer modules + BlendV3\n→ ManagementModule reaper", "originalText": "LookupModule\nManagementModule\nP2PController\nLMCacheDrivenTransferModule\nEngineDrivenTransferModule\nBlendModule (legacy)\nBlendV3Module (current)\n\nInstanceLivenessTarget Protocol\n→ transfer modules + BlendV3\n→ ManagementModule reaper",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000013, "version": 1, "versionNonce": 1000014, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h4_module_b1", "x": 255, "y": 1385, "width": 45, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000015, "version": 1, "versionNonce": 1000016, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[45,0]]
+    },
+    {
+      "type": "text", "id": "h4_col2_title", "x": 720, "y": 1190, "width": 350, "height": 28,
+      "text": "Transfer：两层策略隔离设备差异", "originalText": "Transfer：两层策略隔离设备差异",
+      "fontSize": 17, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#3b82f6", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000017, "version": 1, "versionNonce": 1000018, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h4_transfer_ctx", "x": 720, "y": 1240, "width": 270, "height": 82,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000019, "version": 1, "versionNonce": 1000020, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h4_transfer_ctx_text", "x": 745, "y": 1254, "width": 220, "height": 62,
+      "text": "TransferContext (ABC)\nregister()\nsubmit_store() / submit_retrieve()\nclose()", "originalText": "TransferContext (ABC)\nregister()\nsubmit_store() / submit_retrieve()\nclose()",
+      "fontSize": 11, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000021, "version": 1, "versionNonce": 1000022, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "h4_transfer_ctx_trunk", "x": 855, "y": 1322, "width": 0, "height": 115,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000023, "version": 1, "versionNonce": 1000024, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[0,115]]
+    },
+    {
+      "type": "text", "id": "h4_transfer_ctx_impl", "x": 900, "y": 1350, "width": 330, "height": 82,
+      "text": "LMCacheDrivenTransferContext\n  DeviceIPCWrapper + event handle + STORE/RETRIEVE\nEngineDrivenTransferContext\n  PREPARE → gather/scatter → COMMIT\n  当前不支持 hybrid multi-group", "originalText": "LMCacheDrivenTransferContext\n  DeviceIPCWrapper + event handle + STORE/RETRIEVE\nEngineDrivenTransferContext\n  PREPARE → gather/scatter → COMMIT\n  当前不支持 hybrid multi-group",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000025, "version": 1, "versionNonce": 1000026, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h4_engine_ctx", "x": 720, "y": 1485, "width": 270, "height": 78,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#93c5fd", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000027, "version": 1, "versionNonce": 1000028, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h4_engine_ctx_text", "x": 745, "y": 1502, "width": 220, "height": 44,
+      "text": "EngineDrivenContext (ABC)\nprepare_store/retrieve · commit_*", "originalText": "EngineDrivenContext (ABC)\nprepare_store/retrieve · commit_*",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000029, "version": 1, "versionNonce": 1000030, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "h4_engine_ctx_impl", "x": 1015, "y": 1496, "width": 230, "height": 60,
+      "text": "EngineDrivenContextShm\nEngineDrivenContextPickle\nserver mirrors: Shm/PickleTransferStrategy", "originalText": "EngineDrivenContextShm\nEngineDrivenContextPickle\nserver mirrors: Shm/PickleTransferStrategy",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000031, "version": 1, "versionNonce": 1000032, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "h4_col3_title", "x": 1330, "y": 1190, "width": 330, "height": 28,
+      "text": "Serde / Events：转换与观测可插拔", "originalText": "Serde / Events：转换与观测可插拔",
+      "fontSize": 17, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#3b82f6", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000033, "version": 1, "versionNonce": 1000034, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h4_serde", "x": 1330, "y": 1240, "width": 340, "height": 110,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000035, "version": 1, "versionNonce": 1000036, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h4_serde_text", "x": 1355, "y": 1258, "width": 290, "height": 74,
+      "text": "Serializer (ABC) + Deserializer (ABC)\nSerdeProcessor (ABC)\nMultiSerializer / MultiDeserializer\nFp8Quantization · AsymK16V8\nAsyncSerdeProcessor", "originalText": "Serializer (ABC) + Deserializer (ABC)\nSerdeProcessor (ABC)\nMultiSerializer / MultiDeserializer\nFp8Quantization · AsymK16V8\nAsyncSerdeProcessor",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000037, "version": 1, "versionNonce": 1000038, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h4_event_sub", "x": 1330, "y": 1405, "width": 340, "height": 110,
+      "strokeColor": "#6d28d9", "backgroundColor": "#ddd6fe", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000039, "version": 1, "versionNonce": 1000040, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h4_event_sub_text", "x": 1355, "y": 1422, "width": 290, "height": 76,
+      "text": "EventSubscriber (ABC)\nget_subscriptions() → EventType: callback\nMetrics / Logging / Tracing subscribers\nTraceRecorder(EventSubscriber, ABC)\n失败隔离，不控制 cache correctness", "originalText": "EventSubscriber (ABC)\nget_subscriptions() → EventType: callback\nMetrics / Logging / Tracing subscribers\nTraceRecorder(EventSubscriber, ABC)\n失败隔离，不控制 cache correctness",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000041, "version": 1, "versionNonce": 1000042, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h4_telemetry", "x": 1330, "y": 1570, "width": 340, "height": 78,
+      "strokeColor": "#1e40af", "backgroundColor": "#dbeafe", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000043, "version": 1, "versionNonce": 1000044, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h4_telemetry_text", "x": 1355, "y": 1588, "width": 290, "height": 44,
+      "text": "RequestTelemetry (ABC)\nFastAPIRequestTelemetry · NoOpRequestTelemetry", "originalText": "RequestTelemetry (ABC)\nFastAPIRequestTelemetry · NoOpRequestTelemetry",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000045, "version": 1, "versionNonce": 1000046, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "h4_col4_title", "x": 1790, "y": 1190, "width": 430, "height": 28,
+      "text": "Registry / Factory：扩展时少改中心文件", "originalText": "Registry / Factory：扩展时少改中心文件",
+      "fontSize": 17, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#3b82f6", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000047, "version": 1, "versionNonce": 1000048, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h4_registry_evidence", "x": 1790, "y": 1240, "width": 790, "height": 285,
+      "strokeColor": "#1e293b", "backgroundColor": "#1e293b", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000049, "version": 1, "versionNonce": 1000050, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h4_registry_evidence_text", "x": 1818, "y": 1265, "width": 735, "height": 235,
+      "text": "真实扩展注册\n\n# L2 adapter · config.py / factory.py\nregister_l2_adapter_type(\"fs\", FSL2AdapterConfig)\nregister_l2_adapter_factory(\"fs\", _create_fs_adapter)\n\n# Transfer channel\nregister_transfer_channel_factory(\"nixl\", create_nixl_context)\n\n# Policies\nregister_store_policy(\"default\", DefaultStorePolicy)\nregister_prefetch_policy(\"default\", DefaultPrefetchPolicy)\n\n# Build profiles\nsetup_extensions.policy discovers BuildProfile subclasses with pkgutil", "originalText": "真实扩展注册\n\n# L2 adapter · config.py / factory.py\nregister_l2_adapter_type(\"fs\", FSL2AdapterConfig)\nregister_l2_adapter_factory(\"fs\", _create_fs_adapter)\n\n# Transfer channel\nregister_transfer_channel_factory(\"nixl\", create_nixl_context)\n\n# Policies\nregister_store_policy(\"default\", DefaultStorePolicy)\nregister_prefetch_policy(\"default\", DefaultPrefetchPolicy)\n\n# Build profiles\nsetup_extensions.policy discovers BuildProfile subclasses with pkgutil",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000051, "version": 1, "versionNonce": 1000052, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "h4_decision", "x": 1790, "y": 1570, "width": 790, "height": 100,
+      "strokeColor": "#b45309", "backgroundColor": "#fef3c7", "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000053, "version": 1, "versionNonce": 1000054, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "h4_decision_text", "x": 1820, "y": 1588, "width": 730, "height": 65,
+      "text": "扩展决策\n需要替换算法但保持同一生命周期？→ 实现 ABC/Protocol。\n需要运行时选择第三方实现？→ 自注册 Factory。\n需要改变组件协作顺序？→ 修改 Manager/Context composition，并补行为测试。", "originalText": "扩展决策\n需要替换算法但保持同一生命周期？→ 实现 ABC/Protocol。\n需要运行时选择第三方实现？→ 自注册 Factory。\n需要改变组件协作顺序？→ 修改 Manager/Context composition，并补行为测试。",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top", "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0,
+      "seed": 1000055, "version": 1, "versionNonce": 1000056, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    }
+  ],
+  "appState": {"viewBackgroundColor": "#ffffff", "gridSize": 20},
+  "files": {}
+}
