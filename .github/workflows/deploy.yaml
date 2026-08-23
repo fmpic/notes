@@ -27,16 +27,17 @@ jobs:
         with:
           node-version: 22
 
-      - name: Setup Quartz
-        run: |
-          npm i
-          npx quartz plugin install --from-config
-
       - name: Prepare Content and Config
         run: |
           rm -rf quartz/content/*
           rsync -av --exclude='quartz.config.yaml' --exclude='.github/' --exclude='.git/' my-notes/ quartz/content/
           cp my-notes/quartz.config.yaml quartz/quartz.config.yaml
+
+      - name: Setup Quartz
+        working-directory: quartz
+        run: |
+          npm i
+          npx quartz plugin install --from-config
 
       - name: Build Quartz
         working-directory: quartz
