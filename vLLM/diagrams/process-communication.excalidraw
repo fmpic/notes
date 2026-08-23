@@ -1,0 +1,709 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {
+      "type": "text", "id": "communication_title", "x": 70, "y": 35, "width": 1350, "height": 44,
+      "text": "vLLM 多进程通信：控制面决定“做什么”，数据面搬运 tensor", "originalText": "vLLM 多进程通信：控制面决定“做什么”，数据面搬运 tensor",
+      "fontSize": 32, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10001,
+      "version": 1, "versionNonce": 10101, "isDeleted": false, "groupIds": [], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "communication_subtitle", "x": 72, "y": 88, "width": 1550, "height": 25,
+      "text": "先看进程所有权，再看 wire format：Frontend/Core MessagePack、Executor/Worker Python object transport、Worker ranks torch.distributed 不能混为一种 RPC", "originalText": "先看进程所有权，再看 wire format：Frontend/Core MessagePack、Executor/Worker Python object transport、Worker ranks torch.distributed 不能混为一种 RPC",
+      "fontSize": 17, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10002,
+      "version": 1, "versionNonce": 10102, "isDeleted": false, "groupIds": [], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "snapshot_note", "x": 1900, "y": 46, "width": 430, "height": 22,
+      "text": "代码快照 0934b267 · V1", "originalText": "代码快照 0934b267 · V1",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "right", "verticalAlign": "top",
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10003,
+      "version": 1, "versionNonce": 10103, "isDeleted": false, "groupIds": [], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "header_divider", "x": 70, "y": 125, "width": 2260, "height": 0,
+      "strokeColor": "#93c5fd", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10004,
+      "version": 1, "versionNonce": 10104, "isDeleted": false, "groupIds": [], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [2260, 0]]
+    },
+    {
+      "type": "text", "id": "legend_title", "x": 72, "y": 150, "width": 420, "height": 30,
+      "text": "通信平面图例", "originalText": "通信平面图例",
+      "fontSize": 22, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10010,
+      "version": 1, "versionNonce": 10110, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "legend_northbound", "x": 90, "y": 220, "width": 100, "height": 0,
+      "strokeColor": "#c2410c", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10011,
+      "version": 1, "versionNonce": 10111, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [100, 0]],
+      "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "legend_northbound_text", "x": 210, "y": 207, "width": 240, "height": 25,
+      "text": "HTTP / gRPC / SSE", "originalText": "HTTP / gRPC / SSE", "fontSize": 16, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#c2410c", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 10012, "version": 1, "versionNonce": 10112, "isDeleted": false,
+      "groupIds": ["legend_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "legend_engine_control", "x": 490, "y": 220, "width": 100, "height": 0,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10013,
+      "version": 1, "versionNonce": 10113, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [100, 0]],
+      "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "legend_engine_control_text", "x": 610, "y": 207, "width": 280, "height": 25,
+      "text": "Engine control · MessagePack", "originalText": "Engine control · MessagePack", "fontSize": 16, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#1e40af", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 10014, "version": 1, "versionNonce": 10114, "isDeleted": false,
+      "groupIds": ["legend_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "legend_executor_control", "x": 930, "y": 220, "width": 100, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10015,
+      "version": 1, "versionNonce": 10115, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [100, 0]],
+      "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "legend_executor_control_text", "x": 1050, "y": 207, "width": 300, "height": 25,
+      "text": "Executor control · MessageQueue/Ray", "originalText": "Executor control · MessageQueue/Ray", "fontSize": 16, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#374151", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 10016, "version": 1, "versionNonce": 10116, "isDeleted": false,
+      "groupIds": ["legend_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "legend_data_plane", "x": 1410, "y": 220, "width": 100, "height": 0,
+      "strokeColor": "#6d28d9", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 4,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10017,
+      "version": 1, "versionNonce": 10117, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [100, 0]],
+      "startBinding": null, "endBinding": null, "startArrowhead": "arrow", "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "legend_data_plane_text", "x": 1530, "y": 207, "width": 330, "height": 25,
+      "text": "Model data · torch.distributed", "originalText": "Model data · torch.distributed", "fontSize": 16, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#6d28d9", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 10018, "version": 1, "versionNonce": 10118, "isDeleted": false,
+      "groupIds": ["legend_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "legend_failure", "x": 1930, "y": 220, "width": 100, "height": 0,
+      "strokeColor": "#dc2626", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10019,
+      "version": 1, "versionNonce": 10119, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [100, 0]],
+      "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "legend_failure_text", "x": 2050, "y": 207, "width": 250, "height": 25,
+      "text": "health / failure", "originalText": "health / failure", "fontSize": 16, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#dc2626", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 10020, "version": 1, "versionNonce": 10120, "isDeleted": false,
+      "groupIds": ["legend_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "topology_boundary", "x": 70, "y": 300, "width": 2260, "height": 850,
+      "strokeColor": "#93c5fd", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20001,
+      "version": 1, "versionNonce": 20101, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "topology_title", "x": 92, "y": 317, "width": 1050, "height": 30,
+      "text": "Level 1 · 默认在线多进程拓扑（mp Executor）", "originalText": "Level 1 · 默认在线多进程拓扑（mp Executor）",
+      "fontSize": 22, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20002,
+      "version": 1, "versionNonce": 20102, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "ellipse", "id": "external_client", "x": 100, "y": 370, "width": 230, "height": 65,
+      "strokeColor": "#c2410c", "backgroundColor": "#fed7aa", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20010,
+      "version": 1, "versionNonce": 20110, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": [{"id": "external_client_text", "type": "text"}, {"id": "arrow_http_python", "type": "arrow"}, {"id": "arrow_http_rust", "type": "arrow"}],
+      "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "external_client_text", "x": 136, "y": 390, "width": 158, "height": 25,
+      "text": "OpenAI / gRPC client", "originalText": "OpenAI / gRPC client", "fontSize": 16, "fontFamily": 3,
+      "textAlign": "center", "verticalAlign": "middle", "strokeColor": "#374151", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 20011, "version": 1, "versionNonce": 20111, "isDeleted": false,
+      "groupIds": ["topology_group"], "boundElements": null, "link": null, "locked": false,
+      "containerId": "external_client", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "python_api_process", "x": 100, "y": 480, "width": 420, "height": 230,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20012,
+      "version": 1, "versionNonce": 20112, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": [{"id": "python_api_text", "type": "text"}, {"id": "arrow_http_python", "type": "arrow"}, {"id": "arrow_python_input", "type": "arrow"}, {"id": "arrow_python_output", "type": "arrow"}, {"id": "arrow_tensor_ipc", "type": "arrow"}, {"id": "arrow_coord_front", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "python_api_text", "x": 145, "y": 510, "width": 330, "height": 171,
+      "text": "Process A / N · Python API Server\n\nFastAPI + OpenAIServing + AsyncLLM\nAsyncMPClient / DP*Client\n\nROUTER input socket    (bind)\nPULL output socket     (bind)\nMsgpackEncoder / Decoder\n\nclient_index routes outputs here", "originalText": "Process A / N · Python API Server\n\nFastAPI + OpenAIServing + AsyncLLM\nAsyncMPClient / DP*Client\n\nROUTER input socket    (bind)\nPULL output socket     (bind)\nMsgpackEncoder / Decoder\n\nclient_index routes outputs here",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20013,
+      "version": 1, "versionNonce": 20113, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "python_api_process", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "rust_frontend_process", "x": 100, "y": 800, "width": 420, "height": 230,
+      "strokeColor": "#1e40af", "backgroundColor": "#dbeafe", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20014,
+      "version": 1, "versionNonce": 20114, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": [{"id": "rust_frontend_text", "type": "text"}, {"id": "arrow_http_rust", "type": "arrow"}, {"id": "arrow_rust_input", "type": "arrow"}, {"id": "arrow_rust_output", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "rust_frontend_text", "x": 145, "y": 830, "width": 330, "height": 171,
+      "text": "Process R · Rust frontend（实验）\n\nAxum / tonic + renderer/parser\nRust EngineCoreClient\n\nRouterSendHalf          (bind)\nPullSocket              (bind)\nserde tuple + MessagePack\n\n替换 frontend，不替换 Python core", "originalText": "Process R · Rust frontend（实验）\n\nAxum / tonic + renderer/parser\nRust EngineCoreClient\n\nRouterSendHalf          (bind)\nPullSocket              (bind)\nserde tuple + MessagePack\n\n替换 frontend，不替换 Python core",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20015,
+      "version": 1, "versionNonce": 20115, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "rust_frontend_process", "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_http_python", "x": 215, "y": 437, "width": 0, "height": 41,
+      "strokeColor": "#c2410c", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20016,
+      "version": 1, "versionNonce": 20116, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 41]],
+      "startBinding": {"elementId": "external_client", "focus": 0, "gap": 2}, "endBinding": {"elementId": "python_api_process", "focus": -0.45, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_http_rust", "x": 100, "y": 405, "width": 40, "height": 393,
+      "strokeColor": "#c2410c", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20017,
+      "version": 1, "versionNonce": 20117, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [-30, 0], [-30, 350], [40, 350], [40, 393]],
+      "startBinding": {"elementId": "external_client", "focus": 0.5, "gap": 2}, "endBinding": {"elementId": "rust_frontend_process", "focus": -0.7, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "rectangle", "id": "engine_core_process", "x": 900, "y": 500, "width": 480, "height": 440,
+      "strokeColor": "#6d28d9", "backgroundColor": "#ddd6fe", "fillStyle": "solid", "strokeWidth": 4,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20020,
+      "version": 1, "versionNonce": 20120, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": [{"id": "engine_core_text", "type": "text"}, {"id": "arrow_python_input", "type": "arrow"}, {"id": "arrow_python_output", "type": "arrow"}, {"id": "arrow_rust_input", "type": "arrow"}, {"id": "arrow_rust_output", "type": "arrow"}, {"id": "arrow_tensor_ipc", "type": "arrow"}, {"id": "arrow_core_coord_stats", "type": "arrow"}, {"id": "arrow_coord_core_wave", "type": "arrow"}, {"id": "arrow_core_worker_control", "type": "arrow"}, {"id": "arrow_worker_core_response", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "engine_core_text", "x": 950, "y": 540, "width": 380, "height": 356,
+      "text": "Process B / DP rank · EngineCoreProc\n\ninput IO thread\nDEALER input socket(s)     (connect)\n→ request_type + msgpack + aux\n\nEngineCore\nScheduler + Executor\nrequest state / KV block ownership\n\noutput IO thread\nPUSH output socket(s)      (connect)\n→ select frontend by client_index\n\nengine_index / DP rank routes requests\nEngineCoreProc remains Python", "originalText": "Process B / DP rank · EngineCoreProc\n\ninput IO thread\nDEALER input socket(s)     (connect)\n→ request_type + msgpack + aux\n\nEngineCore\nScheduler + Executor\nrequest state / KV block ownership\n\noutput IO thread\nPUSH output socket(s)      (connect)\n→ select frontend by client_index\n\nengine_index / DP rank routes requests\nEngineCoreProc remains Python",
+      "fontSize": 16, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20021,
+      "version": 1, "versionNonce": 20121, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "engine_core_process", "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_python_input", "x": 522, "y": 550, "width": 376, "height": 0,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20022,
+      "version": 1, "versionNonce": 20122, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [376, 0]],
+      "startBinding": {"elementId": "python_api_process", "focus": -0.35, "gap": 2}, "endBinding": {"elementId": "engine_core_process", "focus": -0.75, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "python_input_label", "x": 565, "y": 510, "width": 290, "height": 35,
+      "text": "ROUTER → DEALER\nADD / ABORT / UTILITY", "originalText": "ROUTER → DEALER\nADD / ABORT / UTILITY",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20023,
+      "version": 1, "versionNonce": 20123, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_python_output", "x": 898, "y": 645, "width": 376, "height": 0,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20024,
+      "version": 1, "versionNonce": 20124, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [-376, 0]],
+      "startBinding": {"elementId": "engine_core_process", "focus": -0.3, "gap": 2}, "endBinding": {"elementId": "python_api_process", "focus": 0.4, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "python_output_label", "x": 565, "y": 655, "width": 290, "height": 35,
+      "text": "PUSH → PULL\nEngineCoreOutputs / utility result", "originalText": "PUSH → PULL\nEngineCoreOutputs / utility result",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20025,
+      "version": 1, "versionNonce": 20125, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_tensor_ipc", "x": 500, "y": 712, "width": 398, "height": 23,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20026,
+      "version": 1, "versionNonce": 20126, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [40, 0], [40, 23], [398, 23]],
+      "startBinding": {"elementId": "python_api_process", "focus": 0.8, "gap": 2}, "endBinding": {"elementId": "engine_core_process", "focus": 0.05, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "tensor_ipc_label", "x": 565, "y": 700, "width": 290, "height": 35,
+      "text": "optional torch_shm tensor IPC\nmm tensors out-of-band (DP > 1 unsupported)", "originalText": "optional torch_shm tensor IPC\nmm tensors out-of-band (DP > 1 unsupported)",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20027,
+      "version": 1, "versionNonce": 20127, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_rust_input", "x": 522, "y": 840, "width": 376, "height": 60,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20028,
+      "version": 1, "versionNonce": 20128, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [180, 0], [180, -60], [376, -60]],
+      "startBinding": {"elementId": "rust_frontend_process", "focus": -0.65, "gap": 2}, "endBinding": {"elementId": "engine_core_process", "focus": 0.3, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_rust_output", "x": 898, "y": 875, "width": 376, "height": 60,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20029,
+      "version": 1, "versionNonce": 20129, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [-180, 0], [-180, 60], [-376, 60]],
+      "startBinding": {"elementId": "engine_core_process", "focus": 0.7, "gap": 2}, "endBinding": {"elementId": "rust_frontend_process", "focus": 0.3, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "rust_protocol_label", "x": 565, "y": 795, "width": 290, "height": 45,
+      "text": "same Python-compatible wire schema\n2-byte little-endian engine identity\nHandshakeOwner or Bootstrapped", "originalText": "same Python-compatible wire schema\n2-byte little-endian engine identity\nHandshakeOwner or Bootstrapped",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20030,
+      "version": 1, "versionNonce": 20130, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "dp_coordinator", "x": 1530, "y": 380, "width": 390, "height": 300,
+      "strokeColor": "#b45309", "backgroundColor": "#fef3c7", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20031,
+      "version": 1, "versionNonce": 20131, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": [{"id": "dp_coordinator_text", "type": "text"}, {"id": "arrow_core_coord_stats", "type": "arrow"}, {"id": "arrow_coord_core_wave", "type": "arrow"}, {"id": "arrow_coord_front", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "dp_coordinator_text", "x": 1572, "y": 402, "width": 306, "height": 235,
+      "text": "Process C · DPCoordinatorProc\n(online DP only)\n\nPULL output_back\n← scheduler [waiting, running] + wave\n\nXPUB publish_back\n→ core START_DP_WAVE / running state\n\nXPUB publish_front\n→ frontend load snapshots\n\n控制面，不传 model tensor", "originalText": "Process C · DPCoordinatorProc\n(online DP only)\n\nPULL output_back\n← scheduler [waiting, running] + wave\n\nXPUB publish_back\n→ core START_DP_WAVE / running state\n\nXPUB publish_front\n→ frontend load snapshots\n\n控制面，不传 model tensor",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20032,
+      "version": 1, "versionNonce": 20132, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "dp_coordinator", "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_core_coord_stats", "x": 1382, "y": 565, "width": 146, "height": 45,
+      "strokeColor": "#b45309", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20033,
+      "version": 1, "versionNonce": 20133, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [70, 0], [70, -45], [146, -45]],
+      "startBinding": {"elementId": "engine_core_process", "focus": -0.6, "gap": 2}, "endBinding": {"elementId": "dp_coordinator", "focus": 0.35, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_coord_core_wave", "x": 1528, "y": 600, "width": 146, "height": 35,
+      "strokeColor": "#b45309", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20034,
+      "version": 1, "versionNonce": 20134, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [-70, 0], [-70, 35], [-146, 35]],
+      "startBinding": {"elementId": "dp_coordinator", "focus": -0.3, "gap": 2}, "endBinding": {"elementId": "engine_core_process", "focus": -0.35, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_coord_front", "x": 1530, "y": 430, "width": 1030, "height": 48,
+      "strokeColor": "#b45309", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20035,
+      "version": 1, "versionNonce": 20135, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [-500, 0], [-500, 48], [-1030, 48]],
+      "startBinding": {"elementId": "dp_coordinator", "focus": 0.6, "gap": 2}, "endBinding": {"elementId": "python_api_process", "focus": -0.8, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "coord_front_label", "x": 1120, "y": 395, "width": 360, "height": 25,
+      "text": "XPUB → XSUB load snapshot / wave state", "originalText": "XPUB → XSUB load snapshot / wave state",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#b45309", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20036,
+      "version": 1, "versionNonce": 20136, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "worker_cluster", "x": 1530, "y": 750, "width": 700, "height": 340,
+      "strokeColor": "#6d28d9", "backgroundColor": "#ddd6fe", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20040,
+      "version": 1, "versionNonce": 20140, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": [{"id": "worker_cluster_title", "type": "text"}, {"id": "arrow_core_worker_control", "type": "arrow"}, {"id": "arrow_worker_core_response", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "worker_cluster_title", "x": 1590, "y": 772, "width": 580, "height": 48,
+      "text": "Processes W0…Wn · WorkerProc + Worker + ModelRunner\nworker/global rank belongs to model-parallel world", "originalText": "Processes W0…Wn · WorkerProc + Worker + ModelRunner\nworker/global rank belongs to model-parallel world",
+      "fontSize": 17, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20041,
+      "version": 1, "versionNonce": 20141, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "worker_cluster", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "worker_rank0", "x": 1590, "y": 850, "width": 250, "height": 150,
+      "strokeColor": "#6d28d9", "backgroundColor": "#ffffff", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20042,
+      "version": 1, "versionNonce": 20142, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": [{"id": "worker_rank0_text", "type": "text"}, {"id": "arrow_rank_data", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "worker_rank0_text", "x": 1620, "y": 878, "width": 190, "height": 94,
+      "text": "Worker rank 0\n\nexecute_model\nModelRunner.forward\nTP / PP / EP member", "originalText": "Worker rank 0\n\nexecute_model\nModelRunner.forward\nTP / PP / EP member",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20043,
+      "version": 1, "versionNonce": 20143, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "worker_rank0", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "worker_rankn", "x": 1920, "y": 850, "width": 250, "height": 150,
+      "strokeColor": "#6d28d9", "backgroundColor": "#ffffff", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20044,
+      "version": 1, "versionNonce": 20144, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": [{"id": "worker_rankn_text", "type": "text"}, {"id": "arrow_rank_data", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "worker_rankn_text", "x": 1950, "y": 878, "width": 190, "height": 94,
+      "text": "Worker rank N\n\nexecute_model\nModelRunner.forward\nTP / PP / EP member", "originalText": "Worker rank N\n\nexecute_model\nModelRunner.forward\nTP / PP / EP member",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20045,
+      "version": 1, "versionNonce": 20145, "isDeleted": false, "groupIds": ["topology_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "worker_rankn", "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_rank_data", "x": 1842, "y": 925, "width": 76, "height": 0,
+      "strokeColor": "#6d28d9", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 4,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20046,
+      "version": 1, "versionNonce": 20146, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [76, 0]],
+      "startBinding": {"elementId": "worker_rank0", "focus": 0, "gap": 2}, "endBinding": {"elementId": "worker_rankn", "focus": 0, "gap": 2},
+      "startArrowhead": "arrow", "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "rank_data_label", "x": 1815, "y": 1017, "width": 230, "height": 48,
+      "text": "torch.distributed data plane\nNCCL / Gloo / XCCL\nTP all-reduce · PP send/recv · EP all-to-all", "originalText": "torch.distributed data plane\nNCCL / Gloo / XCCL\nTP all-reduce · PP send/recv · EP all-to-all",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#6d28d9", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20047,
+      "version": 1, "versionNonce": 20147, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_core_worker_control", "x": 1382, "y": 820, "width": 146, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20048,
+      "version": 1, "versionNonce": 20148, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [146, 0]],
+      "startBinding": {"elementId": "engine_core_process", "focus": 0.45, "gap": 2}, "endBinding": {"elementId": "worker_cluster", "focus": -0.55, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "core_worker_control_label", "x": 1390, "y": 690, "width": 130, "height": 45,
+      "text": "MessageQueue broadcast\n(method, args, kwargs, output_rank)", "originalText": "MessageQueue broadcast\n(method, args, kwargs, output_rank)",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20049,
+      "version": 1, "versionNonce": 20149, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_worker_core_response", "x": 1528, "y": 900, "width": 146, "height": 0,
+      "strokeColor": "#1e3a5f", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20050,
+      "version": 1, "versionNonce": 20150, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [-146, 0]],
+      "startBinding": {"elementId": "worker_cluster", "focus": 0.55, "gap": 2}, "endBinding": {"elementId": "engine_core_process", "focus": 0.75, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "worker_core_response_label", "x": 1390, "y": 910, "width": 130, "height": 35,
+      "text": "response queue\nModelRunnerOutput / FAILURE", "originalText": "response queue\nModelRunnerOutput / FAILURE",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20051,
+      "version": 1, "versionNonce": 20151, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "rank_key_note", "x": 570, "y": 1020, "width": 850, "height": 75,
+      "text": "不要合并三个 routing key\nclient_index = 输出回哪个 frontend  ·  engine_index / DP rank = 哪个 core 调度  ·  Worker/global rank = 模型并行 rank\n同为 0-based，也不代表同一命名空间", "originalText": "不要合并三个 routing key\nclient_index = 输出回哪个 frontend  ·  engine_index / DP rank = 哪个 core 调度  ·  Worker/global rank = 模型并行 rank\n同为 0-based，也不代表同一命名空间",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20052,
+      "version": 1, "versionNonce": 20152, "isDeleted": false, "groupIds": ["topology_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "protocol_title", "x": 72, "y": 1190, "width": 1200, "height": 32,
+      "text": "Level 2 · 三种传输的 wire/security 语义不同", "originalText": "Level 2 · 三种传输的 wire/security 语义不同",
+      "fontSize": 23, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30001,
+      "version": 1, "versionNonce": 30101, "isDeleted": false, "groupIds": ["protocol_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "msgpack_evidence", "x": 70, "y": 1250, "width": 760, "height": 380,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#1e293b", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30010,
+      "version": 1, "versionNonce": 30110, "isDeleted": false, "groupIds": ["protocol_group"],
+      "boundElements": [{"id": "msgpack_evidence_text", "type": "text"}], "link": null, "locked": false,
+      "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "msgpack_evidence_text", "x": 105, "y": 1277, "width": 690, "height": 328,
+      "text": "Frontend ↔ EngineCore · explicit cross-language schema\n\nINPUT multipart\nROUTER: [engine_identity][type_byte][msgpack_root][aux_0]...\nDEALER:                  [type_byte][msgpack_root][aux_0]...\n\n0x00 ADD       → EngineCoreRequest\n0x01 ABORT     → request_id[]\n0x02 START_DP_WAVE\n0x03 UTILITY   → (client_index, call_id, method, args)\n0x04 EXECUTOR_FAILED  · Python internal\n0x05 WAKEUP           · Python internal\n\nOUTPUT multipart\n[msgpack EngineCoreOutputs][aux_0]...\n\nmsgspec array-like field order = Python/Rust compatibility contract\nVLLM_ALLOW_INSECURE_SERIALIZATION=1 才允许 pickle fallback", "originalText": "Frontend ↔ EngineCore · explicit cross-language schema\n\nINPUT multipart\nROUTER: [engine_identity][type_byte][msgpack_root][aux_0]...\nDEALER:                  [type_byte][msgpack_root][aux_0]...\n\n0x00 ADD       → EngineCoreRequest\n0x01 ABORT     → request_id[]\n0x02 START_DP_WAVE\n0x03 UTILITY   → (client_index, call_id, method, args)\n0x04 EXECUTOR_FAILED  · Python internal\n0x05 WAKEUP           · Python internal\n\nOUTPUT multipart\n[msgpack EngineCoreOutputs][aux_0]...\n\nmsgspec array-like field order = Python/Rust compatibility contract\nVLLM_ALLOW_INSECURE_SERIALIZATION=1 才允许 pickle fallback",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#22c55e", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30011,
+      "version": 1, "versionNonce": 30111, "isDeleted": false, "groupIds": ["protocol_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "msgpack_evidence", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "message_queue_evidence", "x": 860, "y": 1250, "width": 670, "height": 380,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#60a5fa", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30012,
+      "version": 1, "versionNonce": 30112, "isDeleted": false, "groupIds": ["protocol_group"],
+      "boundElements": [{"id": "message_queue_evidence_text", "type": "text"}], "link": null, "locked": false,
+      "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "message_queue_evidence_text", "x": 900, "y": 1280, "width": 590, "height": 320,
+      "text": "EngineCore / Executor ↔ Worker · trusted Python object control\n\ncollective_rpc payload\n(method, args, kwargs, output_rank)\n\nserialization\npickle protocol 5 + out-of-band PickleBuffer\n\nlocal readers\nshared-memory ring buffer\nlarge/overflow payload → IPC XPUB/SUB multipart\n\nremote readers\nTCP XPUB/SUB\n\nresponse queues return status / ModelRunnerOutput / FAILURE\n\n它不是 external broker，也不是 Frontend/Core MessagePack wire", "originalText": "EngineCore / Executor ↔ Worker · trusted Python object control\n\ncollective_rpc payload\n(method, args, kwargs, output_rank)\n\nserialization\npickle protocol 5 + out-of-band PickleBuffer\n\nlocal readers\nshared-memory ring buffer\nlarge/overflow payload → IPC XPUB/SUB multipart\n\nremote readers\nTCP XPUB/SUB\n\nresponse queues return status / ModelRunnerOutput / FAILURE\n\n它不是 external broker，也不是 Frontend/Core MessagePack wire",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30013,
+      "version": 1, "versionNonce": 30113, "isDeleted": false, "groupIds": ["protocol_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "message_queue_evidence", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "data_plane_evidence", "x": 1560, "y": 1250, "width": 770, "height": 380,
+      "strokeColor": "#6d28d9", "backgroundColor": "#ddd6fe", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30014,
+      "version": 1, "versionNonce": 30114, "isDeleted": false, "groupIds": ["protocol_group"],
+      "boundElements": [{"id": "data_plane_evidence_text", "type": "text"}], "link": null, "locked": false,
+      "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "data_plane_evidence_text", "x": 1605, "y": 1280, "width": 680, "height": 320,
+      "text": "Worker rank ↔ Worker rank · model tensor data plane\n\ninit_distributed_environment()\n→ torch.distributed.init_process_group(backend, rank, world_size)\n\ninitialize_model_parallel()\nExternalDP × DP × PP × PCP × TP + EP / DCP groups\n\nTP  all-reduce / all-gather / reduce-scatter activation\nPP  isend/irecv IntermediateTensors between stages\nDP  replica/MoE state collective（≠ DPCoordinator load stats）\nEP  token/expert all-to-all dispatch + combine\nPCP/DCP  context shard gather/all-to-all\n\nbackends: NCCL · Gloo · XCCL · platform communicator\n\nKV / EC connectors have their own tensor transport\n这些数据不经过 Frontend MessagePack 或 Executor control MQ", "originalText": "Worker rank ↔ Worker rank · model tensor data plane\n\ninit_distributed_environment()\n→ torch.distributed.init_process_group(backend, rank, world_size)\n\ninitialize_model_parallel()\nExternalDP × DP × PP × PCP × TP + EP / DCP groups\n\nTP  all-reduce / all-gather / reduce-scatter activation\nPP  isend/irecv IntermediateTensors between stages\nDP  replica/MoE state collective（≠ DPCoordinator load stats）\nEP  token/expert all-to-all dispatch + combine\nPCP/DCP  context shard gather/all-to-all\n\nbackends: NCCL · Gloo · XCCL · platform communicator\n\nKV / EC connectors have their own tensor transport\n这些数据不经过 Frontend MessagePack 或 Executor control MQ",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30015,
+      "version": 1, "versionNonce": 30115, "isDeleted": false, "groupIds": ["protocol_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "data_plane_evidence", "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "protocol_contrast_note", "x": 72, "y": 1650, "width": 2200, "height": 50,
+      "text": "同样出现 ZMQ，并不等于同一协议：MessagePack schema 面向 Python/Rust frontend 兼容；MessageQueue 面向受控 Python Worker 拓扑；torch.distributed 面向 tensor collective。", "originalText": "同样出现 ZMQ，并不等于同一协议：MessagePack schema 面向 Python/Rust frontend 兼容；MessageQueue 面向受控 Python Worker 拓扑；torch.distributed 面向 tensor collective。",
+      "fontSize": 17, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30016,
+      "version": 1, "versionNonce": 30116, "isDeleted": false, "groupIds": ["protocol_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "lifecycle_title", "x": 72, "y": 1720, "width": 1200, "height": 32,
+      "text": "Level 3 · 启动 barrier 与故障传播", "originalText": "Level 3 · 启动 barrier 与故障传播",
+      "fontSize": 23, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40001,
+      "version": 1, "versionNonce": 40101, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "startup_label", "x": 72, "y": 1780, "width": 220, "height": 25,
+      "text": "startup / ready", "originalText": "startup / ready", "fontSize": 17, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 40002, "version": 1, "versionNonce": 40102, "isDeleted": false,
+      "groupIds": ["lifecycle_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "startup_timeline", "x": 130, "y": 1840, "width": 2110, "height": 0,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40003,
+      "version": 1, "versionNonce": 40103, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [2110, 0]],
+      "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "ellipse", "id": "startup_dot_hello", "x": 220, "y": 1831, "width": 18, "height": 18,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40010,
+      "version": 1, "versionNonce": 40110, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "startup_hello_text", "x": 115, "y": 1865, "width": 230, "height": 48,
+      "text": "EngineCoreProc → HELLO\n(local/headless/identity)", "originalText": "EngineCoreProc → HELLO\n(local/headless/identity)",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40011,
+      "version": 1, "versionNonce": 40111, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "ellipse", "id": "startup_dot_init", "x": 580, "y": 1831, "width": 18, "height": 18,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40012,
+      "version": 1, "versionNonce": 40112, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "startup_init_text", "x": 475, "y": 1775, "width": 230, "height": 48,
+      "text": "supervisor → INIT\n(addresses + selected DP config)", "originalText": "supervisor → INIT\n(addresses + selected DP config)",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40013,
+      "version": 1, "versionNonce": 40113, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "ellipse", "id": "startup_dot_ready", "x": 940, "y": 1831, "width": 18, "height": 18,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40014,
+      "version": 1, "versionNonce": 40114, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "startup_ready_text", "x": 835, "y": 1865, "width": 230, "height": 48,
+      "text": "EngineCoreProc → READY\n(config hash verified)", "originalText": "EngineCoreProc → READY\n(config hash verified)",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40015,
+      "version": 1, "versionNonce": 40115, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "ellipse", "id": "startup_dot_channel", "x": 1300, "y": 1831, "width": 18, "height": 18,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40016,
+      "version": 1, "versionNonce": 40116, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "startup_channel_text", "x": 1180, "y": 1775, "width": 260, "height": 48,
+      "text": "formal input DEALER registers\nEngineCoreReadyResponse", "originalText": "formal input DEALER registers\nEngineCoreReadyResponse",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40017,
+      "version": 1, "versionNonce": 40117, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "ellipse", "id": "startup_dot_worker", "x": 1660, "y": 1831, "width": 18, "height": 18,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40018,
+      "version": 1, "versionNonce": 40118, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "startup_worker_text", "x": 1545, "y": 1865, "width": 250, "height": 48,
+      "text": "Workers load model + subscribe MQ\nresponse queue handles returned", "originalText": "Workers load model + subscribe MQ\nresponse queue handles returned",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40019,
+      "version": 1, "versionNonce": 40119, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "ellipse", "id": "startup_dot_accept", "x": 2020, "y": 1831, "width": 18, "height": 18,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40020,
+      "version": 1, "versionNonce": 40120, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "startup_accept_text", "x": 1910, "y": 1775, "width": 240, "height": 48,
+      "text": "all barriers complete\nfrontend accepts requests", "originalText": "all barriers complete\nfrontend accepts requests",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40021,
+      "version": 1, "versionNonce": 40121, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "failure_label", "x": 72, "y": 1950, "width": 220, "height": 25,
+      "text": "failure fan-in", "originalText": "failure fan-in", "fontSize": 17, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#dc2626", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 40030, "version": 1, "versionNonce": 40130, "isDeleted": false,
+      "groupIds": ["lifecycle_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "failure_timeline", "x": 130, "y": 2010, "width": 2110, "height": 0,
+      "strokeColor": "#dc2626", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40031,
+      "version": 1, "versionNonce": 40131, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [2110, 0]],
+      "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "failure_timeline_text", "x": 170, "y": 2030, "width": 2050, "height": 55,
+      "text": "Worker exception/death → response FAILURE or Executor failure callback → EXECUTOR_FAILED → ENGINE_CORE_DEAD single frame\n→ Python/Rust EngineCoreClient marks engine dead → AsyncLLM propagates error to request collectors → supervisor shuts down sibling processes", "originalText": "Worker exception/death → response FAILURE or Executor failure callback → EXECUTOR_FAILED → ENGINE_CORE_DEAD single frame\n→ Python/Rust EngineCoreClient marks engine dead → AsyncLLM propagates error to request collectors → supervisor shuts down sibling processes",
+      "fontSize": 16, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#dc2626", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40032,
+      "version": 1, "versionNonce": 40132, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "shutdown_note", "x": 72, "y": 2105, "width": 2250, "height": 45,
+      "text": "所有权决定关闭顺序：frontend manager → EngineCore manager/coordinator → Executor/Worker MQ → process group；graceful drain 超时后才 terminate/kill。", "originalText": "所有权决定关闭顺序：frontend manager → EngineCore manager/coordinator → Executor/Worker MQ → process group；graceful drain 超时后才 terminate/kill。",
+      "fontSize": 16, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40033,
+      "version": 1, "versionNonce": 40133, "isDeleted": false, "groupIds": ["lifecycle_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff",
+    "gridSize": 20
+  },
+  "files": {}
+}

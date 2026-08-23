@@ -1,0 +1,872 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {
+      "type": "text", "id": "build_title", "x": 70, "y": 35, "width": 1300, "height": 44,
+      "text": "vLLM wheel：Python、CMake 与 Cargo 在 setuptools 汇聚", "originalText": "vLLM wheel：Python、CMake 与 Cargo 在 setuptools 汇聚",
+      "fontSize": 32, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10001,
+      "version": 1, "versionNonce": 10101, "isDeleted": false, "groupIds": [], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "build_subtitle", "x": 72, "y": 88, "width": 1540, "height": 25,
+      "text": "同一个 Python distribution 同时装入源码、原生 extensions、Rust executable/PyO3 module、vendored/JIT 资源与 metadata", "originalText": "同一个 Python distribution 同时装入源码、原生 extensions、Rust executable/PyO3 module、vendored/JIT 资源与 metadata",
+      "fontSize": 17, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10002,
+      "version": 1, "versionNonce": 10102, "isDeleted": false, "groupIds": [], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "snapshot_note", "x": 1900, "y": 46, "width": 430, "height": 22,
+      "text": "代码快照 0934b267 · build graph", "originalText": "代码快照 0934b267 · build graph",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "right", "verticalAlign": "top",
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10003,
+      "version": 1, "versionNonce": 10103, "isDeleted": false, "groupIds": [], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "header_divider", "x": 70, "y": 125, "width": 2260, "height": 0,
+      "strokeColor": "#93c5fd", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10004,
+      "version": 1, "versionNonce": 10104, "isDeleted": false, "groupIds": [], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [2260, 0]]
+    },
+    {
+      "type": "text", "id": "legend_title", "x": 72, "y": 150, "width": 300, "height": 30,
+      "text": "构建边图例", "originalText": "构建边图例",
+      "fontSize": 22, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10010,
+      "version": 1, "versionNonce": 10110, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "legend_packaging", "x": 90, "y": 220, "width": 100, "height": 0,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10011,
+      "version": 1, "versionNonce": 10111, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [100, 0]],
+      "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "legend_packaging_text", "x": 210, "y": 207, "width": 250, "height": 25,
+      "text": "packaging / build flow", "originalText": "packaging / build flow", "fontSize": 16, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#1e40af", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 10012, "version": 1, "versionNonce": 10112, "isDeleted": false,
+      "groupIds": ["legend_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "legend_selection", "x": 510, "y": 220, "width": 100, "height": 0,
+      "strokeColor": "#b45309", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10013,
+      "version": 1, "versionNonce": 10113, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [100, 0]],
+      "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "legend_selection_text", "x": 630, "y": 207, "width": 280, "height": 25,
+      "text": "device / target selection", "originalText": "device / target selection", "fontSize": 16, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#b45309", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 10014, "version": 1, "versionNonce": 10114, "isDeleted": false,
+      "groupIds": ["legend_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "legend_precompiled", "x": 970, "y": 220, "width": 100, "height": 0,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10015,
+      "version": 1, "versionNonce": 10115, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [100, 0]],
+      "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "legend_precompiled_text", "x": 1090, "y": 207, "width": 270, "height": 25,
+      "text": "precompiled reuse / skip", "originalText": "precompiled reuse / skip", "fontSize": 16, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#1e40af", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 10016, "version": 1, "versionNonce": 10116, "isDeleted": false,
+      "groupIds": ["legend_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "legend_converge", "x": 1430, "y": 220, "width": 100, "height": 0,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10017,
+      "version": 1, "versionNonce": 10117, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [100, 0]],
+      "startBinding": null, "endBinding": null, "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "legend_converge_text", "x": 1550, "y": 207, "width": 260, "height": 25,
+      "text": "artifact → wheel staging", "originalText": "artifact → wheel staging", "fontSize": 16, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 10018, "version": 1, "versionNonce": 10118, "isDeleted": false,
+      "groupIds": ["legend_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "ellipse", "id": "legend_output", "x": 1940, "y": 198, "width": 100, "height": 45,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 10019,
+      "version": 1, "versionNonce": 10119, "isDeleted": false, "groupIds": ["legend_group"], "boundElements": null,
+      "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "legend_output_text", "x": 2060, "y": 207, "width": 250, "height": 25,
+      "text": "installable wheel", "originalText": "installable wheel", "fontSize": 16, "fontFamily": 3,
+      "textAlign": "left", "verticalAlign": "top", "strokeColor": "#047857", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 10020, "version": 1, "versionNonce": 10120, "isDeleted": false,
+      "groupIds": ["legend_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "entry_boundary", "x": 70, "y": 300, "width": 2260, "height": 330,
+      "strokeColor": "#93c5fd", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20001,
+      "version": 1, "versionNonce": 20101, "isDeleted": false, "groupIds": ["entry_group"], "boundElements": null,
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "entry_title", "x": 92, "y": 317, "width": 860, "height": 30,
+      "text": "Level 1 · PEP 517 frontend 进入 setuptools backend", "originalText": "Level 1 · PEP 517 frontend 进入 setuptools backend",
+      "fontSize": 22, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20002,
+      "version": 1, "versionNonce": 20102, "isDeleted": false, "groupIds": ["entry_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "ellipse", "id": "build_trigger", "x": 100, "y": 410, "width": 230, "height": 80,
+      "strokeColor": "#c2410c", "backgroundColor": "#fed7aa", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20010,
+      "version": 1, "versionNonce": 20110, "isDeleted": false, "groupIds": ["entry_group"],
+      "boundElements": [{"id": "build_trigger_text", "type": "text"}, {"id": "arrow_trigger_pyproject", "type": "arrow"}],
+      "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "build_trigger_text", "x": 131, "y": 428, "width": 168, "height": 45,
+      "text": "pip wheel / build\nPEP 517 frontend", "originalText": "pip wheel / build\nPEP 517 frontend",
+      "fontSize": 16, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20011,
+      "version": 1, "versionNonce": 20111, "isDeleted": false, "groupIds": ["entry_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "build_trigger", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "pyproject", "x": 410, "y": 380, "width": 330, "height": 140,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#60a5fa", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20012,
+      "version": 1, "versionNonce": 20112, "isDeleted": false, "groupIds": ["entry_group"],
+      "boundElements": [{"id": "pyproject_text", "type": "text"}, {"id": "arrow_trigger_pyproject", "type": "arrow"}, {"id": "arrow_pyproject_backend", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "pyproject_text", "x": 430, "y": 392, "width": 290, "height": 112,
+      "text": "pyproject.toml\n[build-system]\nrequires:\nsetuptools / cmake / ninja / torch\nsetuptools-rust / setuptools-scm\njinja2\nbuild-backend =\nsetuptools.build_meta", "originalText": "pyproject.toml\n[build-system]\nrequires:\nsetuptools / cmake / ninja / torch\nsetuptools-rust / setuptools-scm\njinja2\nbuild-backend =\nsetuptools.build_meta",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20013,
+      "version": 1, "versionNonce": 20113, "isDeleted": false, "groupIds": ["entry_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "pyproject", "lineHeight": 1.15
+    },
+    {
+      "type": "rectangle", "id": "setuptools_backend", "x": 830, "y": 395, "width": 280, "height": 110,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20014,
+      "version": 1, "versionNonce": 20114, "isDeleted": false, "groupIds": ["entry_group"],
+      "boundElements": [{"id": "setuptools_backend_text", "type": "text"}, {"id": "arrow_pyproject_backend", "type": "arrow"}, {"id": "arrow_backend_setup", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "setuptools_backend_text", "x": 862, "y": 420, "width": 216, "height": 62,
+      "text": "setuptools.build_meta\ncreates isolated build env\ninvokes setup.py commands", "originalText": "setuptools.build_meta\ncreates isolated build env\ninvokes setup.py commands",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20015,
+      "version": 1, "versionNonce": 20115, "isDeleted": false, "groupIds": ["entry_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "setuptools_backend", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "setup_py", "x": 1210, "y": 360, "width": 410, "height": 180,
+      "strokeColor": "#6d28d9", "backgroundColor": "#ddd6fe", "fillStyle": "solid", "strokeWidth": 4,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20016,
+      "version": 1, "versionNonce": 20116, "isDeleted": false, "groupIds": ["entry_group"],
+      "boundElements": [{"id": "setup_py_text", "type": "text"}, {"id": "arrow_backend_setup", "type": "arrow"}, {"id": "arrow_setup_python", "type": "arrow"}, {"id": "arrow_setup_cmake", "type": "arrow"}, {"id": "arrow_setup_cargo", "type": "arrow"}, {"id": "arrow_setup_precompiled", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "setup_py_text", "x": 1235, "y": 375, "width": 360, "height": 150,
+      "text": "setup.py · dynamic build graph\n\nload vllm/envs.py + tools/build_rust.py\nby path; detect VLLM_TARGET_DEVICE\nget_vllm_version() / get_requirements()\nassemble CMakeExtension[] / RustExtension[]\nchoose build_ext / build_rust command classes\nsetup(...) = Python distribution\naggregation point", "originalText": "setup.py · dynamic build graph\n\nload vllm/envs.py + tools/build_rust.py\nby path; detect VLLM_TARGET_DEVICE\nget_vllm_version() / get_requirements()\nassemble CMakeExtension[] / RustExtension[]\nchoose build_ext / build_rust command classes\nsetup(...) = Python distribution\naggregation point",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20017,
+      "version": 1, "versionNonce": 20117, "isDeleted": false, "groupIds": ["entry_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "setup_py", "lineHeight": 1.15
+    },
+    {
+      "type": "text", "id": "setup_inputs_note", "x": 1710, "y": 370, "width": 560, "height": 150,
+      "text": "Packaging inputs read by setup.py\n\n• requirements/common.txt + cuda/rocm/cpu/... runtime files\n• setuptools-scm → version + device/precompiled suffix\n• PyTorch variant + host platform + explicit env\n• package_data / console script / entry points\n\nBuild/test/docs/lint requirement files do not all become install_requires.", "originalText": "Packaging inputs read by setup.py\n\n• requirements/common.txt + cuda/rocm/cpu/... runtime files\n• setuptools-scm → version + device/precompiled suffix\n• PyTorch variant + host platform + explicit env\n• package_data / console script / entry points\n\nBuild/test/docs/lint requirement files do not all become install_requires.",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20018,
+      "version": 1, "versionNonce": 20118, "isDeleted": false, "groupIds": ["entry_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_trigger_pyproject", "x": 332, "y": 450, "width": 76, "height": 0,
+      "strokeColor": "#c2410c", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20020,
+      "version": 1, "versionNonce": 20120, "isDeleted": false, "groupIds": ["entry_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [76, 0]],
+      "startBinding": {"elementId": "build_trigger", "focus": 0, "gap": 2}, "endBinding": {"elementId": "pyproject", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_pyproject_backend", "x": 742, "y": 450, "width": 86, "height": 0,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20021,
+      "version": 1, "versionNonce": 20121, "isDeleted": false, "groupIds": ["entry_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [86, 0]],
+      "startBinding": {"elementId": "pyproject", "focus": 0, "gap": 2}, "endBinding": {"elementId": "setuptools_backend", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_backend_setup", "x": 1112, "y": 450, "width": 96, "height": 0,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20022,
+      "version": 1, "versionNonce": 20122, "isDeleted": false, "groupIds": ["entry_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [96, 0]],
+      "startBinding": {"elementId": "setuptools_backend", "focus": 0, "gap": 2}, "endBinding": {"elementId": "setup_py", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "entry_invariant_note", "x": 480, "y": 555, "width": 1110, "height": 40,
+      "text": "PEP 517 build requirements 只创建 build environment；setup.py 选择的 platform runtime requirements 才进入 wheel metadata 的 install_requires。", "originalText": "PEP 517 build requirements 只创建 build environment；setup.py 选择的 platform runtime requirements 才进入 wheel metadata 的 install_requires。",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 20023,
+      "version": 1, "versionNonce": 20123, "isDeleted": false, "groupIds": ["entry_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "branch_boundary", "x": 70, "y": 660, "width": 2260, "height": 680,
+      "strokeColor": "#93c5fd", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30001,
+      "version": 1, "versionNonce": 30101, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "branch_title", "x": 92, "y": 677, "width": 1100, "height": 30,
+      "text": "Level 2 · setup.py fan-out：Python、CMake、Cargo 与 precompiled reuse", "originalText": "Level 2 · setup.py fan-out：Python、CMake、Cargo 与 precompiled reuse",
+      "fontSize": 22, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30002,
+      "version": 1, "versionNonce": 30102, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "line", "id": "lane_divider_python", "x": 450, "y": 720, "width": 0, "height": 590,
+      "strokeColor": "#93c5fd", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30003,
+      "version": 1, "versionNonce": 30103, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 590]]
+    },
+    {
+      "type": "line", "id": "lane_divider_cmake", "x": 1480, "y": 720, "width": 0, "height": 590,
+      "strokeColor": "#93c5fd", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30004,
+      "version": 1, "versionNonce": 30104, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 590]]
+    },
+    {
+      "type": "line", "id": "lane_divider_cargo", "x": 1940, "y": 720, "width": 0, "height": 590,
+      "strokeColor": "#93c5fd", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30005,
+      "version": 1, "versionNonce": 30105, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 590]]
+    },
+    {
+      "type": "text", "id": "python_lane_title", "x": 90, "y": 725, "width": 330, "height": 25,
+      "text": "Python package + metadata", "originalText": "Python package + metadata", "fontSize": 18, "fontFamily": 3,
+      "textAlign": "center", "verticalAlign": "top", "strokeColor": "#1e40af", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 30006, "version": 1, "versionNonce": 30106, "isDeleted": false,
+      "groupIds": ["branch_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "python_package_branch", "x": 95, "y": 780, "width": 330, "height": 430,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#60a5fa", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30010,
+      "version": 1, "versionNonce": 30110, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "python_package_text", "type": "text"}, {"id": "arrow_setup_python", "type": "arrow"}, {"id": "arrow_python_stage", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "python_package_text", "x": 115, "y": 800, "width": 290, "height": 390,
+      "text": "setuptools package discovery\n\nvllm/**/*.py\nPython APIs / Engine / Scheduler\nWorker / ModelRunner / wrappers\nPython custom-op wrappers\n\nproject metadata\nversion from setuptools-scm\nrequires-python / dependencies\nconsole script: vllm\nplugin entry points\n\nget_requirements()\ncommon + selected cuda/rocm/cpu/...\n→ install_requires\n\npackage_data\nconfigs · headers · static assets\nlibs · vendored/JIT source packages\n\nNo compiler needed\nfor this lane itself", "originalText": "setuptools package discovery\n\nvllm/**/*.py\nPython APIs / Engine / Scheduler\nWorker / ModelRunner / wrappers\nPython custom-op wrappers\n\nproject metadata\nversion from setuptools-scm\nrequires-python / dependencies\nconsole script: vllm\nplugin entry points\n\nget_requirements()\ncommon + selected cuda/rocm/cpu/...\n→ install_requires\n\npackage_data\nconfigs · headers · static assets\nlibs · vendored/JIT source packages\n\nNo compiler needed\nfor this lane itself",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30011,
+      "version": 1, "versionNonce": 30111, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "python_package_branch", "lineHeight": 1.2
+    },
+    {
+      "type": "text", "id": "cmake_lane_title", "x": 490, "y": 725, "width": 950, "height": 25,
+      "text": "CMake native extensions · configure once, build/install selected components", "originalText": "CMake native extensions · configure once, build/install selected components",
+      "fontSize": 18, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30012,
+      "version": 1, "versionNonce": 30112, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "cmake_configure", "x": 500, "y": 780, "width": 330, "height": 135,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30013,
+      "version": 1, "versionNonce": 30113, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "cmake_configure_text", "type": "text"}, {"id": "arrow_setup_cmake", "type": "arrow"}, {"id": "arrow_cmake_device", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "cmake_configure_text", "x": 536, "y": 805, "width": 258, "height": 85,
+      "text": "cmake_build_ext.configure()\nfind exact Python + Torch\nselect CXX / CUDA / HIP\narches + flags + compiler cache\nFetchContent / external projects\nuser CMAKE_ARGS", "originalText": "cmake_build_ext.configure()\nfind exact Python + Torch\nselect CXX / CUDA / HIP\narches + flags + compiler cache\nFetchContent / external projects\nuser CMAKE_ARGS",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30014,
+      "version": 1, "versionNonce": 30114, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "cmake_configure", "lineHeight": 1.25
+    },
+    {
+      "type": "diamond", "id": "device_decision", "x": 920, "y": 775, "width": 250, "height": 145,
+      "strokeColor": "#b45309", "backgroundColor": "#fef3c7", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30015,
+      "version": 1, "versionNonce": 30115, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "device_decision_text", "type": "text"}, {"id": "arrow_cmake_device", "type": "arrow"}, {"id": "arrow_device_cuda", "type": "arrow"}, {"id": "arrow_device_rocm", "type": "arrow"}, {"id": "arrow_device_cpu", "type": "arrow"}],
+      "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "device_decision_text", "x": 979, "y": 811, "width": 132, "height": 73,
+      "text": "VLLM_TARGET_DEVICE\n+ installed Torch variant\n+ host platform\n\nCUDA / ROCm / CPU", "originalText": "VLLM_TARGET_DEVICE\n+ installed Torch variant\n+ host platform\n\nCUDA / ROCm / CPU",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30016,
+      "version": 1, "versionNonce": 30116, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "device_decision", "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_cmake_device", "x": 832, "y": 848, "width": 86, "height": 0,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30017,
+      "version": 1, "versionNonce": 30117, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [86, 0]],
+      "startBinding": {"elementId": "cmake_configure", "focus": 0, "gap": 2}, "endBinding": {"elementId": "device_decision", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "rectangle", "id": "cuda_targets", "x": 480, "y": 990, "width": 300, "height": 145,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#60a5fa", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30018,
+      "version": 1, "versionNonce": 30118, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "cuda_targets_text", "type": "text"}, {"id": "arrow_device_cuda", "type": "arrow"}, {"id": "arrow_cuda_install", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "cuda_targets_text", "x": 514, "y": 1014, "width": 232, "height": 97,
+      "text": "CUDA / NVCC\n_C_stable_libtorch\n_moe_C_stable_libtorch\ncumem_allocator + optional targets\nFlashAttention / FlashMLA / DeepGEMM\nTriton / CuTe DSL copy/JIT packages", "originalText": "CUDA / NVCC\n_C_stable_libtorch\n_moe_C_stable_libtorch\ncumem_allocator + optional targets\nFlashAttention / FlashMLA / DeepGEMM\nTriton / CuTe DSL copy/JIT packages",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30019,
+      "version": 1, "versionNonce": 30119, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "cuda_targets", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "rocm_targets", "x": 825, "y": 990, "width": 300, "height": 145,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#60a5fa", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30020,
+      "version": 1, "versionNonce": 30120, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "rocm_targets_text", "type": "text"}, {"id": "arrow_device_rocm", "type": "arrow"}, {"id": "arrow_rocm_install", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "rocm_targets_text", "x": 859, "y": 1014, "width": 232, "height": 97,
+      "text": "ROCm / HIPCC\nshared hipify_all\nlegacy _C + stable _C / _moe_C\n_rocm_C (gfx-gated sources)\nreuse .cu → generated .hip\nprefer wheel libamdhip64", "originalText": "ROCm / HIPCC\nshared hipify_all\nlegacy _C + stable _C / _moe_C\n_rocm_C (gfx-gated sources)\nreuse .cu → generated .hip\nprefer wheel libamdhip64",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30021,
+      "version": 1, "versionNonce": 30121, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "rocm_targets", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "cpu_targets", "x": 1170, "y": 990, "width": 280, "height": 145,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#60a5fa", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30022,
+      "version": 1, "versionNonce": 30122, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "cpu_targets_text", "type": "text"}, {"id": "arrow_device_cpu", "type": "arrow"}, {"id": "arrow_cpu_install", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "cpu_targets_text", "x": 1202, "y": 1014, "width": 216, "height": 97,
+      "text": "CPU / CXX\nOpenMP / NUMA / ISA detection\nx86 variants:\n_C (AVX512 BF16/VNNI/AMX)\n_C_AVX512\n_C_AVX2 fallback\nnon-x86 → one _C", "originalText": "CPU / CXX\nOpenMP / NUMA / ISA detection\nx86 variants:\n_C (AVX512 BF16/VNNI/AMX)\n_C_AVX512\n_C_AVX2 fallback\nnon-x86 → one _C",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30023,
+      "version": 1, "versionNonce": 30123, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "cpu_targets", "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_device_cuda", "x": 1000, "y": 922, "width": 370, "height": 66,
+      "strokeColor": "#b45309", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30024,
+      "version": 1, "versionNonce": 30124, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 35], [-370, 35], [-370, 66]],
+      "startBinding": {"elementId": "device_decision", "focus": 0.5, "gap": 2}, "endBinding": {"elementId": "cuda_targets", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_device_rocm", "x": 1045, "y": 922, "width": 70, "height": 66,
+      "strokeColor": "#b45309", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30025,
+      "version": 1, "versionNonce": 30125, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 35], [-70, 35], [-70, 66]],
+      "startBinding": {"elementId": "device_decision", "focus": 0, "gap": 2}, "endBinding": {"elementId": "rocm_targets", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_device_cpu", "x": 1090, "y": 922, "width": 220, "height": 66,
+      "strokeColor": "#b45309", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30026,
+      "version": 1, "versionNonce": 30126, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 35], [220, 35], [220, 66]],
+      "startBinding": {"elementId": "device_decision", "focus": -0.5, "gap": 2}, "endBinding": {"elementId": "cpu_targets", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "rectangle", "id": "cmake_install", "x": 650, "y": 1190, "width": 650, "height": 115,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30027,
+      "version": 1, "versionNonce": 30127, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "cmake_install_text", "type": "text"}, {"id": "arrow_cuda_install", "type": "arrow"}, {"id": "arrow_rocm_install", "type": "arrow"}, {"id": "arrow_cpu_install", "type": "arrow"}, {"id": "arrow_cmake_stage", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "cmake_install_text", "x": 705, "y": 1213, "width": 540, "height": 69,
+      "text": "define_extension_target(name, language, sources, arches, ABI, libs)\n↓\ncmake --build --target=<selected names>\ncmake --install --component=<same target>\n↓\nsetuptools extension output directory", "originalText": "define_extension_target(name, language, sources, arches, ABI, libs)\n↓\ncmake --build --target=<selected names>\ncmake --install --component=<same target>\n↓\nsetuptools extension output directory",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30028,
+      "version": 1, "versionNonce": 30128, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "cmake_install", "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_cuda_install", "x": 630, "y": 1137, "width": 145, "height": 51,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30029,
+      "version": 1, "versionNonce": 30129, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 25], [145, 25], [145, 51]],
+      "startBinding": {"elementId": "cuda_targets", "focus": 0, "gap": 2}, "endBinding": {"elementId": "cmake_install", "focus": -0.6, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_rocm_install", "x": 975, "y": 1137, "width": 0, "height": 51,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30030,
+      "version": 1, "versionNonce": 30130, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 51]],
+      "startBinding": {"elementId": "rocm_targets", "focus": 0, "gap": 2}, "endBinding": {"elementId": "cmake_install", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_cpu_install", "x": 1310, "y": 1137, "width": 145, "height": 51,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30031,
+      "version": 1, "versionNonce": 30131, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 25], [-145, 25], [-145, 51]],
+      "startBinding": {"elementId": "cpu_targets", "focus": 0, "gap": 2}, "endBinding": {"elementId": "cmake_install", "focus": 0.6, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "cargo_lane_title", "x": 1500, "y": 725, "width": 420, "height": 25,
+      "text": "Cargo + setuptools-rust", "originalText": "Cargo + setuptools-rust", "fontSize": 18, "fontFamily": 3,
+      "textAlign": "center", "verticalAlign": "top", "strokeColor": "#1e40af", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "angle": 0, "seed": 30040, "version": 1, "versionNonce": 30140, "isDeleted": false,
+      "groupIds": ["branch_group"], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "cargo_workspace", "x": 1510, "y": 780, "width": 410, "height": 125,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#93c5fd", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30041,
+      "version": 1, "versionNonce": 30141, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "cargo_workspace_text", "type": "text"}, {"id": "arrow_setup_cargo", "type": "arrow"}, {"id": "arrow_cargo_setuptools", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "cargo_workspace_text", "x": 1555, "y": 803, "width": 320, "height": 79,
+      "text": "rust-toolchain.toml\nrust/Cargo.toml workspace + Cargo.lock\n\ncmd crate → [[bin]] vllm-rs\nparser/python crate → cdylib + PyO3", "originalText": "rust-toolchain.toml\nrust/Cargo.toml workspace + Cargo.lock\n\ncmd crate → [[bin]] vllm-rs\nparser/python crate → cdylib + PyO3",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30042,
+      "version": 1, "versionNonce": 30142, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "cargo_workspace", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "setuptools_rust", "x": 1510, "y": 960, "width": 410, "height": 100,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#60a5fa", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30043,
+      "version": 1, "versionNonce": 30143, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "setuptools_rust_text", "type": "text"}, {"id": "arrow_cargo_setuptools", "type": "arrow"}, {"id": "arrow_rust_exec", "type": "arrow"}, {"id": "arrow_rust_pyo3", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "setuptools_rust_text", "x": 1554, "y": 981, "width": 322, "height": 58,
+      "text": "tools/build_rust.py::rust_extensions()\nsetuptools-rust invokes Cargo\noptional unless VLLM_REQUIRE_RUST_FRONTEND\nbuild_rust.sh can build same artifacts in-place", "originalText": "tools/build_rust.py::rust_extensions()\nsetuptools-rust invokes Cargo\noptional unless VLLM_REQUIRE_RUST_FRONTEND\nbuild_rust.sh can build same artifacts in-place",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#ffffff", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30044,
+      "version": 1, "versionNonce": 30144, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "setuptools_rust", "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_cargo_setuptools", "x": 1715, "y": 907, "width": 0, "height": 51,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30045,
+      "version": 1, "versionNonce": 30145, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 51]],
+      "startBinding": {"elementId": "cargo_workspace", "focus": 0, "gap": 2}, "endBinding": {"elementId": "setuptools_rust", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "rectangle", "id": "rust_exec_artifact", "x": 1500, "y": 1130, "width": 195, "height": 100,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30046,
+      "version": 1, "versionNonce": 30146, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "rust_exec_artifact_text", "type": "text"}, {"id": "arrow_rust_exec", "type": "arrow"}, {"id": "arrow_rust_stage", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "rust_exec_artifact_text", "x": 1524, "y": 1151, "width": 147, "height": 58,
+      "text": "Binding.Exec\nvllm.vllm-rs\n→ vllm/vllm-rs\nexecutable", "originalText": "Binding.Exec\nvllm.vllm-rs\n→ vllm/vllm-rs\nexecutable",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30047,
+      "version": 1, "versionNonce": 30147, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "rust_exec_artifact", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "rust_pyo3_artifact", "x": 1725, "y": 1130, "width": 195, "height": 100,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30048,
+      "version": 1, "versionNonce": 30148, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "rust_pyo3_artifact_text", "type": "text"}, {"id": "arrow_rust_pyo3", "type": "arrow"}, {"id": "arrow_pyo3_stage", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "rust_pyo3_artifact_text", "x": 1749, "y": 1151, "width": 147, "height": 58,
+      "text": "Binding.PyO3\nvllm._rust_tool_parser\n→ _rust_tool_parser*.so\nimportable module", "originalText": "Binding.PyO3\nvllm._rust_tool_parser\n→ _rust_tool_parser*.so\nimportable module",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30049,
+      "version": 1, "versionNonce": 30149, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "rust_pyo3_artifact", "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_rust_exec", "x": 1650, "y": 1062, "width": 52, "height": 66,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30050,
+      "version": 1, "versionNonce": 30150, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 30], [-52, 30], [-52, 66]],
+      "startBinding": {"elementId": "setuptools_rust", "focus": 0.3, "gap": 2}, "endBinding": {"elementId": "rust_exec_artifact", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_rust_pyo3", "x": 1780, "y": 1062, "width": 42, "height": 66,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30051,
+      "version": 1, "versionNonce": 30151, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 30], [42, 30], [42, 66]],
+      "startBinding": {"elementId": "setuptools_rust", "focus": -0.3, "gap": 2}, "endBinding": {"elementId": "rust_pyo3_artifact", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "precompiled_lane_title", "x": 1960, "y": 725, "width": 350, "height": 25,
+      "text": "Precompiled reuse（optional path）", "originalText": "Precompiled reuse（optional path）",
+      "fontSize": 17, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30060,
+      "version": 1, "versionNonce": 30160, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "precompiled_source", "x": 1980, "y": 780, "width": 310, "height": 100,
+      "strokeColor": "#1e40af", "backgroundColor": "#dbeafe", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30061,
+      "version": 1, "versionNonce": 30161, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "precompiled_source_text", "type": "text"}, {"id": "arrow_setup_precompiled", "type": "arrow"}, {"id": "arrow_precompiled_extract", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "precompiled_source_text", "x": 2012, "y": 799, "width": 246, "height": 63,
+      "text": "VLLM_USE_PRECOMPILED=1\nlocal / remote compatible wheel\nselected by commit + variant + arch\nnot installed as runtime dependency", "originalText": "VLLM_USE_PRECOMPILED=1\nlocal / remote compatible wheel\nselected by commit + variant + arch\nnot installed as runtime dependency",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30062,
+      "version": 1, "versionNonce": 30162, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "precompiled_source", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "precompiled_extract", "x": 1980, "y": 930, "width": 310, "height": 140,
+      "strokeColor": "#1e40af", "backgroundColor": "#dbeafe", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30063,
+      "version": 1, "versionNonce": 30163, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "precompiled_extract_text", "type": "text"}, {"id": "arrow_precompiled_extract", "type": "arrow"}, {"id": "arrow_precompiled_skip", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "precompiled_extract_text", "x": 2012, "y": 954, "width": 246, "height": 92,
+      "text": "extract_precompiled_and_patch_package()\nallowlist extracts\n• native .so\n• vllm-rs executable\n• _rust_*.so\n• vendored/package files\npatch current package_data", "originalText": "extract_precompiled_and_patch_package()\nallowlist extracts\n• native .so\n• vllm-rs executable\n• _rust_*.so\n• vendored/package files\npatch current package_data",
+      "fontSize": 13, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30064,
+      "version": 1, "versionNonce": 30164, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "precompiled_extract", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "precompiled_skip", "x": 1980, "y": 1120, "width": 310, "height": 150,
+      "strokeColor": "#1e40af", "backgroundColor": "#dbeafe", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30065,
+      "version": 1, "versionNonce": 30165, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": [{"id": "precompiled_skip_text", "type": "text"}, {"id": "arrow_precompiled_skip", "type": "arrow"}, {"id": "arrow_precompiled_stage", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "precompiled_skip_text", "x": 2012, "y": 1138, "width": 246, "height": 110,
+      "text": "precompiled_build_ext\n→ skip local CMake\n\nprecompiled_build_rust\n→ skip Cargo if both artifacts complete\n→ otherwise fallback to local Rust build\n\nrepackage with current Python source", "originalText": "precompiled_build_ext\n→ skip local CMake\n\nprecompiled_build_rust\n→ skip Cargo if both artifacts complete\n→ otherwise fallback to local Rust build\n\nrepackage with current Python source",
+      "fontSize": 12, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30066,
+      "version": 1, "versionNonce": 30166, "isDeleted": false, "groupIds": ["branch_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "precompiled_skip", "lineHeight": 1.2
+    },
+    {
+      "type": "arrow", "id": "arrow_precompiled_extract", "x": 2135, "y": 882, "width": 0, "height": 46,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30067,
+      "version": 1, "versionNonce": 30167, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 46]],
+      "startBinding": {"elementId": "precompiled_source", "focus": 0, "gap": 2}, "endBinding": {"elementId": "precompiled_extract", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_precompiled_skip", "x": 2135, "y": 1072, "width": 0, "height": 46,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30068,
+      "version": 1, "versionNonce": 30168, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 46]],
+      "startBinding": {"elementId": "precompiled_extract", "focus": 0, "gap": 2}, "endBinding": {"elementId": "precompiled_skip", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_setup_python", "x": 1280, "y": 542, "width": 1200, "height": 298,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30070,
+      "version": 1, "versionNonce": 30170, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 100], [-1200, 100], [-1200, 298], [-1187, 298]],
+      "startBinding": {"elementId": "setup_py", "focus": 0.4, "gap": 2}, "endBinding": {"elementId": "python_package_branch", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_setup_cmake", "x": 1380, "y": 542, "width": 910, "height": 298,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30071,
+      "version": 1, "versionNonce": 30171, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 125], [-910, 125], [-910, 298], [-882, 298]],
+      "startBinding": {"elementId": "setup_py", "focus": 0, "gap": 2}, "endBinding": {"elementId": "cmake_configure", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_setup_cargo", "x": 1550, "y": 542, "width": 60, "height": 298,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30072,
+      "version": 1, "versionNonce": 30172, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 148], [-60, 148], [-60, 298], [-42, 298]],
+      "startBinding": {"elementId": "setup_py", "focus": -0.4, "gap": 2}, "endBinding": {"elementId": "cargo_workspace", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_setup_precompiled", "x": 1600, "y": 542, "width": 378, "height": 288,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 30073,
+      "version": 1, "versionNonce": 30173, "isDeleted": false, "groupIds": ["branch_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 78], [350, 78], [350, 288], [378, 288]],
+      "startBinding": {"elementId": "setup_py", "focus": -0.5, "gap": 2}, "endBinding": {"elementId": "precompiled_source", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "rectangle", "id": "wheel_boundary", "x": 70, "y": 1380, "width": 2260, "height": 310,
+      "strokeColor": "#93c5fd", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40001,
+      "version": 1, "versionNonce": 40101, "isDeleted": false, "groupIds": ["wheel_group"], "boundElements": null,
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "wheel_title", "x": 92, "y": 1397, "width": 900, "height": 30,
+      "text": "Level 3 · wheel staging 汇聚所有 artifact", "originalText": "Level 3 · wheel staging 汇聚所有 artifact",
+      "fontSize": 22, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40002,
+      "version": 1, "versionNonce": 40102, "isDeleted": false, "groupIds": ["wheel_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "wheel_staging", "x": 480, "y": 1450, "width": 1350, "height": 210,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 4,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40010,
+      "version": 1, "versionNonce": 40110, "isDeleted": false, "groupIds": ["wheel_group"],
+      "boundElements": [{"id": "wheel_staging_text", "type": "text"}, {"id": "arrow_python_stage", "type": "arrow"}, {"id": "arrow_cmake_stage", "type": "arrow"}, {"id": "arrow_rust_stage", "type": "arrow"}, {"id": "arrow_pyo3_stage", "type": "arrow"}, {"id": "arrow_precompiled_stage", "type": "arrow"}, {"id": "arrow_stage_wheel", "type": "arrow"}],
+      "link": null, "locked": false, "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "wheel_staging_text", "x": 530, "y": 1481, "width": 1250, "height": 127,
+      "text": "setuptools setup(...) / wheel staging directory\n\nPython package                       CMake outputs                         Cargo outputs\nvllm/**/*.py                         _C*.so / _rocm_C / allocator         vllm/vllm-rs (executable)\nAPI + Engine + wrappers              stable-libtorch / MoE / optional     _rust_tool_parser*.so (PyO3)\n\npackage_data / vendored/JIT source / configs / headers / libs / static assets\ndistribution metadata: version · install_requires · console script · plugin entry points\n\nsource build：local toolchains produce artifacts  ·  precompiled build：extracted artifacts join current Python source", "originalText": "setuptools setup(...) / wheel staging directory\n\nPython package                       CMake outputs                         Cargo outputs\nvllm/**/*.py                         _C*.so / _rocm_C / allocator         vllm/vllm-rs (executable)\nAPI + Engine + wrappers              stable-libtorch / MoE / optional     _rust_tool_parser*.so (PyO3)\n\npackage_data / vendored/JIT source / configs / headers / libs / static assets\ndistribution metadata: version · install_requires · console script · plugin entry points\n\nsource build：local toolchains produce artifacts  ·  precompiled build：extracted artifacts join current Python source",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40011,
+      "version": 1, "versionNonce": 40111, "isDeleted": false, "groupIds": ["wheel_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "wheel_staging", "lineHeight": 1.25
+    },
+    {
+      "type": "ellipse", "id": "wheel_output", "x": 1990, "y": 1475, "width": 300, "height": 140,
+      "strokeColor": "#047857", "backgroundColor": "#a7f3d0", "fillStyle": "solid", "strokeWidth": 4,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40012,
+      "version": 1, "versionNonce": 40112, "isDeleted": false, "groupIds": ["wheel_group"],
+      "boundElements": [{"id": "wheel_output_text", "type": "text"}, {"id": "arrow_stage_wheel", "type": "arrow"}],
+      "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "wheel_output_text", "x": 2035, "y": 1513, "width": 210, "height": 65,
+      "text": "vllm-<version>-<tag>.whl\n\ninstallable Python distribution\nvariant suffix records build target", "originalText": "vllm-<version>-<tag>.whl\n\ninstallable Python distribution\nvariant suffix records build target",
+      "fontSize": 16, "fontFamily": 3, "textAlign": "center", "verticalAlign": "middle",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40013,
+      "version": 1, "versionNonce": 40113, "isDeleted": false, "groupIds": ["wheel_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "wheel_output", "lineHeight": 1.25
+    },
+    {
+      "type": "arrow", "id": "arrow_python_stage", "x": 260, "y": 1212, "width": 350, "height": 236,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40020,
+      "version": 1, "versionNonce": 40120, "isDeleted": false, "groupIds": ["wheel_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 130], [350, 130], [350, 236]],
+      "startBinding": {"elementId": "python_package_branch", "focus": 0, "gap": 2}, "endBinding": {"elementId": "wheel_staging", "focus": -0.8, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_cmake_stage", "x": 975, "y": 1307, "width": 0, "height": 141,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40021,
+      "version": 1, "versionNonce": 40121, "isDeleted": false, "groupIds": ["wheel_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 141]],
+      "startBinding": {"elementId": "cmake_install", "focus": 0, "gap": 2}, "endBinding": {"elementId": "wheel_staging", "focus": -0.2, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_rust_stage", "x": 1598, "y": 1232, "width": 0, "height": 216,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40022,
+      "version": 1, "versionNonce": 40122, "isDeleted": false, "groupIds": ["wheel_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 216]],
+      "startBinding": {"elementId": "rust_exec_artifact", "focus": 0, "gap": 2}, "endBinding": {"elementId": "wheel_staging", "focus": 0.6, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_pyo3_stage", "x": 1822, "y": 1232, "width": 102, "height": 216,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40023,
+      "version": 1, "versionNonce": 40123, "isDeleted": false, "groupIds": ["wheel_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 100], [-102, 100], [-102, 216]],
+      "startBinding": {"elementId": "rust_pyo3_artifact", "focus": 0, "gap": 2}, "endBinding": {"elementId": "wheel_staging", "focus": 0.85, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_precompiled_stage", "x": 2135, "y": 1272, "width": 303, "height": 240,
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 3,
+      "strokeStyle": "dashed", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40024,
+      "version": 1, "versionNonce": 40124, "isDeleted": false, "groupIds": ["wheel_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [0, 120], [-303, 120], [-303, 240]],
+      "startBinding": {"elementId": "precompiled_skip", "focus": 0, "gap": 2}, "endBinding": {"elementId": "wheel_staging", "focus": -0.9, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "arrow", "id": "arrow_stage_wheel", "x": 1832, "y": 1545, "width": 156, "height": 0,
+      "strokeColor": "#047857", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 4,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40025,
+      "version": 1, "versionNonce": 40125, "isDeleted": false, "groupIds": ["wheel_group"], "boundElements": null,
+      "link": null, "locked": false, "points": [[0, 0], [156, 0]],
+      "startBinding": {"elementId": "wheel_staging", "focus": 0, "gap": 2}, "endBinding": {"elementId": "wheel_output", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow"
+    },
+    {
+      "type": "text", "id": "wheel_abi_note", "x": 95, "y": 1480, "width": 340, "height": 130,
+      "text": "Compatibility still matters\n\nPython ABI / abi3 vs free-threaded\nPyTorch stable C shim target floor\nCUDA/ROCm driver + runtime + arches\nsource wrapper/schema/protocol consistency\n\n“download succeeded” ≠ ABI proof", "originalText": "Compatibility still matters\n\nPython ABI / abi3 vs free-threaded\nPyTorch stable C shim target floor\nCUDA/ROCm driver + runtime + arches\nsource wrapper/schema/protocol consistency\n\n“download succeeded” ≠ ABI proof",
+      "fontSize": 14, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40026,
+      "version": 1, "versionNonce": 40126, "isDeleted": false, "groupIds": ["wheel_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "text", "id": "evidence_title", "x": 72, "y": 1730, "width": 700, "height": 32,
+      "text": "Level 4 · 名称映射与验证边界", "originalText": "Level 4 · 名称映射与验证边界",
+      "fontSize": 23, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40030,
+      "version": 1, "versionNonce": 40130, "isDeleted": false, "groupIds": ["evidence_group"], "boundElements": null,
+      "link": null, "locked": false, "containerId": null, "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "mapping_evidence", "x": 70, "y": 1790, "width": 1270, "height": 270,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#1e293b", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40031,
+      "version": 1, "versionNonce": 40131, "isDeleted": false, "groupIds": ["evidence_group"],
+      "boundElements": [{"id": "mapping_evidence_text", "type": "text"}], "link": null, "locked": false,
+      "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "mapping_evidence_text", "x": 110, "y": 1818, "width": 1190, "height": 220,
+      "text": "setup.py: CMakeExtension logical name\n       = CMake target name\n       = cmake --install component name\n       → setuptools package destination / import name\n\nshared library filename ≠ torch operator namespace\nvllm/_C_stable_libtorch*.so --import/init--> STABLE_TORCH_LIBRARY_FRAGMENT(_C, ops)\n                                           → torch.ops._C.<op>\n\nCargo artifacts are different kinds:\nvllm/vllm-rs = Binding.Exec executable    ·    _rust_tool_parser*.so = Binding.PyO3 import module", "originalText": "setup.py: CMakeExtension logical name\n       = CMake target name\n       = cmake --install component name\n       → setuptools package destination / import name\n\nshared library filename ≠ torch operator namespace\nvllm/_C_stable_libtorch*.so --import/init--> STABLE_TORCH_LIBRARY_FRAGMENT(_C, ops)\n                                           → torch.ops._C.<op>\n\nCargo artifacts are different kinds:\nvllm/vllm-rs = Binding.Exec executable    ·    _rust_tool_parser*.so = Binding.PyO3 import module",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#22c55e", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40032,
+      "version": 1, "versionNonce": 40132, "isDeleted": false, "groupIds": ["evidence_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "mapping_evidence", "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle", "id": "ci_validation_note", "x": 1380, "y": 1790, "width": 950, "height": 270,
+      "strokeColor": "#1e3a5f", "backgroundColor": "#93c5fd", "fillStyle": "solid", "strokeWidth": 2,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40033,
+      "version": 1, "versionNonce": 40133, "isDeleted": false, "groupIds": ["evidence_group"],
+      "boundElements": [{"id": "ci_validation_note_text", "type": "text"}], "link": null, "locked": false,
+      "roundness": {"type": 3}
+    },
+    {
+      "type": "text", "id": "ci_validation_note_text", "x": 1425, "y": 1818, "width": 860, "height": 225,
+      "text": "Docker / CI expands the same graph into a variant matrix\nCUDA version × x86_64/aarch64 · CPU · macOS · ROCm recipes\ncsrc wheel can act as an internal native artifact cache before final source aggregation\n\nEvidence ladder（cannot substitute for one another）\n1. build succeeds      → compiler/linker accepted inputs\n2. import succeeds     → loader + registration work\n3. correctness test    → op/model behavior is correct\n4. benchmark           → performance impact\n\nReview target changes against every affected architecture/ABI matrix, not one local build.", "originalText": "Docker / CI expands the same graph into a variant matrix\nCUDA version × x86_64/aarch64 · CPU · macOS · ROCm recipes\ncsrc wheel can act as an internal native artifact cache before final source aggregation\n\nEvidence ladder（cannot substitute for one another）\n1. build succeeds      → compiler/linker accepted inputs\n2. import succeeds     → loader + registration work\n3. correctness test    → op/model behavior is correct\n4. benchmark           → performance impact\n\nReview target changes against every affected architecture/ABI matrix, not one local build.",
+      "fontSize": 15, "fontFamily": 3, "textAlign": "left", "verticalAlign": "top",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1,
+      "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 40034,
+      "version": 1, "versionNonce": 40134, "isDeleted": false, "groupIds": ["evidence_group"],
+      "boundElements": null, "link": null, "locked": false, "containerId": "ci_validation_note", "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff",
+    "gridSize": 20
+  },
+  "files": {}
+}
